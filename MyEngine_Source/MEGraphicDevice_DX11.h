@@ -14,13 +14,15 @@ namespace ME::graphics
 	public:
 		GraphicDevice_DX11();
 		~GraphicDevice_DX11();
+		void Initialize();
 		void Draw();
+
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> mContext;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> mRenderTarget;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>	mRenderTargetView;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D>			mDepthStencilBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D>			mDepthStencil;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	mDepthStencilView;
 		Microsoft::WRL::ComPtr<IDXGISwapChain>	mSwapChain;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> mSamplers;

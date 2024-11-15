@@ -3,7 +3,7 @@
 #include "CommonInclude.h"
 #include "MEGameObject.h"
 #include "MEScenes.h"
-
+#include "MEGraphicDevice_DX11.h"
 
 
 namespace ME
@@ -42,6 +42,8 @@ namespace ME
 		void createBuffer(UINT width, UINT height);
 		void initializeEtc();
 
+	private:
+
 		HWND mHwnd;
 		HDC mHdc;
 
@@ -53,9 +55,10 @@ namespace ME
 
 		float mSpeed;
 
-		
 
 		std::vector <Scene*> mScenes;
+
+		std::unique_ptr<graphics::GraphicDevice_DX11> mGraphicDevice;
 	};
 
 }

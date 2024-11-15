@@ -9,6 +9,7 @@
 #include "MEFmod.h"
 
 
+
 namespace ME 
 {
 
@@ -32,10 +33,15 @@ namespace ME
 	void Application::Initialize(HWND hwnd, UINT width, UINT height)
 	{
 	
+
 		 adjustWindowRect(hwnd, width, height);
 		 createBuffer(width, height);
 		 initializeEtc();
+
 		
+		 mGraphicDevice = std::make_unique<graphics::GraphicDevice_DX11>();
+
+		 mGraphicDevice->Initialize();
 		 Fmod::Initialize();
 		 CollisionManager::Iniatialize();
 		 UIManager::Initailize();
@@ -74,7 +80,7 @@ namespace ME
 	void Application::Render()
 	{
 	
-		ClearRenderTarget();
+		mGraphicDevice->Draw();
 
 		Time::Render(mBackHdc);
 		
@@ -82,7 +88,7 @@ namespace ME
 		SceneManager::Render(mBackHdc);
 		UIManager::Render(mBackHdc);
 
-		CopyRenderTarget(mBackHdc, mHdc);
+
 		
 	
 	}
