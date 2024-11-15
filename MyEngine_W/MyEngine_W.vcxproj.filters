@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="MELoadScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="LoadResources.h" />
+    <ClInclude Include="METoolScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="METile.h">
+      <Filter>Contents\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="MECameraScript.h">
+      <Filter>Script\Others</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Contents">
+      <UniqueIdentifier>{945fd437-f4f2-463d-bfe2-86c567d82a8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scenes">
+      <UniqueIdentifier>{0539cc36-b4d1-4691-a517-4f5fc77bd770}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script">
+      <UniqueIdentifier>{2487e8b0-7a9a-4989-b70f-ed09f8743489}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents\Map">
+      <UniqueIdentifier>{2382fb8e-e6cd-4692-a8ce-39c6bdfae09e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script\Others">
+      <UniqueIdentifier>{9d60996d-cdf5-4934-89a8-dd0212567add}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="METitleScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="METoolScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="METile.cpp">
+      <Filter>Contents\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="MECameraScript.cpp">
+      <Filter>Script\Others</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
