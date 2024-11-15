@@ -34,6 +34,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGameObject.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEApplication.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInput.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MELayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMath.h" />

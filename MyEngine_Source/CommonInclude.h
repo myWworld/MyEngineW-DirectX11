@@ -24,4 +24,5 @@
 #include <gdiplus.h>
 #pragma comment(lib,"gdiplus.lib")
 
-#include <wrl.h>
+
+#include "MEGraphics.h"
