@@ -7,6 +7,7 @@
 #include "MEUIManager.h"
 
 #include "MEFmod.h"
+#include "MERenderer.h"
 
 
 
@@ -40,7 +41,8 @@ namespace ME
 
 		
 		 mGraphicDevice = std::make_unique<graphics::GraphicDevice_DX11>();
-
+		 
+		 renderer::Initialize();
 		 mGraphicDevice->Initialize();
 		 Fmod::Initialize();
 		 CollisionManager::Iniatialize();
@@ -103,6 +105,9 @@ namespace ME
 		SceneManager::Release();
 		UIManager::Release();
 		Resources::Release();
+
+
+		renderer::Release();
 
 
 	}
