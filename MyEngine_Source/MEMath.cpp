@@ -1,8 +1,5 @@
 #include "MEMath.h"
 
-
-
-
 	//-------------------------------------------------------------------------------------
 	// SimpleMath.cpp -- Simplified C++ Math wrapper for DirectXMath
 	//
@@ -149,6 +146,8 @@ void Quaternion::LookRotation(const Vector3& forward, const Vector3& up, Quatern
 * Viewport
 *
 ****************************************************************************/
+
+
 
 #if defined(__d3d11_h__) || defined(__d3d11_x_h__)
 static_assert(sizeof(DirectX::SimpleMath::Viewport) == sizeof(D3D11_VIEWPORT), "Size mismatch");

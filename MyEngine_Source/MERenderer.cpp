@@ -1,6 +1,9 @@
 #include "MERenderer.h"
 #include "MEGraphicDevice_DX11.h"
 
+#include "MEResources.h"
+#include "MEShader.h"
+
 namespace ME::renderer
 {
 	Camera* mainCamera = nullptr;
@@ -13,10 +16,6 @@ namespace ME::renderer
 	ID3D11Buffer* indexBuffer = nullptr;
 	ID3D11Buffer* constantBuffer = nullptr;
 
-	ID3DBlob* vsBlob = nullptr;
-	ID3D11VertexShader* vsShader = nullptr;
-	ID3DBlob* psBlob = nullptr;
-	ID3D11PixelShader* psShader = nullptr;
 	ID3D11InputLayout* inputLayouts = nullptr;
 
 	void LoadTriangleMesh()
@@ -42,18 +41,20 @@ namespace ME::renderer
 		LoadTriangleMesh();
 	}
 
+	void LoadShaders()
+	{
+		ME::Resources::Load<graphics::Shader>(L"TriangleShader", L"..\\Shaders_SOURCE\\Triangle");
+	}
+
 	void Initialize()
 	{
 		LoadMeshes();
+		LoadShaders();
 	}
 
 	void Release()
 	{
 		vertexBuffer->Release();
-		vsBlob->Release();
-		vsShader->Release();
-		psBlob->Release();
-		psShader->Release();
 		inputLayouts->Release();
 		indexBuffer->Release();
 		constantBuffer->Release();

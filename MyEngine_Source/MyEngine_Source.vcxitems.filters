@@ -109,6 +109,15 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp">
       <Filter>Graphic_Device</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEMesh.cpp">
+      <Filter>Resource\Mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEMaterial.cpp">
+      <Filter>Resource\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEShader.cpp">
+      <Filter>Resource\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -234,7 +243,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.h">
       <Filter>Graphic_Device</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEMesh.h">
+      <Filter>Resource\Mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEMaterial.h">
+      <Filter>Resource\Material</Filter>
+    </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEShader.h">
+      <Filter>Resource\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -311,6 +329,15 @@
     </Filter>
     <Filter Include="Graphic_Device">
       <UniqueIdentifier>{eea11378-0b74-4ae3-a31d-327f1b789ebe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Graphics">
+      <UniqueIdentifier>{be8631b1-8b6e-4455-b4b7-647add188e51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Material">
+      <UniqueIdentifier>{a363f8f3-55c7-4061-9f01-82588fb07338}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Mesh">
+      <UniqueIdentifier>{f60138c2-ed34-47b4-8135-75d740f0a017}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -37,7 +37,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInput.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MELayer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEMaterial.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMath.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEMesh.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEObject.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MERenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEResource.h" />
@@ -46,6 +48,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MESceneManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScenes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScript.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEShader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MESpriteRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)METexture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)METileMapRenderer.h" />
@@ -77,7 +80,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEInput.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MELayer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEMaterial.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMath.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEMesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MERenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEResource.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEResources.cpp" />
@@ -85,6 +90,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MESceneManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScenes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScript.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEShader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MESpriteRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)METexture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)METileMapRenderer.cpp" />

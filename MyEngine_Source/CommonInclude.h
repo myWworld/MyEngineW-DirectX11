@@ -28,4 +28,3 @@
 #pragma comment(lib,"gdiplus.lib")
 
 
-#include "MEGraphics.h"

@@ -2,6 +2,9 @@
 #include "MEApplication.h"
 #include "MERenderer.h"
 
+#include "MEResources.h"
+#include "MEShader.h"
+
 extern ME::Application application;
 
 namespace ME::graphics
@@ -9,6 +12,9 @@ namespace ME::graphics
 	GraphicDevice_DX11::GraphicDevice_DX11()
 	{
 		ME::graphics::GetDevice() = this;
+
+		if (!CreateDevice())
+			assert(NULL && "Create Device Failed!");
 	}
 	GraphicDevice_DX11::~GraphicDevice_DX11()
 	{
@@ -94,7 +100,7 @@ namespace ME::graphics
 			ID3DBlob* errorBlob = nullptr;
 			const std::wstring shaderFilpath = L"..\\Shaders_SOURCE\\";
 
-			D3DCompileFromFile((shaderFilpath + fileName).c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
+			D3DCompileFromFile((shaderFilpath + fileName + L"VS.hlsl").c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
 				, "main", "vs_5_0", shaderFlags, 0, ppCode, &errorBlob);
 
 			if (errorBlob)
@@ -124,7 +130,7 @@ namespace ME::graphics
 			ID3DBlob* errorBlob = nullptr;
 			const std::wstring shaderFilpath = L"..\\Shaders_SOURCE\\";
 
-			D3DCompileFromFile((shaderFilpath + fileName).c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
+			D3DCompileFromFile((shaderFilpath + fileName+ L"PS.hlsl").c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
 				, "main", "ps_5_0", shaderFlags, 0, ppCode, &errorBlob);
 
 			if (errorBlob)
@@ -162,6 +168,16 @@ namespace ME::graphics
 			return false;
 
 		return true;
+	}
+
+	void GraphicDevice_DX11::BindVS(ID3D11VertexShader * pVertexShader)
+	{
+		mContext->VSSetShader(pVertexShader, 0, 0);
+	}
+
+	void GraphicDevice_DX11::BindPS(ID3D11PixelShader* pPixelShader)
+	{
+		mContext->PSSetShader(pPixelShader, 0, 0);
 	}
 
 	void GraphicDevice_DX11::BindConstantBuffer(eShaderStage stage, eCBType type, ID3D11Buffer* buffer)
@@ -205,14 +221,6 @@ namespace ME::graphics
 
 	void GraphicDevice_DX11::Initialize()
 	{
-		//mDevice;
-	//mContext;
-		
-		if (!(CreateDevice()))
-			assert(NULL && "Create Device Failed!");
-
-
-
 
 #pragma region swapchain desc
 
@@ -275,12 +283,7 @@ namespace ME::graphics
 
 		if (!(CreateDepthStencilView(mDepthStencil.Get(), nullptr, mDepthStencilView.GetAddressOf())))
 			assert(NULL && "Create depthstencilview failed!");
-		
-		if (!(CreateVertexShader(L"TriangleVS.hlsl", &renderer::vsBlob, &renderer::vsShader)))
-			assert(NULL && "Create vertex shader failed!");
-
-		if (!(CreatePixelShader(L"TrianglePS.hlsl", &renderer::psBlob, &renderer::psShader)))
-			assert(NULL && "Create pixel shader failed!");
+	
 
 #pragma region inputLayout Desc
 
@@ -300,9 +303,11 @@ namespace ME::graphics
 
 #pragma endregion
 
+		graphics::Shader* triangle = Resources::Find<graphics::Shader>(L"TriangleShader");
+
 		if (!(CreateInputLayout(inputLayoutDesces, 2
-			, renderer::vsBlob->GetBufferPointer()
-			, renderer::vsBlob->GetBufferSize()
+			, triangle->GetVSBloc()->GetBufferPointer()
+			, triangle->GetVSBloc()->GetBufferSize()
 		, &renderer::inputLayouts)))
 		assert(NULL && "Create input layout failed!");
 
@@ -377,8 +382,10 @@ namespace ME::graphics
 
 		mContext->IASetVertexBuffers(0, 1, &renderer::vertexBuffer, &vertexSize, &offset);
 		mContext->IASetIndexBuffer(renderer::indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-		mContext->VSSetShader(renderer::vsShader, 0, 0);
-		mContext->PSSetShader(renderer::psShader, 0, 0);
+	
+
+		graphics::Shader* triangle = Resources::Find<graphics::Shader>(L"TriangleShader");
+		triangle->Bind();
 
 		mContext->Draw(3, 0);
 

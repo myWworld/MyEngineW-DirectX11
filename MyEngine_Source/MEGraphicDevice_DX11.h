@@ -1,10 +1,5 @@
 #pragma once
-#include <d3d11.h>
-#include <d3dcompiler.h>
-#pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "d3dcompiler.lib")
-#include "CommonInclude.h"
-#include <wrl.h>
+#include "MEGraphics.h"
 
 //https://github.com/kevinmoran/BeginnerDirect3D11
 
@@ -28,6 +23,9 @@ namespace ME::graphics
 			, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength, ID3D11InputLayout** ppInputLayout);
 		bool CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Buffer** ppBuffer);
 
+		void BindVS(ID3D11VertexShader* pVertexShader);
+		void BindPS(ID3D11PixelShader* pPixelShader);
+
 		void BindConstantBuffer(eShaderStage stage, eCBType type, ID3D11Buffer* buffer);
 
 		void Initialize();
@@ -40,6 +38,7 @@ namespace ME::graphics
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView>	mRenderTargetView;
 		Microsoft::WRL::ComPtr<ID3D11Texture2D>			mDepthStencil;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView>	mDepthStencilView;
+
 		Microsoft::WRL::ComPtr<IDXGISwapChain>	mSwapChain;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> mSamplers;
 	};
