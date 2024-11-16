@@ -15,7 +15,7 @@ extern ME::Application application;
 
 namespace ME
 {
-	GameObject* TitleScene::redTriangle = nullptr;
+
 
 	ME::TitleScene::TitleScene()
 	{
@@ -33,16 +33,6 @@ namespace ME
 		mCameraComp = camera->AddComponent<Camera>();
 		renderer::mainCamera = mCameraComp;
 
-		redTriangle = object::Instantiate<GameObject>(enums::eLayerType::BackGround,Vector2(243, 127));
-		SpriteRenderer* redTriangleSr = redTriangle->AddComponent<SpriteRenderer>();
-		graphics::Texture* redTriangleTex = Resources::Find<graphics::Texture>(L"REDTRIANGLE");
-		
-		redTriangle->GetComponent<Transform>()->SetScale(Vector2(0.3, 0.3));
-		redTriangleSr->SetTexture(redTriangleTex);
-
-
-		redTriangle->SetNoRender(false);
-
 		titleBg = object::Instantiate<GameObject>(enums::eLayerType::BackGround);
 
 		SpriteRenderer* sr = titleBg->AddComponent<SpriteRenderer>();
@@ -51,8 +41,7 @@ namespace ME
 		tr->SetScale(Vector2(0.2f, 0.15f));
 
 
-		graphics::Texture* titleTexture = Resources::Find<graphics::Texture>(L"TITLE");
-		sr->SetTexture(titleTexture);
+		
 
 		Scene::Initialize();
 
@@ -68,11 +57,6 @@ namespace ME
 	{
 		Scene::LateUpdate();
 
-		if (Input::GetKeyDown(eKeyCode::Enter))
-		{
-			SceneManager::LoadScene(L"Stage1");
-		}
-
 	}
 
 	void ME::TitleScene::Render(HDC mHdc)
@@ -83,8 +67,7 @@ namespace ME
 
 	void TitleScene::OnEnter()
 	{
-		Transform* tr = titleBg->GetComponent<Transform>();
-		tr->SetPosition(Vector2(190, 30));
+		MakeBG();
 
 		renderer::mainCamera = mCameraComp;
 
@@ -100,6 +83,15 @@ namespace ME
 
 		Scene::OnExit();
 
+	}
+
+	void TitleScene::MakeBG()
+	{
+		graphics::Texture* titleTexture = Resources::Find<graphics::Texture>(L"TITLE");
+		titleBg->GetComponent<SpriteRenderer>()->SetTexture(titleTexture);
+
+		Transform* tr = titleBg->GetComponent<Transform>();
+		tr->SetPosition(Vector2(190, 30));
 	}
 
 }

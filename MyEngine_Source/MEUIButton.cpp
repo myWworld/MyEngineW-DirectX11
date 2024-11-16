@@ -39,21 +39,18 @@ namespace ME
 	void UIButton::OnUpdate()
 	{
 		Vector2 mousePos = Input::GetMousePos();
-		GameObject* rT = TitleScene::GetRedTriangle();
+
 
 
 
 		if (mousePos.x >= mPosition.x && mousePos.x <= mPosition.x + mSize.x
 			&& mousePos.y >= mPosition.y && mousePos.y <= mPosition.y + mSize.y)
 		{
-			if(rT != nullptr)
-				rT->SetNoRender(true);
+		
 			mbMouseOn = true;
 		}
 		else
 		{
-			if (rT != nullptr)
-				rT->SetNoRender(false);
 			mbMouseOn = false;
 		}
 
@@ -115,7 +112,7 @@ namespace ME
 	{
 		if (SceneManager::GetActiveScene()->GetName() == L"TitleScene")
 		{
-			SceneManager::LoadScene(L"Stage1");
+		
 		}
 		
 	}

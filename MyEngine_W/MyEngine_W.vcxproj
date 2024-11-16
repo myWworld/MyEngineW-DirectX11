@@ -19,14 +19,18 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LoadResources.h" />
     <ClInclude Include="MECameraScript.h" />
+    <ClInclude Include="MELoadingScene.h" />
     <ClInclude Include="MELoadScene.h" />
+    <ClInclude Include="MEPlayScene.h" />
     <ClInclude Include="METile.h" />
+    <ClInclude Include="METitleScene.h" />
     <ClInclude Include="METoolScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MECameraScript.cpp" />
+    <ClCompile Include="MELoadingScene.cpp" />
+    <ClCompile Include="MEPlayScene.cpp" />
     <ClCompile Include="METile.cpp" />
     <ClCompile Include="METitleScene.cpp" />
     <ClCompile Include="METoolScene.cpp" />

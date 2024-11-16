@@ -4,7 +4,6 @@
     <ClInclude Include="MELoadScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="LoadResources.h" />
     <ClInclude Include="METoolScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
@@ -14,6 +13,13 @@
     <ClInclude Include="MECameraScript.h">
       <Filter>Script\Others</Filter>
     </ClInclude>
+    <ClInclude Include="MELoadingScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="METitleScene.h">
+      <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="MEPlayScene.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -45,5 +51,9 @@
     <ClCompile Include="MECameraScript.cpp">
       <Filter>Script\Others</Filter>
     </ClCompile>
+    <ClCompile Include="MELoadingScene.cpp">
+      <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="MEPlayScene.cpp" />
   </ItemGroup>
 </Project>

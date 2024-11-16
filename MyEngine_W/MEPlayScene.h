@@ -4,11 +4,11 @@
 
 namespace ME
 {
-	class TitleScene:public Scene
+	class PlayScene :public Scene
 	{
 	public:
-		TitleScene();
-		~TitleScene();
+		PlayScene();
+		~PlayScene();
 
 		void Initialize() override;
 		void Update() override;
@@ -18,17 +18,12 @@ namespace ME
 
 		void OnEnter() override;
 		void OnExit() override;
-
-	private:
-
-		void MakeBG();
-
-
+		
 	private:
 
 		class Camera* mCameraComp;
 		class GameObject* titleBg;
-	
+
 	};
 }
 

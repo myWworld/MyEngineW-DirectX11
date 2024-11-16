@@ -5,7 +5,8 @@
 #include "myEngineforStudy.h"
 #include "..//MyEngine_Source/MEApplication.h"
 #include "..//MyEngine_W/MELoadScene.h"
-#include "../MyEngine_W/LoadResources.h"
+#include "..//MyEngine_Source//MEResources.h"
+
 #include "../MyEngine_Source/METexture.h"
 #include "../MyEngine_W/METoolScene.h"
 #include "../MyEngine_Source/MESceneManager.h"
@@ -154,7 +155,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    Gdiplus::GdiplusStartup(&gpToken, &gpsi, NULL);
 
 
-   ME::LoadResources();
    ME::LoadScenes();   
 
    //Tile 윈도우 크기 조정

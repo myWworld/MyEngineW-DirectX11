@@ -5,6 +5,8 @@
 #include "METitleScene.h"
 
 #include "METoolScene.h"
+#include "MELoadingScene.h"
+#include "MEPlayScene.h"
 
 
 namespace ME
@@ -12,9 +14,11 @@ namespace ME
 	void LoadScenes()
 	{
 		
-		// SceneManager::CreateScene<ToolScene>(L"ToolScene");
- 		//SceneManager::CreateScene<TitleScene>(L"TitleScene");
+		SceneManager::CreateScene<LoadingScene>(L"LoadingScene");
+		SceneManager::CreateScene<TitleScene>(L"PlayScene");
+		SceneManager::CreateScene<TitleScene>(L"TitleScene");
 
+		SceneManager::LoadScene(L"LoadingScene");
 	
 
 	}
