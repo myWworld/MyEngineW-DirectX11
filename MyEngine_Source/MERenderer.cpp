@@ -13,9 +13,10 @@ namespace ME::renderer
 	std::vector<UINT> indices;
 
 	graphics::VertexBuffer vertexBuffer;
-	ID3D11Buffer* indexBuffer = nullptr;
-	ID3D11Buffer* constantBuffer = nullptr;
+	graphics::IndexBuffer indexBuffer;
+	graphics::ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End] = {};
 
+	ID3D11Buffer* constantBuffer = nullptr;
 	ID3D11InputLayout* inputLayouts = nullptr;
 
 	void LoadTriangleMesh()
@@ -48,17 +49,21 @@ namespace ME::renderer
 		ME::Resources::Load<graphics::Shader>(L"TriangleShader", L"..\\Shaders_SOURCE\\Triangle");
 	}
 
+	void LoadConstantBuffers()
+	{
+		constantBuffers[(UINT)graphics::eCBType::Transform].Create(graphics::eCBType::Transform, sizeof(Vector4));
+	}
+
 	void Initialize()
 	{
 		LoadMeshes();
 		LoadShaders();
+		LoadConstantBuffers();
 	}
 
 	void Release()
 	{
 	
 		inputLayouts->Release();
-		indexBuffer->Release();
-		constantBuffer->Release();
 	}
 }

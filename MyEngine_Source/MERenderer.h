@@ -3,6 +3,11 @@
 #include "MEGraphicDevice_DX11.h"
 
 #include "MEVertexBuffer.h"
+#include "MEIndexBuffer.h"
+#include "MEConstantBuffer.h"
+
+using namespace ME::math;
+using namespace ME::graphics;
 
 namespace ME::renderer 
 {
@@ -13,10 +18,12 @@ namespace ME::renderer
 	extern std::vector<UINT> indices;
 
 	extern graphics::VertexBuffer vertexBuffer;
-	extern ID3D11Buffer* indexBuffer;
+	extern graphics::IndexBuffer indexBuffer;
+	extern graphics::ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End];
+
+
+
 	extern ID3D11Buffer* constantBuffer;
-
-
 	extern ID3D11InputLayout* inputLayouts;
 
 	void Initialize();

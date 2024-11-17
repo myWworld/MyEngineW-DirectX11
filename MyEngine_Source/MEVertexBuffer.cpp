@@ -1,7 +1,7 @@
 #include "MEVertexBuffer.h"
 
 
-namespace ME
+namespace ME::graphics
 {
 
 
