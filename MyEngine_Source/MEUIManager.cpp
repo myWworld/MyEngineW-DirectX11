@@ -18,7 +18,7 @@ namespace ME
 		mUIs.insert({ enums::eUIType::Button, button });
 	}
 
-	void UIManager::Render(HDC hdc)
+	void UIManager::Render()
 	{
 		std::stack<UIBase*> uiBases = mUIBases;
 
@@ -28,7 +28,7 @@ namespace ME
 
 			if (uiBase)
 			{
-				uiBase->Render(hdc);
+				uiBase->Render();
 				uiBases.pop();
 			}
 

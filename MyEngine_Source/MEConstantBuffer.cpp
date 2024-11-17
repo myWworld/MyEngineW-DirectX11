@@ -4,6 +4,8 @@
 namespace ME::graphics
 {
 	ConstantBuffer::ConstantBuffer()
+		:mSize(0)
+		,mType(eCBType::None)
 	{
 	}
 	ConstantBuffer::~ConstantBuffer()
@@ -34,15 +36,15 @@ namespace ME::graphics
 		}
 
 		if (!success)
-			assert(NULL, "Create Constant Buffer failed");
+			assert(NULL/*, "Create Constant Buffer failed"*/);
 
 		return true;
 	}
-	void ConstantBuffer::SetData(void* data)
+	void ConstantBuffer::SetData(void* data) const
 	{
 		GetDevice()->SetDataBuffer(buffer.Get(), data, mSize);
 	}
-	void ConstantBuffer::Bind(eShaderStage stage)
+	void ConstantBuffer::Bind(eShaderStage stage) const
 	{
 		GetDevice()->BindConstantBuffer(stage, mType, buffer.Get());
 	}

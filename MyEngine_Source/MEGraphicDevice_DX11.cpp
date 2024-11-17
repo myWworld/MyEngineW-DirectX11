@@ -28,11 +28,12 @@ namespace ME::graphics
 #if defined(DEBUG) || defined(_DEBUG)
 		creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-		HRESULT hr = D3D11CreateDevice(0, D3D_DRIVER_TYPE_HARDWARE,
+		 if(FAILED(D3D11CreateDevice(0, D3D_DRIVER_TYPE_HARDWARE,
 			0, creationFlags,
 			featureLevels, ARRAYSIZE(featureLevels),
 			D3D11_SDK_VERSION, mDevice.GetAddressOf(),
-			0, mContext.GetAddressOf());
+			0, mContext.GetAddressOf())))
+			 return false;
 
 		return true;
 	}
@@ -348,7 +349,7 @@ namespace ME::graphics
 		mContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 		D3D11_VIEWPORT viewPort =
 		{
-			0, 0, application.GetWidth(), application.GetHeight(),
+			0, 0, (float)application.GetWidth(), (float)application.GetHeight(),
 			0.0f, 1.0f
 		};
 		mContext->RSSetViewports(1, &viewPort);

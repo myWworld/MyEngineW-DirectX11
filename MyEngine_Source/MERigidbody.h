@@ -15,14 +15,14 @@ namespace ME
 		void Initialize() override;
 		void Update()  override;
 		void LateUpdate()  override;
-		void Render(HDC hdc)  override;
+		void Render()  override;
 
 		void SetMass(float mass) { mMass = mass; }
 		void AddForce(Vector2 force) { mForce = force; }
 		void SetGround(bool ground) { mbGround = ground; }
 		void SetVelocity(Vector2 velocity) { mVelocity = velocity; }
 
-		Vector2 GetVelocity(){return mVelocity;}
+		Vector2 GetVelocity() const{return mVelocity;}
 		Vector2 GetForce() { return mForce; }
 		bool IsGround() { return mbGround; }
 

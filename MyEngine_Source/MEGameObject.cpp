@@ -68,7 +68,7 @@ namespace ME {
 	}
 	
 
-	void GameObject::Render(HDC hdc)
+	void GameObject::Render()
 	{
 
  		for (Component* comp : mComponents)
@@ -77,7 +77,7 @@ namespace ME {
 				continue;
 
 
-			comp->Render(hdc);
+			comp->Render();
 		} 
 
 	}

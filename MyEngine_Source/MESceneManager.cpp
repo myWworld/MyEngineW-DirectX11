@@ -57,10 +57,10 @@ namespace ME
 		mActiveScene->LateUpdate();
 		mDontDestroyOnLoad->LateUpdate();
 	}
-	void SceneManager::Render(HDC mHdc)
+	void SceneManager::Render()
 	{
-		mActiveScene->Render(mHdc);
-		mDontDestroyOnLoad->Render(mHdc);
+		mActiveScene->Render();
+		mDontDestroyOnLoad->Render();
 	}
 
 	void SceneManager::Destroy()

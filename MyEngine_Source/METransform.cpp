@@ -27,7 +27,7 @@ namespace ME
 	{
 	}
 
-	void ME::Transform::Render(HDC hdc)
+	void ME::Transform::Render( )
 	{
 	}
 

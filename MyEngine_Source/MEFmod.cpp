@@ -36,9 +36,9 @@ namespace ME
 
 	}
 
-	void Fmod::Set3DListenerAttributes(const Vector2* pos)
+	void Fmod::Set3DListenerAttributes(const Vector3& pos)
 	{
-		FMOD_VECTOR fmodPos(0.0f, 0.0f, 0.3f);
+		FMOD_VECTOR fmodPos(pos.x, pos.y, pos.z);
 		FMOD_VECTOR fmodVel(0.0f, 0.0f, 0.3f);
 		FMOD_VECTOR fmodForward(0.0f, 0.0f, 1.0f);
 		FMOD_VECTOR fmodUp(0.0f, 1.0f, 0.0f);

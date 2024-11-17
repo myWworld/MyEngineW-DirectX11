@@ -15,7 +15,7 @@ namespace ME
 
 	void ME::CollisionManager::Update()
 	{
-		Scene* scene = SceneManager::GetActiveScene();
+		
 
 		for (UINT row = 0; row < (UINT)enums::eLayerType::Max; row++)
 		{
@@ -23,7 +23,7 @@ namespace ME
 			{
 				if (mCollisionLayerMatrix[row][col] == true)
 				{
-					LayerCollision(scene, (enums::eLayerType)row, (enums::eLayerType)col);
+					LayerCollision((enums::eLayerType)row, (enums::eLayerType)col);
 				}
 			}
 		}
@@ -33,7 +33,7 @@ namespace ME
 	{
 	}
 
-	void ME::CollisionManager::Render(HDC hdc)
+	void ME::CollisionManager::Render( )
 	{
 	}
 
@@ -57,19 +57,19 @@ namespace ME
 	}
 
 
-	void CollisionManager::LayerCollision(Scene* scene, enums::eLayerType left, enums::eLayerType right)
+	void CollisionManager::LayerCollision( enums::eLayerType left, enums::eLayerType right)
 	{
-		const std::vector<GameObject*>& lefts = SceneManager::GetGameObject(left);
-		const std::vector<GameObject*>& rights = SceneManager::GetGameObject(right);
+		const std::vector<GameObject*>& leftObjs = SceneManager::GetGameObject(left);
+		const std::vector<GameObject*>& rightObjs = SceneManager::GetGameObject(right);
 
-		for (GameObject* left : lefts)
+		for (GameObject* leftObj : leftObjs)
 		{
-			if (left->IsActive() == false)
+			if (leftObj->IsActive() == false)
 			{
 				continue;
 			}
 
-			Collider* leftCol = left->GetComponent<Collider>();
+			Collider* leftCol = leftObj->GetComponent<Collider>();
 
 			if (leftCol == nullptr)
 			{
@@ -78,15 +78,15 @@ namespace ME
 
 
 
-			for (GameObject* right : rights)
+			for (GameObject* rightObj : rightObjs)
 			{
 				{
-					if (right->IsActive() == false)
+					if (rightObj->IsActive() == false)
 					{
 						continue;
 					}
 
-					Collider* rightCol = right->GetComponent<Collider>();
+					Collider* rightCol = rightObj->GetComponent<Collider>();
 
 					if (rightCol == nullptr)
 					{
@@ -94,7 +94,7 @@ namespace ME
 					}
 
 
-					if (left == right)
+					if (leftObj == rightObj)
 						continue;
 
 					ColliderCollision(leftCol, rightCol);

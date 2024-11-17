@@ -8,7 +8,7 @@ namespace ME
 	{
 	public:
 		static void Initailize();
-		static void Render(HDC hdc);
+		static void Render();
 		static void OnLoad(enums::eUIType type);
 		static void Update();
 		static void LateUpdate();

@@ -34,7 +34,7 @@ namespace ME
 	void LoadingScene::LateUpdate()
 	{
 	}
-	void LoadingScene::Render(HDC mHdc)
+	void LoadingScene::Render()
 	{
 	}
 	void LoadingScene::Destroy()

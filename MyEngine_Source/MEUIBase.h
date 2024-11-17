@@ -28,7 +28,7 @@ namespace ME
 		};
 
 		void Initialize();
-		void Render(HDC hdc);
+		void Render();
 		void Active();
 
 		void InActive();
@@ -43,7 +43,7 @@ namespace ME
 		virtual void OnInActive();
 		virtual void OnUpdate();
 		virtual void OnLateUpdate();
-		virtual void OnRender(HDC hdc);
+		virtual void OnRender();
 		virtual void OnClear();
 
 		enums::eUIType GetType() { return mType; }

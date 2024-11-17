@@ -28,7 +28,7 @@ namespace ME {
 		virtual void Initialize();
 		virtual void Update();
 		virtual void LateUpdate();
-		virtual void Render(HDC hdc);
+		virtual void Render();
 
 		template <typename T>
 		T* AddComponent()
@@ -77,16 +77,16 @@ namespace ME {
 			else return false;
 		}
 
-		eState GetState() { return mState; }
+		eState GetState() const{ return mState; }
 		
-		bool IsActive() { return mState == eState::Active;}
-		bool IsDead() { return mState == eState::Dead; }
+		bool IsActive() const{ return mState == eState::Active;}
+		bool IsDead() const{ return mState == eState::Dead; }
 
 		void SetDeath() {mState = eState::Dead;}
 
 		void SetLayerType(enums::eLayerType type) { mLayerType = type; }
 
-		enums::eLayerType GetLayerType() { return mLayerType; }
+		enums::eLayerType GetLayerType() const{ return mLayerType; }
 
 
 	private:

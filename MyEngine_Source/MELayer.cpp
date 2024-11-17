@@ -72,7 +72,7 @@ namespace ME
 	
 	}
 
-	void ME::Layer::Render(HDC hdc)
+	void ME::Layer::Render()
 	{
 		for (GameObject* gameObj : mGameObjects)
 		{
@@ -88,7 +88,7 @@ namespace ME
 				continue;
 			}
 
-			gameObj->Render(hdc);
+			gameObj->Render();
 		}
 
 	}

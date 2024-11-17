@@ -84,11 +84,11 @@ namespace ME
 	
 		mGraphicDevice->Draw();
 
-		Time::Render(mBackHdc);
+		Time::Render();
 		
-		CollisionManager::Render(mBackHdc);
-		SceneManager::Render(mBackHdc);
-		UIManager::Render(mBackHdc);
+		CollisionManager::Render();
+		SceneManager::Render();
+		UIManager::Render();
 
 
 		
@@ -139,7 +139,7 @@ namespace ME
 		mHdc = GetDC(hwnd);
 
 
-		RECT rect = { 0,0,width,height };
+		RECT rect = { 0,0,(LONG)width,(LONG)height };
 
 		mWidth = rect.right - rect.left;
 		mHeight = rect.bottom - rect.top;

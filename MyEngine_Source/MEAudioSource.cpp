@@ -7,6 +7,7 @@ namespace ME
 {
 	AudioSource::AudioSource()
 		:Component(enums::eComponentType::AudioSource)
+		,mAudioClip(nullptr)
 	{
 	}
 	AudioSource::~AudioSource()
@@ -25,9 +26,9 @@ namespace ME
 		Vector2 pos = tr->GetPosition();
 
 
-		mAudioClip->Set3DAttributes(pos);
+		//mAudioClip->Set3DAttributes(pos);
 	}
-	void AudioSource::Render(HDC hdc)
+	void AudioSource::Render()
 	{
 	}
 	void AudioSource::Play()

@@ -19,7 +19,7 @@ namespace ME
 		virtual void Initialize();
 		virtual void Update();
 		virtual void LateUpdate();
-		virtual void Render(HDC mHdc);
+		virtual void Render();
 		virtual void Destroy();
 
 		

@@ -23,9 +23,9 @@ void ME::DonDestroyOnLoad::LateUpdate()
 	Scene::LateUpdate();
 }
 
-void ME::DonDestroyOnLoad::Render(HDC mHdc)
+void ME::DonDestroyOnLoad::Render()
 {
-	Scene::Render(mHdc);
+	Scene::Render();
 }
 
 void ME::DonDestroyOnLoad::OnEnter()

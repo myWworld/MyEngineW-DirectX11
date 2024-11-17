@@ -17,16 +17,16 @@ namespace ME
 		void Initialize() override;
 		void Update()  override;
 		void LateUpdate()  override;
-		void Render(HDC hdc)  override;
+		void Render()  override;
 		
 		void SetPosition(Vector2 pos) { mPosition = pos; }
 		void SetScale(Vector2 scale) { mScale = scale; }
 		void SetRotation(float rotation) { mRotation = rotation; }
 
-		Vector2 GetPosition() { return mPosition; }
+		Vector2 GetPosition() const{ return mPosition; }
 
-		Vector2 GetScale() { return mScale; }
-		float GetRotation() { return mRotation; }
+		Vector2 GetScale() const{ return mScale; }
+		float GetRotation() const{ return mRotation; }
 
 	private:
 		Vector2 mPosition;

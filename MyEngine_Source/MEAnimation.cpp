@@ -52,108 +52,12 @@ namespace ME
 		}
 	}
 
-	void Animation::Render(HDC hdc)
+	void Animation::Render()
 	{
 			if (mTexture == nullptr)
 				return;
 
-		GameObject * gameObj = mAnimator->GetOwner();
-		Transform* tr = gameObj->GetComponent<Transform>();
 		
-
-		Vector2 pos = tr->GetPosition();
-
-
-
-		Vector2 scale = tr->GetScale();
-		float rot = tr->GetRotation();
-
-		Sprite sprite = mAnimationSheet[mIndex];
-
-	
-		if (renderer::mainCamera)
-		{
-
-			pos = renderer::mainCamera->CalculatePosition(pos);
-
-		}
-
-		graphics::Texture::eTextureType type = mTexture->GetTextureType();
-
-		if (type == graphics::Texture::eTextureType::Bmp)
-		{	
-
-			HDC imgHdc = mTexture->GedHdc();
-
-			if (mTexture->IsAlpha())
-			{
-				//반투명한 효과를 원할때
-				BLENDFUNCTION func = {};		
-				func.BlendOp = AC_SRC_OVER;
-				func.BlendFlags = 0;
-				func.AlphaFormat = 0;
-				func.SourceConstantAlpha = 255;
-				
-
-				AlphaBlend(hdc
-					, pos.x - (sprite.size.x / 2.0f) + sprite.offset.x
-					, pos.y - (sprite.size.y / 2.0f) + sprite.offset.y
-					, sprite.size.x * scale.x
-					, sprite.size.y * scale.y
-					, imgHdc
-					, sprite.leftTop.x
-					, sprite.leftTop.y
-					, sprite.size.x
-					, sprite.size.y
-					, func);
-			}
-			else
-			{
-				TransparentBlt(hdc
-					, pos.x - (sprite.size.x / 2.0f) + sprite.offset.x
-					, pos.y - (sprite.size.y / 2.0f) + sprite.offset.y
-					, sprite.size.x * scale.x
-					, sprite.size.y * scale.y
-					, imgHdc
-					, sprite.leftTop.x
-					, sprite.leftTop.y
-					, sprite.size.x
-					, sprite.size.y
-					, RGB(255, 0, 255));
-			}
-
-		}
-		else if (type == graphics::Texture::eTextureType::Png)
-		{
-			//내가 원하는 픽셀을 투명화 시킬때
-			Gdiplus::ImageAttributes imgAtt = {};
-
-			imgAtt.SetColorKey(Gdiplus::Color(100, 100, 100), Gdiplus::Color(255, 255, 255));
-
-			Gdiplus::Graphics graphics(hdc);
-
-			graphics.TranslateTransform(pos.x, pos.y);
-			graphics.RotateTransform(rot);
-			graphics.TranslateTransform(-pos.x, -pos.y);
-
-			graphics.DrawImage(mTexture->GetImage()
-				,Gdiplus::Rect
-				(
-					  pos.x - (sprite.size.x / 2.0f) + sprite.offset.x
-					, pos.y - (sprite.size.y / 2.0f) + sprite.offset.y
-					, sprite.size.x * scale.x
-					, sprite.size.y * scale.y
-				)
-				,sprite.leftTop.x
-				, sprite.leftTop.y
-				, sprite.size.x
-				, sprite.size.y
-				,Gdiplus::UnitPixel
-				,nullptr
-			);
-		}
-
-		//Rectangle(hdc, pos.x, pos.y, pos.x +5 , pos.y+5);
 	}
 
 	void Animation::CreateAnimation(const std::wstring& name, graphics::Texture* spriteSheet, Vector2 leftTop, Vector2 size
@@ -161,6 +65,8 @@ namespace ME
 	{
 		mTexture = spriteSheet;
 		
+		SetName(name);
+
 		std::wstring Direction = name.substr(name.size() - 1);
 
 		if (Direction == L"R")

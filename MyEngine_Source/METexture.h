@@ -21,27 +21,22 @@ namespace ME::graphics
 		
 		virtual HRESULT Load(const std::wstring& path) override;
 
-		UINT GetWidth() { return mWidth; }
+		UINT GetWidth() const{ return mWidth; }
 		void SetWidth(UINT width) { mWidth = width; }
-		UINT GetHeight() { return mHeight; }
+		UINT GetHeight() const{ return mHeight; }
 		void SetHeight(UINT height) { mHeight = height; }
 
-		HDC GedHdc() { return mHdc; }
-		eTextureType GetTextureType() { return mType; }
-		Gdiplus::Image* GetImage() { return mImage; }
+		
+		eTextureType GetTextureType() const{ return mType; }
+		bool IsAlpha() const{ return mbAlpha; }
 
-		bool IsAlpha() { return mbAlpha; }
-
-		COLORREF GetPixel(int x, int y);
+		//COLORREF GetPixel(int x, int y);
 
 	private:
 
 		eTextureType mType;
 
-		Gdiplus::Image* mImage;
-		HBITMAP mBitmap;
-		HDC mHdc;
-
+	
 		UINT mWidth;
 		UINT mHeight;
 

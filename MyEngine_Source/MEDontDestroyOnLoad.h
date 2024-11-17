@@ -16,7 +16,7 @@ namespace ME
 		void Initialize()override;
 		void Update()override;
 		void LateUpdate()override;
-		void Render(HDC mHdc) override;
+		void Render() override;
 
 
 

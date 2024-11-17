@@ -27,10 +27,10 @@ namespace ME
 		static void Iniatialize();
 		static void Update();
 		static void LateUpdate();
-		static void Render(HDC hdc);
+		static void Render();
 
 		static void CollisionLayerCheck(enums::eLayerType left, enums::eLayerType right, bool enable);
-		static void LayerCollision(class Scene* scene, enums::eLayerType left, enums::eLayerType right);
+		static void LayerCollision( enums::eLayerType left, enums::eLayerType right);
 		static void ColliderCollision(Collider* left, Collider* right);
 
 		static bool Intersect(Collider* left, Collider* right);

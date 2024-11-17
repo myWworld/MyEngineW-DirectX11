@@ -54,7 +54,7 @@ namespace ME
 			layer->LateUpdate();
 		}
 	}
-	void Scene::Render(HDC mHdc)
+	void Scene::Render()
 	{
 		
 			for (Layer* layer : mLayers)
@@ -62,7 +62,7 @@ namespace ME
 				if (layer == nullptr)
 					continue;
 
-				layer->Render(mHdc);
+				layer->Render();
 			}
 	}
 	void Scene::Destroy()

@@ -63,47 +63,10 @@ namespace ME
 	void UIButton::OnLateUpdate()
 	{
 	}
-	void UIButton::OnRender(HDC hdc)
+	void UIButton::OnRender()
 	{
 		
-		if (mTexture->GetTextureType() == graphics::Texture::eTextureType::Png)
-		{
-			Gdiplus::ImageAttributes imgAtt = {};
-
-			imgAtt.SetColorKey(Gdiplus::Color(230, 230, 230), Gdiplus::Color(255, 255, 255));
-
-			Gdiplus::Graphics graphics(hdc);
-
-			if (mTexture->GetImage() == nullptr)
-				return;
-
-			graphics.DrawImage(mTexture->GetImage()
-				, Gdiplus::Rect
-				(
-					mPosition.x
-					, mPosition.y
-					,  mSize.x
-					, mSize.y
-				)
-				, 0, 0
-				, mTexture->GetWidth()
-				, mTexture->GetHeight()
-				, Gdiplus::UnitPixel
-				, nullptr
-			);
-		}
-		else if (mTexture->GetTextureType() == graphics::Texture::eTextureType::Bmp)
-		{
-			TransparentBlt(hdc
-				, mPosition.x, mPosition.y
-				, mPosition.x + mSize.x
-				, mPosition.y + mSize.y
-				, mTexture->GedHdc()
-				, 0, 0
-				, mTexture->GetWidth()
-				, mTexture->GetHeight()
-				, RGB(255, 0, 255));
-		}
+		
 	}
 	void UIButton::OnClear()
 	{

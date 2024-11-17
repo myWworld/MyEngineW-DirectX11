@@ -25,7 +25,7 @@ namespace ME
 	{
 	}
 
-	void ME::Component::Render(HDC hdc)
+	void ME::Component::Render()
 	{
 	}
 

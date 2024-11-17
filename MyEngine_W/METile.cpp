@@ -27,9 +27,9 @@ namespace ME
 		GameObject::LateUpdate();
 	}
 
-	void ME::Tile::Render(HDC hdc)
+	void ME::Tile::Render()
 	{
-		GameObject::Render(hdc);
+		GameObject::Render();
 	}
 	void Tile::SetIndexPosition(int x, int y)
 	{

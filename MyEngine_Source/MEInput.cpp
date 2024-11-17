@@ -124,15 +124,15 @@ namespace ME{
 		mMousePosition.x = -1.0f;
 		mMousePosition.y = -1.0f;
 
-		if (mousePos.x < width && mousePos.x > 0)
+		if ((UINT)mousePos.x < width && (UINT)mousePos.x > 0)
 		{
-			mMousePosition.x = mousePos.x;
+			mMousePosition.x = (float)mousePos.x;
 		}
 		
 
-		if (mousePos.y < height && mousePos.y > 0)
+		if ((UINT)mousePos.y < height && (UINT)mousePos.y > 0)
 		{
-			mMousePosition.y = mousePos.y;
+			mMousePosition.y = (float)mousePos.y;
 		}
 	
 	}

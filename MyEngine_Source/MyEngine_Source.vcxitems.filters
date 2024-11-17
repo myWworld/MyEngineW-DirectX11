@@ -116,7 +116,7 @@
       <Filter>Resource\Material</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)MEShader.cpp">
-      <Filter>Resource\Graphics</Filter>
+      <Filter>Resource\Shader</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)MEConstantBuffer.cpp">
       <Filter>Graphics\GpuBuffer</Filter>
@@ -259,7 +259,7 @@
       <Filter>Resource\Material</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MEShader.h">
-      <Filter>Resource\Graphics</Filter>
+      <Filter>Resource\Shader</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h">
       <Filter>Graphics</Filter>
@@ -347,9 +347,6 @@
     <Filter Include="Resource\Animation">
       <UniqueIdentifier>{f108d414-a31d-49c1-9411-84a7ce1fa8e8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Resource\Graphics">
-      <UniqueIdentifier>{be8631b1-8b6e-4455-b4b7-647add188e51}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource\Material">
       <UniqueIdentifier>{a363f8f3-55c7-4061-9f01-82588fb07338}</UniqueIdentifier>
     </Filter>
@@ -364,6 +361,9 @@
     </Filter>
     <Filter Include="Graphics\GpuBuffer">
       <UniqueIdentifier>{5407470d-04cb-40ee-95d5-7fc1c7052dc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Shader">
+      <UniqueIdentifier>{be8631b1-8b6e-4455-b4b7-647add188e51}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

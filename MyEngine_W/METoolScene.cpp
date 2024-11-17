@@ -78,28 +78,11 @@ namespace ME
 		}
 
 	}
-	void ToolScene::Render(HDC mHdc)
+	void ToolScene::Render()
 	{
-		Scene::Render(mHdc);
+		Scene::Render();
 
-		for (size_t i = 0; i < 50; i++)
-		{
-			Vector2 pos = renderer::mainCamera->CalculatePosition(Vector2(TileMapRenderer::TileSize.x * i, 0.0f));
-
-			MoveToEx(mHdc, pos.x, 0, NULL);
-			LineTo(mHdc, pos.x, 1000);
-
-		}
-
-		for (size_t i = 0; i < 50; i++)
-		{
-
-			Vector2 pos = renderer::mainCamera->CalculatePosition(Vector2(0.0f, TileMapRenderer::TileSize.y * i));
-
-			MoveToEx(mHdc, 0, pos.y, NULL);
-			LineTo(mHdc,1000, pos.y);
-
-		}
+	
 	}
 	void ToolScene::Destroy()
 	{
@@ -256,24 +239,7 @@ LRESULT CALLBACK WndTileProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	case WM_PAINT:
 	{
 		PAINTSTRUCT ps;
-		HDC hdc = BeginPaint(hWnd, &ps);
-		// TODO: 여기에 hdc를 사용하는 그리기 코드를 추가합니다...
-		//DC란 화면에 출력에 필요한 모든 정보를 가지는 데이터 구조체
-		//GDI모듈에 의해서 관리된다.
-		//어떤 폰트를 사용할 건가, 어떤 선의 굵기를 정해줄건가 어떤 색상으로 그려줄껀가
-		//화면 출력에 필요한 모든 경우는 WINAPI에서는 DC를 통해서 작업을 진행할 수 있다,
-
-		ME::graphics::Texture* texture = ME::Resources::Find<ME::graphics::Texture>(L"SPRINGFLOOR");
-
-		TransparentBlt(hdc
-			, 0, 0
-			, texture->GetWidth()
-			, texture->GetHeight()
-			, texture->GedHdc()
-			, 0, 0
-			, texture->GetWidth()
-			, texture->GetHeight()
-			, RGB(255, 0, 255));
+	
 
 		EndPaint(hWnd, &ps);
 	}

@@ -37,47 +37,13 @@ namespace ME
 	void BoxCollider2D::LateUpdate()
 	{
 	}
-	void BoxCollider2D::Render(HDC hdc)
+	void BoxCollider2D::Render()
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
 		Vector2 pos = tr->GetPosition();
 		
 
-		if (renderer::mainCamera)
-		{
-			pos = renderer::mainCamera->CalculatePosition(pos);
-		}
-
-		Vector2 offset = GetOwner()->GetComponent<BoxCollider2D>()->GetOffset();
-
-		HBRUSH transparentBrush = (HBRUSH)GetStockObject(NULL_BRUSH);
-		HBRUSH oldBrush = (HBRUSH)SelectObject(hdc, transparentBrush);
-
-		HPEN greenPen = CreatePen(PS_SOLID, 2, RGB(0, 255, 0));
-		HPEN oldPen = (HPEN)SelectObject(hdc, greenPen);
-
-		Vector2 rightBottom;
-		rightBottom.x = pos.x + offset.x + (100.0f * GetSize().x);
-		rightBottom.y = pos.y + offset.y + (100.0f * GetSize().y);
-
-		float width =  (100.0f * GetSize().x);
-		float height = (100.0f * GetSize().y);
-
-		if (mRot != 0)
-		{
-		//	Polygon(hdc, mPoint, 4);
-			mbIsRotate = true;
-		}
-		else
-		{
-		//	Rectangle(hdc, pos.x + offset.x, pos.y + offset.y, rightBottom.x, rightBottom.y);
-			mbIsRotate = false;
-		}
-			
-
-		SelectObject(hdc, oldBrush);
-		SelectObject(hdc, oldPen);
-		DeleteObject(greenPen);
+		
 	}
 
 	Vector2 BoxCollider2D::RotateCollider(float rot, int x ,int y, int width,int height)//, HDC hdc)

@@ -37,7 +37,7 @@ namespace ME
 	void PlayScene::LateUpdate()
 	{
 	}
-	void PlayScene::Render(HDC mHdc)
+	void PlayScene::Render()
 	{
 	}
 	void PlayScene::OnEnter()

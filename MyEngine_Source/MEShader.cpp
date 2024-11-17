@@ -14,8 +14,8 @@ namespace ME::graphics
 
 	HRESULT ME::graphics::Shader::Load(const std::wstring& path)
 	{
-		int fileNameBeginOffset = path.rfind(L"\\") + 1;
-		int fileNameEndOffset = path.length() - fileNameBeginOffset;
+		size_t fileNameBeginOffset = path.rfind(L"\\") + 1;
+		size_t fileNameEndOffset = path.length() - fileNameBeginOffset;
 
 		const std::wstring fileName(path.substr(fileNameBeginOffset, fileNameEndOffset));
 

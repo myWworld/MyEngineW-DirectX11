@@ -59,9 +59,9 @@ namespace ME
 
 	}
 
-	void ME::TitleScene::Render(HDC mHdc)
+	void ME::TitleScene::Render()
 	{
- 		Scene::Render(mHdc);
+ 		Scene::Render();
 	
 	}
 

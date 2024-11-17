@@ -42,7 +42,7 @@ namespace ME
     void CameraScript::LateUpdate()
     {
     }
-    void CameraScript::Render(HDC hdc)
+    void CameraScript::Render()
     {
     }
 }

@@ -28,3 +28,5 @@
 #pragma comment(lib,"gdiplus.lib")
 
 
+#define CAST_UINT(value) static_cast<UINT>(value)
+#define CAST_FLOAT(value) static_cast<float>(value)

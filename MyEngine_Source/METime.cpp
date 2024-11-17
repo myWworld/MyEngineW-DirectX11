@@ -28,13 +28,13 @@ namespace ME {
 
 		PrevFrequency.QuadPart = CurrentFrequency.QuadPart;
 	}
-	void Time::Render(HDC hdc)
+	void Time::Render() 
 	{
-		static float time = 0.0f;
-
-		time += DeltaTimeValue;
-
-		float fps = 1.0f / DeltaTimeValue;
+	//static float time = 0.0f;
+	//
+	//time += DeltaTimeValue;
+	//
+	//float fps = 1.0f / DeltaTimeValue;
 
 	}
 }
