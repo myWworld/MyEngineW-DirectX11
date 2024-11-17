@@ -27,6 +27,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MECollider.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECollisionManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEComponent.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEConstantBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEDontDestroyOnLoad.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEEntity.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEEnums.h" />
@@ -35,6 +36,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEApplication.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEIndexBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInput.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MELayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMaterial.h" />
@@ -58,6 +60,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEUIButton.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEUIHUD.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEUIManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEVertexBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ObjectAndScript.h" />
   </ItemGroup>
   <ItemGroup>
@@ -72,12 +75,14 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MECollider.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECollisionManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEComponent.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEConstantBuffer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEDontDestroyOnLoad.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEEntity.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEFmod.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGameObject.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEApplication.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEIndexBuffer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEInput.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MELayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMaterial.cpp" />
@@ -100,5 +105,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEUIButton.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEUIHUD.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEUIManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEVertexBuffer.cpp" />
   </ItemGroup>
 </Project>

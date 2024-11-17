@@ -107,7 +107,7 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp">
-      <Filter>Graphic_Device</Filter>
+      <Filter>Graphics\Graphic_Device</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMesh.cpp">
       <Filter>Resource\Mesh</Filter>
@@ -117,6 +117,15 @@
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)MEShader.cpp">
       <Filter>Resource\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEConstantBuffer.cpp">
+      <Filter>Graphics\GpuBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEIndexBuffer.cpp">
+      <Filter>Graphics\GpuBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEVertexBuffer.cpp">
+      <Filter>Graphics\GpuBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -241,7 +250,7 @@
       <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.h">
-      <Filter>Graphic_Device</Filter>
+      <Filter>Graphics\Graphic_Device</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMesh.h">
       <Filter>Resource\Mesh</Filter>
@@ -249,9 +258,20 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMaterial.h">
       <Filter>Resource\Material</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEShader.h">
       <Filter>Resource\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEConstantBuffer.h">
+      <Filter>Graphics\GpuBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEIndexBuffer.h">
+      <Filter>Graphics\GpuBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEVertexBuffer.h">
+      <Filter>Graphics\GpuBuffer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -327,9 +347,6 @@
     <Filter Include="Resource\Animation">
       <UniqueIdentifier>{f108d414-a31d-49c1-9411-84a7ce1fa8e8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphic_Device">
-      <UniqueIdentifier>{eea11378-0b74-4ae3-a31d-327f1b789ebe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource\Graphics">
       <UniqueIdentifier>{be8631b1-8b6e-4455-b4b7-647add188e51}</UniqueIdentifier>
     </Filter>
@@ -338,6 +355,15 @@
     </Filter>
     <Filter Include="Resource\Mesh">
       <UniqueIdentifier>{f60138c2-ed34-47b4-8135-75d740f0a017}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{c3e14de2-f4cc-4866-bcb0-3bc6afbb1d77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Graphic_Device">
+      <UniqueIdentifier>{eea11378-0b74-4ae3-a31d-327f1b789ebe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\GpuBuffer">
+      <UniqueIdentifier>{5407470d-04cb-40ee-95d5-7fc1c7052dc1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

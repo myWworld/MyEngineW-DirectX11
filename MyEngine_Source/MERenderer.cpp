@@ -9,10 +9,10 @@ namespace ME::renderer
 	Camera* mainCamera = nullptr;
 	Camera* playerCamera = nullptr;
 
-	Vertex vertexes[3] = {};
+	std::vector<graphics::Vertex> vertexes = {};
 	std::vector<UINT> indices;
 
-	ID3D11Buffer* vertexBuffer = nullptr;
+	graphics::VertexBuffer vertexBuffer;
 	ID3D11Buffer* indexBuffer = nullptr;
 	ID3D11Buffer* constantBuffer = nullptr;
 
@@ -22,6 +22,8 @@ namespace ME::renderer
 	{
 		//xyz
 	//rgba
+		renderer::vertexes.resize(3);
+
 		renderer::vertexes[0].pos = Vector3(0.f, 0.5f, 0.0f);
 		renderer::vertexes[0].color = Vector4(0.0f, 1.0f, 0.0f, 1.0f);
 
@@ -54,7 +56,7 @@ namespace ME::renderer
 
 	void Release()
 	{
-		vertexBuffer->Release();
+	
 		inputLayouts->Release();
 		indexBuffer->Release();
 		constantBuffer->Release();
