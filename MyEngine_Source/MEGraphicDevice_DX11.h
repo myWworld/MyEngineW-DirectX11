@@ -27,7 +27,7 @@ namespace ME::graphics
 		void SetDataBuffer(ID3D11Buffer* buffer, void* data, UINT size);
 
 
-
+		void BindPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY topology);
 		void BindVS(ID3D11VertexShader* pVertexShader);
 		void BindPS(ID3D11PixelShader* pPixelShader);
 

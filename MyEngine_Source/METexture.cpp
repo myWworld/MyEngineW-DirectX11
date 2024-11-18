@@ -51,6 +51,11 @@ namespace ME::graphics
 	{
 	}
 
+	HRESULT Texture::Save(const std::wstring& path)
+	{
+		return S_OK;
+	 }
+
 	HRESULT Texture::Load(const std::wstring& path)
 	{
 		//bmp ¿œ∂ß

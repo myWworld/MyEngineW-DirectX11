@@ -4,6 +4,7 @@
 #include "MEResources.h"
 #include "MEShader.h"
 
+
 namespace ME::renderer
 {
 	Camera* mainCamera = nullptr;
@@ -12,8 +13,8 @@ namespace ME::renderer
 	std::vector<graphics::Vertex> vertexes = {};
 	std::vector<UINT> indices;
 
-	graphics::VertexBuffer vertexBuffer;
-	graphics::IndexBuffer indexBuffer;
+	Mesh* mesh = nullptr;
+
 	graphics::ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End] = {};
 
 	ID3D11Buffer* constantBuffer = nullptr;
@@ -21,6 +22,8 @@ namespace ME::renderer
 
 	void LoadTriangleMesh()
 	{
+		mesh = new Mesh();
+
 		//xyz
 	//rgba
 		renderer::vertexes.resize(3);
@@ -37,6 +40,9 @@ namespace ME::renderer
 		indices.push_back(0);
 		indices.push_back(1);
 		indices.push_back(2);
+
+		mesh->CreatIB(indices);
+		mesh->CreatVB(vertexes);
 	}
 
 	void LoadMeshes()
@@ -65,5 +71,6 @@ namespace ME::renderer
 	{
 	
 		inputLayouts->Release();
+		delete mesh;
 	}
 }

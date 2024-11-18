@@ -12,6 +12,11 @@ namespace ME::graphics
 	{
 	}
 
+	HRESULT Shader::Save(const std::wstring& path)
+	{
+		return E_NOTIMPL;
+	}
+
 	HRESULT ME::graphics::Shader::Load(const std::wstring& path)
 	{
 		size_t fileNameBeginOffset = path.rfind(L"\\") + 1;
