@@ -9,6 +9,8 @@
 #include "MEResources.h"
 #include "METransform.h"
 #include "MEApplication.h"
+
+#include "MEGraphicDevice_DX11.h"
 #include "MEUIManager.h"
 
 extern ME::Application application;
@@ -62,6 +64,8 @@ namespace ME
 	void ME::TitleScene::Render()
 	{
  		Scene::Render();
+
+		graphics::GetDevice()->Draw();
 	
 	}
 

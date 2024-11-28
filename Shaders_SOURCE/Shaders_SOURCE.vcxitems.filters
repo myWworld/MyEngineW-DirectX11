@@ -7,6 +7,12 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)TriangleVS.hlsl">
       <Filter>VS</Filter>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)SpritePS.hlsl">
+      <Filter>PS</Filter>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)SpriteVS.hlsl">
+      <Filter>VS</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="PS">
@@ -21,6 +27,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)ConstantBuffers.hlsli">
+      <Filter>LIB</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Samplers.hlsli">
+      <Filter>LIB</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)Textures.hlsli">
       <Filter>LIB</Filter>
     </None>
   </ItemGroup>

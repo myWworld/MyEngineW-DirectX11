@@ -4,6 +4,9 @@
 #include "MEResources.h"
 #include "METexture.h"
 
+#include "MEApplication.h"
+extern ME::Application application;
+
 namespace ME
 {
 	LoadingScene::LoadingScene()
@@ -24,18 +27,19 @@ namespace ME
 	}
 	void LoadingScene::Update()
 	{
-		if (mbLoadCompleted)
-		{
-			mResourcesLoadThread->join();
 
-			SceneManager::LoadScene(L"TitleScene");
-		}
 	}
 	void LoadingScene::LateUpdate()
 	{
 	}
 	void LoadingScene::Render()
 	{
+		if (mbLoadCompleted)
+		{
+			mResourcesLoadThread->join();
+
+			SceneManager::LoadScene(L"TitleScene");
+		}
 	}
 	void LoadingScene::Destroy()
 	{
@@ -48,11 +52,19 @@ namespace ME
 	}
 	void LoadingScene::resourcesLoad(std::mutex& m)
 	{
+
+		while (true)
+		{
+			if (application.IsLoaded() == true)
+			{
+				break;
+			}
+		}
+
 		m.lock();
 		{
 			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\Title.png");
-			Resources::Load<graphics::Texture>(L"HPBAR", L"..\\Resources\\Hpbar.png");
-			Resources::Load<graphics::Texture>(L"STARTBUTTON", L"..\\Resources\\StartButton.png");
+		
 		}
 		m.unlock();
 

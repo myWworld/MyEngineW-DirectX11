@@ -18,14 +18,19 @@ namespace ME::graphics
 		bool CreateRenderTargetView(ID3D11Resource* pResource, const D3D11_RENDER_TARGET_VIEW_DESC* pDesc, ID3D11RenderTargetView** ppRTView);
 		bool CreateDepthStencilView(ID3D11Resource* pResource, const D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc, ID3D11DepthStencilView** ppDepthStencilView);
 		bool CreateTexture2D(const D3D11_TEXTURE2D_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Texture2D** ppTexture2D);
+
+		bool CreateSamplerState(const D3D11_SAMPLER_DESC* pSamplerDesc, ID3D11SamplerState** ppSamplerState);
+
 		bool CreateVertexShader(const std::wstring& fileName, ID3DBlob** ppCode, ID3D11VertexShader** ppVertexShader);
 		bool CreatePixelShader(const std::wstring& fileName, ID3DBlob** ppCode, ID3D11PixelShader** ppPixelShader);
 		bool CreateInputLayout(const D3D11_INPUT_ELEMENT_DESC* pInputElementDescs, UINT NumElements
 			, const void* pShaderBytecodeWithInputSignature, SIZE_T BytecodeLength, ID3D11InputLayout** ppInputLayout);
 		bool CreateBuffer(const D3D11_BUFFER_DESC* pDesc, const D3D11_SUBRESOURCE_DATA* pInitialData, ID3D11Buffer** ppBuffer);
 
-		void SetDataBuffer(ID3D11Buffer* buffer, void* data, UINT size);
+		bool CreateShaderResourceView(ID3D11Resource* pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc, ID3D11ShaderResourceView** ppSRView);
 
+		void SetDataGpuBuffer(ID3D11Buffer* buffer, void* data, UINT size);
+		void SetShaderResource(eShaderStage stage, UINT startSlot, ID3D11ShaderResourceView** ppSRV);
 
 		void BindPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY topology);
 		void BindVS(ID3D11VertexShader* pVertexShader);
@@ -37,8 +42,16 @@ namespace ME::graphics
 
 		void BindConstantBuffer(eShaderStage stage, eCBType type, ID3D11Buffer* buffer);
 
+		void BindSampler(eShaderStage stage, UINT StartSlot, UINT NumSamplers, ID3D11SamplerState* const* ppSamplers);
+		void BindSamplers(UINT StartSlot, UINT NumSamplers, ID3D11SamplerState* const* ppSamplers);
+
 		void Initialize();
 		void Draw();
+
+
+	public:
+
+		Microsoft::WRL::ComPtr<ID3D11Device>GetID3D11Device() { return mDevice; }
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Device> mDevice;

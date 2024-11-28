@@ -142,35 +142,35 @@ namespace ME
 		UINT Length = spriteLength1;
 		Vector2 pos = leftTop;
 		
-		UINT width = mTexture->GetWidth();
 
-		for (size_t j = 0; j < count; j++)
-		{
 
-			if (j == 1)
-			{
-				Length = spriteLength2;
-				pos.y += size.y;
-
-				if (pos.x < width - size.x)
-				{
-					pos.x = width - size.x;
-				}
-
-			}
-
-			for (size_t i = 0; i < Length; i++)
-			{
-				Sprite sprite = {};
-				sprite.leftTop.x = pos.x - (size.x * i);
-				sprite.leftTop.y = pos.y;
-				sprite.size = size;
-				sprite.offset = offset;
-				sprite.duration = duration;
-
-				mAnimationSheet.push_back(sprite);
-			}
-		}
+	//for (size_t j = 0; j < count; j++)
+	//{
+	//
+	//	if (j == 1)
+	//	{
+	//		Length = spriteLength2;
+	//		pos.y += size.y;
+	//
+	//		if (pos.x < width - size.x)
+	//		{
+	//			pos.x = width - size.x;
+	//		}
+	//
+	//	}
+	//
+	//	for (size_t i = 0; i < Length; i++)
+	//	{
+	//		Sprite sprite = {};
+	//		sprite.leftTop.x = pos.x - (size.x * i);
+	//		sprite.leftTop.y = pos.y;
+	//		sprite.size = size;
+	//		sprite.offset = offset;
+	//		sprite.duration = duration;
+	//
+	//		mAnimationSheet.push_back(sprite);
+	//	}
+	//}
 	}
 
 

@@ -19,6 +19,10 @@ namespace ME
 		~Application();
 
 		void Initialize(HWND hwnd, UINT width, UINT height);
+
+		void AdjustWindowRect(HWND hwnd, UINT width, UINT height);
+		void InitializeEtc();
+
 		void Run();
 		void Update();
 		void LateUpdate();
@@ -34,14 +38,8 @@ namespace ME
 		UINT GetHeight() const { return mHeight; }
 
 		
-	private:
-		
-		void ClearRenderTarget();
-		void CopyRenderTarget(HDC source, HDC dest);
-		void adjustWindowRect(HWND hwnd, UINT width, UINT height);
-		void createBuffer(UINT width, UINT height);
-		void initializeEtc();
-
+		bool IsLoaded() const { return mbLoaded; }
+		void IsLoaded(bool load) { mbLoaded = load; }
 	private:
 
 		HWND mHwnd;
@@ -54,6 +52,8 @@ namespace ME
 		UINT mHeight;
 
 		float mSpeed;
+
+		bool mbLoaded;
 
 
 		std::vector <Scene*> mScenes;

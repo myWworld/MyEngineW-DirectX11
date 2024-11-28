@@ -1,6 +1,7 @@
 #include "MEGraphicDevice_DX11.h"
 #include "MEApplication.h"
 #include "MERenderer.h"
+#include "METexture.h"	
 
 #include "MEResources.h"
 #include "MEShader.h"
@@ -91,24 +92,38 @@ namespace ME::graphics
 		return true;
 	}
 
+	bool GraphicDevice_DX11::CreateSamplerState(const D3D11_SAMPLER_DESC* pSamplerDesc, ID3D11SamplerState** ppSamplerState)
+	{
+		if (FAILED(mDevice->CreateSamplerState(pSamplerDesc, ppSamplerState)))
+			return false;
+		
+		return true;
+	}
+
+
 	bool GraphicDevice_DX11::CreateVertexShader(const std::wstring& fileName, ID3DBlob** ppCode, ID3D11VertexShader** ppVertexShader)
 	{
 		DWORD shaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 		shaderFlags |= D3DCOMPILE_DEBUG;
 		shaderFlags |= D3DCOMPILE_SKIP_OPTIMIZATION;
 		//vertex shader
-		{
+		
 			ID3DBlob* errorBlob = nullptr;
-			const std::wstring shaderFilpath = L"..\\Shaders_SOURCE\\";
+			const std::wstring shaderFilepath = L"..\\Shaders_SOURCE\\";
 
-			D3DCompileFromFile((shaderFilpath + fileName + L"VS.hlsl").c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
+			 D3DCompileFromFile((shaderFilepath + fileName + L"VS.hlsl").c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE
 				, "main", "vs_5_0", shaderFlags, 0, ppCode, &errorBlob);
 
+
+
+			std::wstring fp = (shaderFilepath + fileName + L"VS.hlsl");
+		
 			if (errorBlob)
 			{
+
 				OutputDebugStringA((char*)errorBlob->GetBufferPointer());
 				errorBlob->Release();
-				assert(NULL && "hlsl file have problem check message!");
+				assert(NULL && "hlsl file have problem check message! VS");
 				return false;
 			}
 
@@ -117,8 +132,8 @@ namespace ME::graphics
 				return false;
 
 			return true;
-			
-		}
+		
+		
 	}
 
 	bool GraphicDevice_DX11::CreatePixelShader(const std::wstring& fileName, ID3DBlob** ppCode, ID3D11PixelShader** ppPixelShader)
@@ -138,7 +153,7 @@ namespace ME::graphics
 			{
 				OutputDebugStringA((char*)errorBlob->GetBufferPointer());
 				errorBlob->Release();
-				assert(NULL && "hlsl file have problem check message!");
+				assert(NULL && "hlsl file have problem check message! PS");
 				return false;
 			}
 
@@ -171,7 +186,32 @@ namespace ME::graphics
 		return true;
 	}
 
-	void GraphicDevice_DX11::SetDataBuffer(ID3D11Buffer* buffer, void* data, UINT size)
+	bool GraphicDevice_DX11::CreateShaderResourceView(ID3D11Resource* pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc, ID3D11ShaderResourceView** ppSRView)
+	{
+		if (FAILED(mDevice->CreateShaderResourceView(pResource, pDesc, ppSRView)))
+			return false;
+
+		return true;
+	}
+
+
+	void GraphicDevice_DX11::SetShaderResource(eShaderStage stage, UINT startSlot, ID3D11ShaderResourceView** ppSRV)
+	{
+		if ((UINT)eShaderStage::VS & (UINT)stage)
+			mContext->VSSetShaderResources(startSlot, 1, ppSRV);
+		if ((UINT)eShaderStage::HS & (UINT)stage)
+			mContext->HSSetShaderResources(startSlot, 1, ppSRV);
+		if ((UINT)eShaderStage::DS & (UINT)stage)
+			mContext->DSSetShaderResources(startSlot, 1, ppSRV);
+		if ((UINT)eShaderStage::GS & (UINT)stage)
+			mContext->GSSetShaderResources(startSlot, 1, ppSRV);
+		if ((UINT)eShaderStage::PS & (UINT)stage)
+			mContext->PSSetShaderResources(startSlot, 1, ppSRV);
+		if ((UINT)eShaderStage::CS & (UINT)stage)
+			mContext->CSSetShaderResources(startSlot, 1, ppSRV);
+	}
+
+	void GraphicDevice_DX11::SetDataGpuBuffer(ID3D11Buffer* buffer, void* data, UINT size)
 	{
 		D3D11_MAPPED_SUBRESOURCE sub = {};
 		mContext->Map(buffer, 0, D3D11_MAP::D3D11_MAP_WRITE_DISCARD, 0, &sub);
@@ -246,6 +286,27 @@ namespace ME::graphics
 		}
 	}
 
+	void GraphicDevice_DX11::BindSampler(eShaderStage stage, UINT StartSlot, UINT NumSamplers, ID3D11SamplerState* const* ppSamplers)
+	{
+		if (eShaderStage::VS == stage)
+			mContext->VSSetSamplers(StartSlot, NumSamplers, ppSamplers);
+		if (eShaderStage::HS == stage)
+			mContext->HSSetSamplers(StartSlot, NumSamplers, ppSamplers);
+		if (eShaderStage::DS == stage)
+			mContext->DSSetSamplers(StartSlot, NumSamplers, ppSamplers);
+		if (eShaderStage::GS == stage)
+			mContext->GSSetSamplers(StartSlot, NumSamplers, ppSamplers);
+		if (eShaderStage::PS == stage)
+			mContext->PSSetSamplers(StartSlot, NumSamplers, ppSamplers);
+	}
+	void GraphicDevice_DX11::BindSamplers(UINT StartSlot, UINT NumSamplers, ID3D11SamplerState* const* ppSamplers)
+	{
+		BindSampler(eShaderStage::VS, StartSlot, NumSamplers, ppSamplers);
+		BindSampler(eShaderStage::HS, StartSlot, NumSamplers, ppSamplers);
+		BindSampler(eShaderStage::DS, StartSlot, NumSamplers, ppSamplers);
+		BindSampler(eShaderStage::GS, StartSlot, NumSamplers, ppSamplers);
+		BindSampler(eShaderStage::PS, StartSlot, NumSamplers, ppSamplers);
+	}
 
 	void GraphicDevice_DX11::Initialize()
 	{
@@ -315,13 +376,14 @@ namespace ME::graphics
 
 #pragma region inputLayout Desc
 
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[2] = {};
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[3] = {};
 		inputLayoutDesces[0].AlignedByteOffset = 0;
 		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[0].InputSlot = 0;
 		inputLayoutDesces[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputLayoutDesces[0].SemanticName = "POSITION";
 		inputLayoutDesces[0].SemanticIndex = 0;
+
 		inputLayoutDesces[1].AlignedByteOffset = 12;
 		inputLayoutDesces[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		inputLayoutDesces[1].InputSlot = 0;
@@ -329,13 +391,20 @@ namespace ME::graphics
 		inputLayoutDesces[1].SemanticName = "COLOR";
 		inputLayoutDesces[1].SemanticIndex = 0;
 
+		inputLayoutDesces[2].AlignedByteOffset = 28; //12 + 16
+		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutDesces[2].InputSlot = 0;
+		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[2].SemanticName = "TEXCOORD";
+		inputLayoutDesces[2].SemanticIndex = 0;
+
 #pragma endregion
 
-		graphics::Shader* triangle = Resources::Find<graphics::Shader>(L"TriangleShader");
+		graphics::Shader* sprite = Resources::Find<graphics::Shader>(L"SpriteShader");
 
-		if (!(CreateInputLayout(inputLayoutDesces, 2
-			, triangle->GetVSBloc()->GetBufferPointer()
-			, triangle->GetVSBloc()->GetBufferSize()
+		if (!(CreateInputLayout(inputLayoutDesces, 3
+			, sprite->GetVSBloc()->GetBufferPointer()
+			, sprite->GetVSBloc()->GetBufferSize()
 		, &renderer::inputLayouts)))
 		assert(NULL && "Create input layout failed!");
 
@@ -361,14 +430,19 @@ namespace ME::graphics
 		
 		renderer::mesh->Bind();
 
-		Vector4 pos(0.5f, 0.0f, 0.0f, 1.0f);
+		Vector4 pos(0.0f, 0.0f, 0.0f, 1.0f);
 		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].SetData(&pos);
 		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].Bind(eShaderStage::VS);
 
-		graphics::Shader* triangle = Resources::Find<graphics::Shader>(L"TriangleShader");
+		graphics::Shader* triangle = Resources::Find<graphics::Shader>(L"SpriteShader");
 		triangle->Bind();
 
-		mContext->Draw(3, 0);
+		graphics::Texture* texture = Resources::Find<graphics::Texture>(L"TITLE");
+
+		if (texture)
+			texture->Bind(eShaderStage::PS, 0);
+
+		mContext->DrawIndexed(6, 0, 0);
 
 		mSwapChain->Present(1, 0);
 	}

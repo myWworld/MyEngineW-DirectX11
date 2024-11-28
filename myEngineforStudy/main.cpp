@@ -63,6 +63,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
+    ME::LoadScenes();
+
     while (true)
     {
             if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
@@ -101,7 +103,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
    // }
     RemoveFontResourceEx(L"..\\Resources\\jejufont.tff", FR_PRIVATE, 0);
 
-    Gdiplus::GdiplusShutdown(gpToken);
+   
     application.Release();
 
     return (int) msg.wParam;
@@ -141,7 +143,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
 
 
-   application.Initialize(hWnd, width, height);
+ 
 
    if (!hWnd)
    {
@@ -152,10 +154,9 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
-   Gdiplus::GdiplusStartup(&gpToken, &gpsi, NULL);
 
 
-   ME::LoadScenes();   
+   application.Initialize(hWnd, width, height);
 
    //Tile 윈도우 크기 조정
 
@@ -163,28 +164,28 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    std::wstring name = activeScene->GetName();
 
-   if (name == L"ToolScene")
-   {
-       HWND ToolHwnd = CreateWindowW(L"TILEWINDOW", L"TileWindow", WS_OVERLAPPEDWINDOW,
-           0, 0, width, height, nullptr, nullptr, hInstance, nullptr);
-
-       ME::graphics::Texture* texture = ME::Resources::Find<ME::graphics::Texture>(L"SPRINGFLOOR");
-
-       RECT rect = { 0,0,texture->GetWidth(),texture->GetHeight() };
-
-
-       UINT toolWidth = rect.right - rect.left;
-       UINT toolHeight = rect.bottom - rect.top;
-
-       AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
-
-
-
-       SetWindowPos(ToolHwnd, nullptr, width, 0, toolWidth, toolHeight, 0);
-
-       ShowWindow(ToolHwnd, true);
-       UpdateWindow(ToolHwnd);
-   }
+// if (name == L"ToolScene")
+// {
+//     HWND ToolHwnd = CreateWindowW(L"TILEWINDOW", L"TileWindow", WS_OVERLAPPEDWINDOW,
+//         0, 0, width, height, nullptr, nullptr, hInstance, nullptr);
+//
+//     ME::graphics::Texture* texture = ME::Resources::Find<ME::graphics::Texture>(L"SPRINGFLOOR");
+//
+//     RECT rect = { 0,0,texture->GetWidth(),texture->GetHeight() };
+//
+//
+//     UINT toolWidth = rect.right - rect.left;
+//     UINT toolHeight = rect.bottom - rect.top;
+//
+//     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
+//
+//
+//
+//     SetWindowPos(ToolHwnd, nullptr, width, 0, toolWidth, toolHeight, 0);
+//
+//     ShowWindow(ToolHwnd, true);
+//     UpdateWindow(ToolHwnd);
+// }
 
 
    return TRUE;

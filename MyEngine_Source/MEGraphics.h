@@ -13,6 +13,7 @@ namespace ME::graphics
 	{
 		math::Vector3 pos;
 		math::Vector4 color;
+		math::Vector2 uv;
 	};
 
 
@@ -32,6 +33,14 @@ namespace ME::graphics
 	{
 		Transform,
 		None,
+		End,
+	};
+
+	enum class eSamplerType
+	{
+		Anisotropic,
+		Point,
+		PostProcess,
 		End,
 	};
 

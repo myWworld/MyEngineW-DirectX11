@@ -14,8 +14,7 @@ namespace ME::renderer
 	extern Camera* mainCamera;
 	extern Camera* playerCamera;
 
-	extern std::vector<graphics::Vertex> vertexes;
-	extern std::vector<UINT> indices;
+	
 
 	extern graphics::ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End];
 	
