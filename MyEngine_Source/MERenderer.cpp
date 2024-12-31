@@ -3,6 +3,9 @@
 
 #include "MEResources.h"
 #include "MEShader.h"
+#include "MEMesh.h"
+
+#include "MEMaterial.h"
 
 
 namespace ME::renderer
@@ -11,13 +14,12 @@ namespace ME::renderer
 	Camera* playerCamera = nullptr;
 
 	
-	Mesh* mesh = nullptr;
 
 	ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End] = {};
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[(UINT)eSamplerType::End] = {};
 
-	ID3D11Buffer* constantBuffer = nullptr;
-	ID3D11InputLayout* inputLayouts = nullptr;
+	extern Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout = nullptr;
+
 
 	void LoadStage()
 	{
@@ -74,7 +76,7 @@ namespace ME::renderer
 	
 	void LoadTriangleMesh()
 	{
-		mesh = new Mesh();
+		Mesh* mesh = new Mesh();
 
 		//xyz
 	//rgba
@@ -99,11 +101,13 @@ namespace ME::renderer
 
 		mesh->CreatIB(indices);
 		mesh->CreatVB(vertexes);
+
+		ME::Resources::Insert(L"TriangleMesh", mesh);
 	}
 
 	void LoadRectMesh()
 	{
-		mesh = new Mesh();
+		Mesh* mesh = new Mesh();
 
 		std::vector<graphics::Vertex> vertexes = {};
 		std::vector<UINT> indices;
@@ -137,6 +141,8 @@ namespace ME::renderer
 
 		mesh->CreatIB(indices);
 		mesh->CreatVB(vertexes);
+
+		ME::Resources::Insert(L"RectMesh", mesh);
 	}
 
 	void LoadMeshes()
@@ -151,6 +157,14 @@ namespace ME::renderer
 		ME::Resources::Load<graphics::Shader>(L"SpriteShader", L"..\\Shaders_SOURCE\\Sprite");
 	}
 
+	void LoadMaterials()
+	{
+		Material* spriteMaterial = new Material();
+		ME::Resources::Insert(L"SpriteMaterial", spriteMaterial);
+
+		spriteMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"SpriteShader"));
+	}
+
 	void LoadConstantBuffers()
 	{
 		constantBuffers[(UINT)graphics::eCBType::Transform].Create(graphics::eCBType::Transform, sizeof(Vector4));
@@ -161,13 +175,14 @@ namespace ME::renderer
 		LoadStage();
 		LoadMeshes();
 		LoadShaders();
+		LoadMaterials();
 		LoadConstantBuffers();
 	}
 
 	void Release()
 	{
-	
-		inputLayouts->Release();
-		delete mesh;
+		//if(inputLayouts)
+			//inputLayouts->Release();
+		
 	}
 }

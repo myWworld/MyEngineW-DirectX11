@@ -4,7 +4,7 @@
 
 #include "MEConstantBuffer.h"
 
-#include "MEMesh.h"
+
 
 using namespace ME::math;
 using namespace ME::graphics;
@@ -18,10 +18,7 @@ namespace ME::renderer
 
 	extern graphics::ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End];
 	
-	extern Mesh* mesh;
-
-	extern ID3D11Buffer* constantBuffer;
-	extern ID3D11InputLayout* inputLayouts;
+	extern Microsoft::WRL::ComPtr<ID3D11InputLayout> inputLayout;
 
 	void Initialize();
 	void Release();

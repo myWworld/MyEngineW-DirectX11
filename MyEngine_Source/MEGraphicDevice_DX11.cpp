@@ -6,6 +6,9 @@
 #include "MEResources.h"
 #include "MEShader.h"
 
+#include "MEMesh.h"
+#include "MEMaterial.h"
+
 extern ME::Application application;
 
 namespace ME::graphics
@@ -405,8 +408,8 @@ namespace ME::graphics
 		if (!(CreateInputLayout(inputLayoutDesces, 3
 			, sprite->GetVSBloc()->GetBufferPointer()
 			, sprite->GetVSBloc()->GetBufferSize()
-		, &renderer::inputLayouts)))
-		assert(NULL && "Create input layout failed!");
+		,	renderer::inputLayout.GetAddressOf())))
+				assert(NULL && "Create input layout failed!");
 
 	}
 
@@ -424,18 +427,18 @@ namespace ME::graphics
 		mContext->RSSetViewports(1, &viewPort);
 		mContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
 
-		BindConstantBuffer(eShaderStage::VS, eCBType::Transform, renderer::constantBuffer);
-
-		mContext->IASetInputLayout(renderer::inputLayouts);
+	
+		mContext->IASetInputLayout(renderer::inputLayout.Get());
 		
-		renderer::mesh->Bind();
+		Mesh* mesh = Resources::Find<Mesh>(L"RectMesh");
+		mesh->Bind();
 
 		Vector4 pos(0.0f, 0.0f, 0.0f, 1.0f);
 		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].SetData(&pos);
 		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].Bind(eShaderStage::VS);
 
-		graphics::Shader* triangle = Resources::Find<graphics::Shader>(L"SpriteShader");
-		triangle->Bind();
+		Material* material = ME::Resources::Find<Material>(L"SpriteMaterial");
+		material->Bind();
 
 		graphics::Texture* texture = Resources::Find<graphics::Texture>(L"TITLE");
 
