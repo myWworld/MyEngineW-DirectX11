@@ -29,22 +29,7 @@ namespace ME
 
 	void ME::TitleScene::Initialize()
 	{
-		Vector2 resolution = Vector2(application.GetWidth(), application.GetHeight());
-
-		GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, resolution / 2.0f);
-		mCameraComp = camera->AddComponent<Camera>();
-		renderer::mainCamera = mCameraComp;
-
-		titleBg = object::Instantiate<GameObject>(enums::eLayerType::BackGround);
-
-		SpriteRenderer* sr = titleBg->AddComponent<SpriteRenderer>();
-
-		Transform* tr = titleBg->GetComponent<Transform>();
-		tr->SetScale(Vector2(0.2f, 0.15f));
-
-
-		
-
+	
 		Scene::Initialize();
 
 
@@ -71,9 +56,8 @@ namespace ME
 
 	void TitleScene::OnEnter()
 	{
-		MakeBG();
+		
 
-		renderer::mainCamera = mCameraComp;
 
 		UIManager::Push(enums::eUIType::Button);
 		
@@ -89,13 +73,5 @@ namespace ME
 
 	}
 
-	void TitleScene::MakeBG()
-	{
-		graphics::Texture* titleTexture = Resources::Find<graphics::Texture>(L"TITLE");
-		titleBg->GetComponent<SpriteRenderer>()->SetTexture(titleTexture);
-
-		Transform* tr = titleBg->GetComponent<Transform>();
-		tr->SetPosition(Vector2(190, 30));
-	}
 
 }

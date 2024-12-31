@@ -29,7 +29,7 @@ namespace ME
 	
 	Application::~Application()
 	{
-		
+		CoUninitialize();
 	}
 
 
@@ -40,6 +40,11 @@ namespace ME
 		AdjustWindowRect(hwnd, width, height);
 		InitializeEtc();
 
+		HRESULT hr = CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+		if (FAILED(hr)) {
+			MessageBox(nullptr, L"COM 초기화 실패!", L"Error", MB_OK);
+			return;
+		}
 
 		 mGraphicDevice = std::make_unique<graphics::GraphicDevice_DX11>();
 		 
@@ -132,6 +137,7 @@ namespace ME
 
 
 		renderer::Release();
+
 
 
 	}

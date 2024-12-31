@@ -225,6 +225,11 @@ namespace ME::graphics
 	
 	}
 
+	void GraphicDevice_DX11::BindInputLayout(ID3D11InputLayout* pInputLayout)
+	{
+		mContext->IASetInputLayout(pInputLayout);
+	}
+
 	void GraphicDevice_DX11::BindPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY topology)
 	{
 		mContext->IASetPrimitiveTopology(topology);
@@ -255,34 +260,33 @@ namespace ME::graphics
 	{
 		UINT slot = (UINT)type;
 	
-		switch (stage
-)
+		switch (stage)
 		{
 		case ME::graphics::eShaderStage::VS:
-			mContext->VSGetConstantBuffers(slot, 1, &buffer);
+			mContext->VSSetConstantBuffers(slot, 1, &buffer);
 			break;
 		case ME::graphics::eShaderStage::HS:
-			mContext->HSGetConstantBuffers(slot, 1, &buffer);
+			mContext->HSSetConstantBuffers(slot, 1, &buffer);
 			break;
 		case ME::graphics::eShaderStage::DS:
-			mContext->DSGetConstantBuffers(slot, 1, &buffer);
+			mContext->DSSetConstantBuffers(slot, 1, &buffer);
 			break;
 		case ME::graphics::eShaderStage::GS:
-			mContext->GSGetConstantBuffers(slot, 1, &buffer);
+			mContext->GSSetConstantBuffers(slot, 1, &buffer);
 			break;
 		case ME::graphics::eShaderStage::PS:
-			mContext->PSGetConstantBuffers(slot, 1, &buffer);
+			mContext->PSSetConstantBuffers(slot, 1, &buffer);
 			break;
 		case ME::graphics::eShaderStage::CS:
-			mContext->CSGetConstantBuffers(slot, 1, &buffer);
+			mContext->CSSetConstantBuffers(slot, 1, &buffer);
 			break;
 		case ME::graphics::eShaderStage::All:
-			mContext->VSGetConstantBuffers(slot, 1, &buffer);
-			mContext->HSGetConstantBuffers(slot, 1, &buffer);
-			mContext->DSGetConstantBuffers(slot, 1, &buffer);
-			mContext->GSGetConstantBuffers(slot, 1, &buffer);
-			mContext->PSGetConstantBuffers(slot, 1, &buffer);
-			mContext->CSGetConstantBuffers(slot, 1, &buffer);
+			mContext->VSSetConstantBuffers(slot, 1, &buffer);
+			mContext->HSSetConstantBuffers(slot, 1, &buffer);
+			mContext->DSSetConstantBuffers(slot, 1, &buffer);
+			mContext->GSSetConstantBuffers(slot, 1, &buffer);
+			mContext->PSSetConstantBuffers(slot, 1, &buffer);
+			mContext->CSSetConstantBuffers(slot, 1, &buffer);
 			break;
 		default:
 			break;
@@ -377,40 +381,6 @@ namespace ME::graphics
 			assert(NULL && "Create depthstencilview failed!");
 	
 
-#pragma region inputLayout Desc
-
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[3] = {};
-		inputLayoutDesces[0].AlignedByteOffset = 0;
-		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		inputLayoutDesces[0].InputSlot = 0;
-		inputLayoutDesces[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[0].SemanticName = "POSITION";
-		inputLayoutDesces[0].SemanticIndex = 0;
-
-		inputLayoutDesces[1].AlignedByteOffset = 12;
-		inputLayoutDesces[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		inputLayoutDesces[1].InputSlot = 0;
-		inputLayoutDesces[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[1].SemanticName = "COLOR";
-		inputLayoutDesces[1].SemanticIndex = 0;
-
-		inputLayoutDesces[2].AlignedByteOffset = 28; //12 + 16
-		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32_FLOAT;
-		inputLayoutDesces[2].InputSlot = 0;
-		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[2].SemanticName = "TEXCOORD";
-		inputLayoutDesces[2].SemanticIndex = 0;
-
-#pragma endregion
-
-		graphics::Shader* sprite = Resources::Find<graphics::Shader>(L"SpriteShader");
-
-		if (!(CreateInputLayout(inputLayoutDesces, 3
-			, sprite->GetVSBloc()->GetBufferPointer()
-			, sprite->GetVSBloc()->GetBufferSize()
-		,	renderer::inputLayout.GetAddressOf())))
-				assert(NULL && "Create input layout failed!");
-
 	}
 
 	void GraphicDevice_DX11::Draw()
@@ -427,13 +397,11 @@ namespace ME::graphics
 		mContext->RSSetViewports(1, &viewPort);
 		mContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
 
-	
-		mContext->IASetInputLayout(renderer::inputLayout.Get());
 		
 		Mesh* mesh = Resources::Find<Mesh>(L"RectMesh");
 		mesh->Bind();
 
-		Vector4 pos(0.0f, 0.0f, 0.0f, 1.0f);
+		Vector4 pos(-0.2f, 0.0f, 0.5f, 1.0f);
 		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].SetData(&pos);
 		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].Bind(eShaderStage::VS);
 
@@ -446,6 +414,21 @@ namespace ME::graphics
 			texture->Bind(eShaderStage::PS, 0);
 
 		mContext->DrawIndexed(6, 0, 0);
+
+
+
+		mesh = Resources::Find<Mesh>(L"TriangleMesh");
+		mesh->Bind();
+
+		pos = Vector4(0.2f, 0.0f, 0.0f, 1.0f);
+		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].SetData(&pos);
+		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].Bind(eShaderStage::VS);
+
+		material = ME::Resources::Find<Material>(L"TriangleMaterial");
+		material->Bind();
+
+
+		mContext->DrawIndexed(3, 0, 0);
 
 		mSwapChain->Present(1, 0);
 	}

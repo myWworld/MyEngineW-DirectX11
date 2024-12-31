@@ -23,11 +23,6 @@ namespace ME
 	}
 	void PlayScene::Initialize()
 	{
-		Vector2 resolution = Vector2(application.GetWidth(), application.GetHeight());
-
-		GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, resolution / 2.0f);
-		mCameraComp = camera->AddComponent<Camera>();
-		renderer::mainCamera = mCameraComp;
 
 
 	}

@@ -127,6 +127,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEVertexBuffer.cpp">
       <Filter>Graphics\GpuBuffer</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEInputLayout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -273,6 +274,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEVertexBuffer.h">
       <Filter>Graphics\GpuBuffer</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEInputLayout.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">

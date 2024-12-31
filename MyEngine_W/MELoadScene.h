@@ -15,7 +15,6 @@ namespace ME
 	{
 		
 		SceneManager::CreateScene<LoadingScene>(L"LoadingScene");
-		SceneManager::CreateScene<TitleScene>(L"PlayScene");
 		SceneManager::CreateScene<TitleScene>(L"TitleScene");
 
 		SceneManager::LoadScene(L"LoadingScene");

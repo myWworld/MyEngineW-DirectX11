@@ -38,6 +38,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEIndexBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInput.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEInputLayout.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MELayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMaterial.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMath.h" />
@@ -84,6 +85,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEIndexBuffer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEInput.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEInputLayout.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MELayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMaterial.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMath.cpp" />

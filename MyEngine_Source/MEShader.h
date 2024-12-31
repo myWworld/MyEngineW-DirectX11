@@ -25,7 +25,7 @@ namespace ME::graphics
 		void Bind();
 
 
-		Microsoft::WRL::ComPtr<ID3DBlob> GetVSBloc(){ return mVSBlob; }
+		Microsoft::WRL::ComPtr<ID3DBlob> GetVSBlob(){ return mVSBlob; }
 
 	private:
 

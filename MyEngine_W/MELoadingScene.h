@@ -9,7 +9,7 @@ namespace ME
 	{
 	public:
 		LoadingScene();
-		~LoadingScene();
+		virtual ~LoadingScene();
 
 		void Initialize() override;
 		void Update()override;

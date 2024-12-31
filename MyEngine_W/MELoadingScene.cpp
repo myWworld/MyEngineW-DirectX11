@@ -63,7 +63,7 @@ namespace ME
 
 		m.lock();
 		{
-			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\Title.png");
+			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\StartButton.png");
 		
 		}
 		m.unlock();

@@ -3,6 +3,7 @@
 #include "MEResource.h"
 #include "MEVertexBuffer.h"
 #include "MEIndexBuffer.h"
+#include "MEInputLayout.h"
 
 
 namespace ME
@@ -31,10 +32,14 @@ namespace ME
 
 		bool CreatVB(const std::vector<graphics::Vertex>& vertices);
 		bool CreatIB(const std::vector<UINT>& indices);
+		void SetVertexBufferParams(UINT vertexCount, D3D11_INPUT_ELEMENT_DESC* layout, const void* pShaderByteCodeWithInputSignature
+			, SIZE_T BytecodeLength);
 		void Bind();
+
 
 	private:
 
+		graphics::InputLayout mInputLayout;
 		graphics::VertexBuffer mVB;
 		graphics::IndexBuffer mIB;
 
