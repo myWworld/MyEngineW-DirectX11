@@ -29,6 +29,10 @@ namespace ME::graphics
 
 		bool CreateShaderResourceView(ID3D11Resource* pResource, const D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc, ID3D11ShaderResourceView** ppSRView);
 
+		bool CreateRasterizerState(const D3D11_RASTERIZER_DESC* pRasterizerDesc, ID3D11RasterizerState** pRasterizerState);
+		bool CreateBlendState(const D3D11_BLEND_DESC* pBlendDesc, ID3D11BlendState** pBlendState);
+		bool CreateDepthStencilState(const D3D11_DEPTH_STENCIL_DESC* pDepthStencilDesc, ID3D11DepthStencilState** pDepthStencilState);
+
 		void SetDataGpuBuffer(ID3D11Buffer* buffer, void* data, UINT size);
 		void SetShaderResource(eShaderStage stage, UINT startSlot, ID3D11ShaderResourceView** ppSRV);
 
@@ -46,8 +50,26 @@ namespace ME::graphics
 		void BindSampler(eShaderStage stage, UINT StartSlot, UINT NumSamplers, ID3D11SamplerState* const* ppSamplers);
 		void BindSamplers(UINT StartSlot, UINT NumSamplers, ID3D11SamplerState* const* ppSamplers);
 
+		void BindRasterizerState(ID3D11RasterizerState* pRasterizerState);
+		void BindBlendState(ID3D11BlendState* pBlendState, const FLOAT BlendFactor[4], UINT SampleMask);
+		void BindDepthStencilState(ID3D11DepthStencilState* pDepthStencilState, UINT StencilRef);
+
+
+		void BindViewPort();
+		void BindRenderTargets(UINT NumViews = 1, ID3D11RenderTargetView* const* ppRenderTargetViews = nullptr,
+			ID3D11DepthStencilView* pDepthStencilViews = nullptr);
+		void BindDefaultRenderTarget();
+
+		void ClearRenderTargetView();
+		void ClearDepthStencilView();
+
+
+
 		void Initialize();
 		void Draw();
+		
+		void DrawIndexed(UINT indexCount, UINT StartIndexLocation, INT BaseVertexLocation);
+		void Present();
 
 
 	public:

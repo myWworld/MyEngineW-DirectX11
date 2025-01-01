@@ -12,6 +12,7 @@
 
 #include "MEGraphicDevice_DX11.h"
 #include "MEUIManager.h"
+#include "MEPlayer.h"
 
 extern ME::Application application;
 
@@ -29,8 +30,9 @@ namespace ME
 
 	void ME::TitleScene::Initialize()
 	{
-	
+
 		Scene::Initialize();
+
 
 
 	}
@@ -49,14 +51,16 @@ namespace ME
 	void ME::TitleScene::Render()
 	{
  		Scene::Render();
-
-		graphics::GetDevice()->Draw();
-	
 	}
 
 	void TitleScene::OnEnter()
 	{
-		
+		mPlayer = object::Instantiate<Player>(enums::eLayerType::Player);
+
+		SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
+		sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
+		sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
+
 
 
 		UIManager::Push(enums::eUIType::Button);

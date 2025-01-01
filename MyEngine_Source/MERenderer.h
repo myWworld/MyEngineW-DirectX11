@@ -16,7 +16,10 @@ namespace ME::renderer
 
 	extern graphics::ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End];
 	
-
+	extern Microsoft::WRL::ComPtr<ID3D11SamplerState> samplterState[(UINT)eSamplerType::End];
+	 extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[(UINT)eRasterizerState::End];
+	 extern Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[(UINT)eBlendState::End];
+	 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[(UINT)eDepthStencilState::End];
 
 	void Initialize();
 	void Release();

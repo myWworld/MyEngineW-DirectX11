@@ -1,14 +1,14 @@
 #include "Samplers.hlsli"
 #include "Textures.hlsli"
 
-struct VS_Input
+struct VSInput
 {
     float3 pos : POSITION;
     float4 color : COLOR;
     float2 uv : TEXCOORD;
 };
 
-struct VS_Output
+struct VSOutput
 {
 
     float4 pos : SV_Position;
@@ -16,8 +16,8 @@ struct VS_Output
     float2 uv : TEXCOORD;
 };
 
-float4 main(VS_Output input) : SV_Target
+float4 main(VSOutput input) : SV_Target
 {
-    float4 color = albedo.Sample(anisotrophicSampler, input.uv);
+    float4 color = sprite.Sample(anisotrophicSampler, input.uv);
     return color;
 }

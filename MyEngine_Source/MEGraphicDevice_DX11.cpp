@@ -197,6 +197,30 @@ namespace ME::graphics
 		return true;
 	}
 
+	bool GraphicDevice_DX11::CreateRasterizerState(const D3D11_RASTERIZER_DESC* pRasterizerDesc, ID3D11RasterizerState** pRasterizerState)
+	{
+		if(FAILED(mDevice->CreateRasterizerState(pRasterizerDesc, pRasterizerState)))
+			return false;
+
+		return true;
+	}
+
+	bool GraphicDevice_DX11::CreateBlendState(const D3D11_BLEND_DESC* pBlendDesc, ID3D11BlendState** pBlendState)
+	{
+		if (FAILED(mDevice->CreateBlendState(pBlendDesc, pBlendState)))
+			return false;
+
+		return true;
+	}
+
+	bool GraphicDevice_DX11::CreateDepthStencilState(const D3D11_DEPTH_STENCIL_DESC* pDepthStencilDesc, ID3D11DepthStencilState** pDepthStencilState)
+	{
+		if (FAILED(mDevice->CreateDepthStencilState(pDepthStencilDesc, pDepthStencilState)))
+			return false;
+
+		return true;
+	}
+
 
 	void GraphicDevice_DX11::SetShaderResource(eShaderStage stage, UINT startSlot, ID3D11ShaderResourceView** ppSRV)
 	{
@@ -315,6 +339,55 @@ namespace ME::graphics
 		BindSampler(eShaderStage::PS, StartSlot, NumSamplers, ppSamplers);
 	}
 
+	void GraphicDevice_DX11::BindRasterizerState(ID3D11RasterizerState* pRasterizerState)
+	{
+		mContext->RSSetState(pRasterizerState);
+	}
+
+	void GraphicDevice_DX11::BindBlendState(ID3D11BlendState* pBlendState, const FLOAT BlendFactor[4], UINT SampleMask)
+	{
+		mContext->OMSetBlendState(pBlendState, BlendFactor, SampleMask);
+	}
+
+	void GraphicDevice_DX11::BindDepthStencilState(ID3D11DepthStencilState* pDepthStencilState, UINT StencilRef)
+	{
+		mContext->OMSetDepthStencilState(pDepthStencilState, StencilRef);
+	}
+
+	void GraphicDevice_DX11::BindViewPort()
+	{
+
+		D3D11_VIEWPORT viewPort =
+		{
+			0, 0, (float)application.GetWidth(), (float)application.GetHeight(),
+			0.0f, 1.0f
+		};
+		mContext->RSSetViewports(1, &viewPort);
+	}
+
+	void GraphicDevice_DX11::BindRenderTargets(UINT NumViews, ID3D11RenderTargetView* const* ppRenderTargetViews,
+		ID3D11DepthStencilView* pDepthStencilViews)
+	{
+		mContext->OMSetRenderTargets(NumViews, ppRenderTargetViews, pDepthStencilViews);
+	}
+
+
+	void GraphicDevice_DX11::BindDefaultRenderTarget()
+	{
+		mContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
+	}
+
+	void GraphicDevice_DX11::ClearRenderTargetView()
+	{
+		FLOAT backgroundColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+		mContext->ClearRenderTargetView(mRenderTargetView.Get(), backgroundColor);
+	}
+
+	void GraphicDevice_DX11::ClearDepthStencilView()
+	{
+		mContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
+	}
+
 	void GraphicDevice_DX11::Initialize()
 	{
 
@@ -385,19 +458,7 @@ namespace ME::graphics
 
 	void GraphicDevice_DX11::Draw()
 	{
-		FLOAT backgroundColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
-		mContext->ClearRenderTargetView(mRenderTargetView.Get(), backgroundColor);
 
-		mContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
-		D3D11_VIEWPORT viewPort =
-		{
-			0, 0, (float)application.GetWidth(), (float)application.GetHeight(),
-			0.0f, 1.0f
-		};
-		mContext->RSSetViewports(1, &viewPort);
-		mContext->OMSetRenderTargets(1, mRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
-
-		
 		Mesh* mesh = Resources::Find<Mesh>(L"RectMesh");
 		mesh->Bind();
 
@@ -430,6 +491,17 @@ namespace ME::graphics
 
 		mContext->DrawIndexed(3, 0, 0);
 
+	}
+
+
+	void GraphicDevice_DX11::DrawIndexed(UINT indexCount, UINT StartIndexLocation, INT BaseVertexLocation)
+	{
+		mContext->DrawIndexed(indexCount, StartIndexLocation, BaseVertexLocation);
+	}
+
+	void GraphicDevice_DX11::Present()
+	{
 		mSwapChain->Present(1, 0);
 	}
+
 }

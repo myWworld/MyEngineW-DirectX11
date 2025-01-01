@@ -36,6 +36,8 @@ namespace ME
 			, SIZE_T BytecodeLength);
 		void Bind();
 
+		UINT GetIndexCount() const { return mIB.GetIndexCount(); }
+
 
 	private:
 

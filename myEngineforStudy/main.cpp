@@ -52,6 +52,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     MyRegisterClass(hInstance , szWindowClass, WndProc);
     MyRegisterClass(hInstance, L"TILEWINDOW", WndTileProc);
 
+    ME::LoadScenes();
 
     // 애플리케이션 초기화를 수행합니다:
     if (!InitInstance (hInstance, nCmdShow))
@@ -63,7 +64,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-    ME::LoadScenes();
+  
 
     while (true)
     {
@@ -163,29 +164,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    ME::Scene* activeScene = ME::SceneManager::GetActiveScene();
 
    std::wstring name = activeScene->GetName();
-
-// if (name == L"ToolScene")
-// {
-//     HWND ToolHwnd = CreateWindowW(L"TILEWINDOW", L"TileWindow", WS_OVERLAPPEDWINDOW,
-//         0, 0, width, height, nullptr, nullptr, hInstance, nullptr);
-//
-//     ME::graphics::Texture* texture = ME::Resources::Find<ME::graphics::Texture>(L"SPRINGFLOOR");
-//
-//     RECT rect = { 0,0,texture->GetWidth(),texture->GetHeight() };
-//
-//
-//     UINT toolWidth = rect.right - rect.left;
-//     UINT toolHeight = rect.bottom - rect.top;
-//
-//     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
-//
-//
-//
-//     SetWindowPos(ToolHwnd, nullptr, width, 0, toolWidth, toolHeight, 0);
-//
-//     ShowWindow(ToolHwnd, true);
-//     UpdateWindow(ToolHwnd);
-// }
 
 
    return TRUE;

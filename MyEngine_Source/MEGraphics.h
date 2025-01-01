@@ -55,6 +55,40 @@ namespace ME::graphics
 		End,
 	};
 
+	enum class eTextureType
+	{
+		Albedo,
+		Normal,
+		Specular,
+		Smoothness,
+		Metalic,
+		Sprite,
+		End,
+	};
+
+	enum class eRasterizerState
+	{
+		SolidBack,
+		SolidFront,
+		SolidNone,
+		WireFrame,
+		End,
+	};
+
+	enum class eBlendState
+	{
+		AlphaBlend,
+		OneOne,
+		End,
+	};
+
+	enum class eDepthStencilState
+	{
+		DepthNone,
+		LessEqual,
+		End,
+	};
+
 	struct GpuBuffer
 	{
 		Microsoft::WRL::ComPtr<ID3D11Buffer> buffer = nullptr;

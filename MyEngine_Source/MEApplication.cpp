@@ -111,7 +111,11 @@ namespace ME
 	void Application::Render()
 	{
 	
-		
+		graphics::GetDevice()->ClearRenderTargetView();
+		graphics::GetDevice()->ClearDepthStencilView();
+		graphics::GetDevice()->BindViewPort();
+		graphics::GetDevice()->BindDefaultRenderTarget();
+
 
 		Time::Render();
 		
@@ -119,6 +123,7 @@ namespace ME
 		SceneManager::Render();
 		UIManager::Render();
 
+		graphics::GetDevice()->Present();
 
 		
 	

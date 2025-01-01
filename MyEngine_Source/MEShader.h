@@ -25,7 +25,17 @@ namespace ME::graphics
 		void Bind();
 
 
+
+
 		Microsoft::WRL::ComPtr<ID3DBlob> GetVSBlob(){ return mVSBlob; }
+		Microsoft::WRL::ComPtr<ID3DBlob> GetHSBlob(){return mHSBlob;}
+		Microsoft::WRL::ComPtr<ID3DBlob> GetGSBlob(){return mGSBlob;}
+		Microsoft::WRL::ComPtr<ID3DBlob> GetDSBlob(){return mDSBlob;}
+		Microsoft::WRL::ComPtr<ID3DBlob> GetPSBlob(){return mPSBlob;}
+
+		void SetRasterizerState(const eRasterizerState state) { mRasterizerState = state; }
+		void SetBlendState(const eBlendState state) { mBlendState = state; }
+		void SetDepthStencilState(const eDepthStencilState state) { mDepthStencilState = state; }
 
 	private:
 
@@ -40,7 +50,12 @@ namespace ME::graphics
 			Microsoft::WRL::ComPtr<ID3D11DomainShader> mDS;
 			Microsoft::WRL::ComPtr<ID3D11GeometryShader> mGS;
 			Microsoft::WRL::ComPtr<ID3D11PixelShader> mPS;
-		
+
+			graphics::eRasterizerState mRasterizerState;
+			graphics::eBlendState mBlendState;
+			graphics::eDepthStencilState mDepthStencilState;
+
+
 	};
 
 }

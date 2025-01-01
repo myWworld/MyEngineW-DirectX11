@@ -3,8 +3,14 @@
 #include "MESceneManager.h"
 #include "MEResources.h"
 #include "METexture.h"
+#include "MESceneManager.h"
+#include "METitleScene.h"
+
+
 
 #include "MEApplication.h"
+
+
 extern ME::Application application;
 
 namespace ME
@@ -64,6 +70,10 @@ namespace ME
 		m.lock();
 		{
 			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\StartButton.png");
+
+			renderer::Initialize();
+
+			SceneManager::CreateScene<TitleScene>(L"TitleScene");
 		
 		}
 		m.unlock();

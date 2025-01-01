@@ -20,6 +20,9 @@
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="MEPlayScene.h" />
+    <ClInclude Include="MEPlayer.h">
+      <Filter>Contents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -55,5 +58,8 @@
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="MEPlayScene.cpp" />
+    <ClCompile Include="MEPlayer.cpp">
+      <Filter>Contents</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

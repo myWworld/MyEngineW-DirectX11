@@ -27,7 +27,7 @@ namespace ME
 	private:
 
 		class Camera* mCameraComp;
-		class GameObject* titleBg;
+		class GameObject* mPlayer;
 	
 	};
 }
