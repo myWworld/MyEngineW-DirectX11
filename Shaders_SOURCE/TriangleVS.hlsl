@@ -1,25 +1,25 @@
 #include "ConstantBuffers.hlsli"
 
-struct VS_Input
+struct VSInput
 {
     float3 pos : POSITION;
     float4 color : COLOR;
 };
-struct VS_Output
+struct VSOutput
 {
     float4 pos : SV_Position;
     float4 color : COLOR;
     
 };
-VS_Output main(VS_Input input)
+VSOutput main(VSInput input)
 {
-    VS_Output output;
-    output.pos = float4(input.pos, 1.0f);
+    VSOutput output = (VSOutput) 0.0f;
     
-    output.pos.x += position.x;
-    output.pos.y += position.y;
-    output.pos.z += position.z;
+    float4 pos = mul(float4(input.pos, 1.0f), WorldMatrix);
+    float4 viewPos = mul(pos, ViewMatrix);
+    float4 projPos = mul(viewPos, ProjectionMatrix);
     
+    output.pos = projPos;
     output.color = input.color;
     
     return output;

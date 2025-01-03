@@ -34,7 +34,7 @@ namespace ME
 	void Tile::SetIndexPosition(int x, int y)
 	{
 		Transform* tr = GetComponent<Transform>();
-		Vector2 pos;
+		Vector3 pos;
 		pos.x =  x * TileMapRenderer::TileSize.x;
 		pos.y =  y * TileMapRenderer::TileSize.y;
 

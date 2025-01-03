@@ -23,9 +23,9 @@ namespace ME
 	void BoxCollider2D::Update()
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
-		Vector2 pos = tr->GetPosition();
+		Vector3 pos = tr->GetPosition();
 
-		Vector2 offset = GetOwner()->GetComponent<BoxCollider2D>()->GetOffset();
+		Vector3 offset = GetOwner()->GetComponent<BoxCollider2D>()->GetOffset();
 		float width = (100.0f * GetSize().x);
 		float height = (100.0f * GetSize().y);
 
@@ -40,13 +40,13 @@ namespace ME
 	void BoxCollider2D::Render()
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
-		Vector2 pos = tr->GetPosition();
+		Vector3 pos = tr->GetPosition();
 		
 
 		
 	}
 
-	Vector2 BoxCollider2D::RotateCollider(float rot, int x ,int y, int width,int height)//, HDC hdc)
+	Vector3 BoxCollider2D::RotateCollider(float rot, int x ,int y, int width,int height)//, HDC hdc)
 	{
 		
 		float radian = rot * (3.14159265f / 180.0f);
@@ -82,7 +82,7 @@ namespace ME
 	
 		mPoint =  points;
 
-		Vector2 centralPoint = Vector2(midx, midy);
+		Vector3 centralPoint = Vector3(midx, midy, 0.0f);
 
 		return centralPoint;
 	}

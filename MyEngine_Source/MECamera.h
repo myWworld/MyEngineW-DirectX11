@@ -8,9 +8,17 @@ namespace ME
 	class Camera :public Component
 	{
 	public:
+	
+		enum class eProjectionType
+		{
+			Perspective,
+			Orthographic,
+		};
 
-		Vector2 CalculatePosition(Vector2 pos)const{ return pos - mDistance;}
-		Vector2 CalculateTilePosition(Vector2 pos) const{ return pos + mDistance; }
+		static Matrix GetGpuViewMatrix() { return ViewMatrix; }
+		static Matrix GetGpuProjectionMatrix() { return ProjectionMatrix; }
+		static void SetGpuViewMatrix(Matrix matrix) { ViewMatrix = matrix; }
+		static void SetGpuProjectionMatrix(Matrix matrix) { ProjectionMatrix = matrix; }
 
 		Camera();
 		~Camera();
@@ -21,7 +29,11 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
-		void SetTarget(GameObject* target) { mTarget = target; }
+		void CreateViewMatrix();
+		void CreateProjectionMatrix(eProjectionType type);
+
+		void SetProjectionMatrix(eProjectionType type) { mProjectionType = type; }
+		void SetSize(float size) { mSize = size; }
 
 		
 
@@ -29,12 +41,18 @@ namespace ME
 
 		//std::vector<GameObject*> mGameObjects;
 
+		static Matrix ViewMatrix;
+		static Matrix ProjectionMatrix;
 
-		Vector2 mDistance;
-		Vector2 mResolution;
-		Vector2 mLookPosition;
+		eProjectionType mProjectionType;
+
+		Matrix mViewMatrix;
+		Matrix mProjectionMatrix;
 		
-		GameObject* mTarget;
+		float mAspectRatio;
+		float mNear;
+		float mFar;
+		float mSize;
 	
 	};
 

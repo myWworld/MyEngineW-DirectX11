@@ -157,11 +157,11 @@ namespace ME
 		Transform* leftTr = left->GetOwner()->GetComponent<Transform>();
 		Transform* rightTr = right->GetOwner()->GetComponent<Transform>();
 
-		Vector2 leftPos = leftTr->GetPosition() + left->GetOffset();
-		Vector2 rightPos = rightTr->GetPosition() + right->GetOffset();
+		Vector3 leftPos = leftTr->GetPosition() + left->GetOffset();
+		Vector3 rightPos = rightTr->GetPosition() + right->GetOffset();
 
-		Vector2 leftSize = left->GetSize() * 100.0f;
-		Vector2 rightSize = right->GetSize() * 100.0f;
+		Vector3 leftSize = left->GetSize() * 100.0f;
+		Vector3 rightSize = right->GetSize() * 100.0f;
 
 		BoxCollider2D* leftBC = (static_cast<BoxCollider2D*>(left));
 		BoxCollider2D* rightBC = (static_cast<BoxCollider2D*>(right));
@@ -172,8 +172,8 @@ namespace ME
 		if (leftType == enums::eColliderType::Rect2D
 			&& rightType == enums::eColliderType::Rect2D)
 		{
-			Vector2 leftCenterPos = leftPos  + (leftSize / 2.0f);
-			Vector2 rightCenterPos = rightPos + (rightSize / 2.0f);
+			Vector3 leftCenterPos = leftPos  + (leftSize / 2.0f);
+			Vector3 rightCenterPos = rightPos + (rightSize / 2.0f);
 
 	
 				if (leftBC->IsRotate())
@@ -214,8 +214,8 @@ namespace ME
 			&& rightType == enums::eColliderType::Circle2D)
 		{
 			//circle - circle
-			Vector2 leftCirclePos = leftPos + (leftSize / 2.0f);
-			Vector2 rightCirclePos = rightPos + (rightSize / 2.0f);
+			Vector3 leftCirclePos = leftPos + (leftSize / 2.0f);
+			Vector3 rightCirclePos = rightPos + (rightSize / 2.0f);
 
 			float distance = (leftCirclePos - rightCirclePos).Length();
 
@@ -229,7 +229,7 @@ namespace ME
 		if (leftType == enums::eColliderType::Circle2D && rightType == enums::eColliderType::Rect2D)
 		{
 			//circle - rect
-			Vector2 leftCirclePos = leftPos + (leftSize / 2.0f);
+			Vector3 leftCirclePos = leftPos + (leftSize / 2.0f);
 
 			float r = leftSize.x / 2.0f;
 
@@ -246,7 +246,7 @@ namespace ME
 		if (leftType == enums::eColliderType::Rect2D && rightType == enums::eColliderType::Circle2D)
 		{
 			//circle - rect
-			Vector2 rightCirclePos = rightPos + (rightSize / 2.0f);
+			Vector3 rightCirclePos = rightPos + (rightSize / 2.0f);
 
 			float r = rightSize.x / 2.0f;
 

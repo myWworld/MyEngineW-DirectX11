@@ -26,8 +26,7 @@ namespace ME
 		Vector2 GetForce() { return mForce; }
 		bool IsGround() { return mbGround; }
 
-		void StopMoving();
-
+	
 		void SetNeedGravity(bool isAffected, Vector2 gravity = Vector2(0,0))
 		{
 			if (isAffected == false)

@@ -1,4 +1,6 @@
 cbuffer Transform : register(b0)
 {
-    float4 position;
+    row_major matrix WorldMatrix;
+    row_major matrix ViewMatrix;
+    row_major matrix ProjectionMatrix;
 }

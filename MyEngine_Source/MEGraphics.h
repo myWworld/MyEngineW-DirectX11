@@ -6,6 +6,11 @@
 #include "CommonInclude.h"
 #include <wrl.h>
 
+#define CB_GETBINDSLOT(name) __CBUFFERBINDSLOT__##name##__
+#define CBUFFER(name, slot) static const int CB_GETBINDSLOT(name) = slot; struct alignas(16) name
+
+#define CBSLOT_TRANSFORM 0
+
 namespace ME::graphics
 {
 
@@ -96,6 +101,14 @@ namespace ME::graphics
 
 		GpuBuffer() = default;
 		virtual ~GpuBuffer() = default;
+
+	};
+
+	CBUFFER(TransformCB, CBSLOT_TRANSFORM)
+	{
+		math::Matrix world;
+		math::Matrix view;
+		math::Matrix projection;
 
 	};
 

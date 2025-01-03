@@ -20,7 +20,7 @@ namespace ME
 
 		 
 		 void SetRotation(float rot) { mRot = rot; }
-		 Vector2 GetCentralPoint() { return mCentralPoint; }
+		 Vector3 GetCentralPoint() { return mCentralPoint; }
 
 		 bool IsRotate() { return mbIsRotate; }
 		 float GetHeight() { return mHeight; }
@@ -30,12 +30,12 @@ namespace ME
 
 	private:
 	
-		Vector2 RotateCollider(float rot, int x, int y, int width, int height);
+		Vector3 RotateCollider(float rot, int x, int y, int width, int height);
 	
 	private:
 		
 		float mRot;
-		Vector2 mCentralPoint;
+		Vector3 mCentralPoint;
 
 		float mWidth, mHeight;
 

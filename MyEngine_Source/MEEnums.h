@@ -6,14 +6,9 @@ namespace ME::enums
 	{
 		None,
 		BackGround,
-		Tile,
 		Block,
 		Floor,
 		Items,
-		Bullet,
-		Monster,
-		Obstacle,
-		Aura,
 		Player,
 		Particle,
 		Max = 20

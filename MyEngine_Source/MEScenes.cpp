@@ -1,6 +1,7 @@
 
 #include "MEScenes.h"
 #include "MECollisionManager.h"
+#include "MESceneManager.h"
 
 namespace ME
 {
@@ -23,13 +24,8 @@ namespace ME
 
 	void Scene::Initialize()
 	{
-		for (Layer* layer : mLayers)
-		{
-			if (layer == nullptr)
-				continue;
-
-			layer->Initialize();
-		}
+		const std::wstring& sceneName = GetName();
+		SceneManager::SetActiveScene(sceneName);
 	}
 
 	void Scene::Update()

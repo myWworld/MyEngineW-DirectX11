@@ -14,6 +14,8 @@
 #include "MEUIManager.h"
 #include "MEPlayer.h"
 
+#include "MECameraScript.h"
+
 extern ME::Application application;
 
 namespace ME
@@ -32,6 +34,15 @@ namespace ME
 	{
 
 		Scene::Initialize();
+
+		GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, Vector3(0,0,0));
+
+		Camera* cameraComp = camera->AddComponent<Camera>();
+		cameraComp->SetProjectionMatrix(Camera::eProjectionType::Orthographic);
+		cameraComp->SetSize(200.0f);
+
+		CameraScript* cameraScript = camera->AddComponent<CameraScript>();
+		renderer::mainCamera = cameraComp;
 
 
 

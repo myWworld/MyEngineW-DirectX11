@@ -15,7 +15,7 @@ namespace ME::renderer
 
 	
 
-	ConstantBuffer constantBuffers[(UINT)graphics::eCBType::End] = {};
+	ConstantBuffer* constantBuffers[(UINT)graphics::eCBType::End] = {};
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[(UINT)eSamplerType::End] = {};
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[(UINT)eRasterizerState::End] = {};
@@ -303,7 +303,8 @@ namespace ME::renderer
 
 	void LoadConstantBuffers()
 	{
-		constantBuffers[(UINT)graphics::eCBType::Transform].Create(graphics::eCBType::Transform, sizeof(Vector4));
+		constantBuffers[CBSLOT_TRANSFORM] = new ConstantBuffer(eCBType::Transform);
+		constantBuffers[CBSLOT_TRANSFORM]->Create(sizeof(TransformCB));
 	}
 
 	void Initialize()
@@ -317,8 +318,11 @@ namespace ME::renderer
 
 	void Release()
 	{
-		//if(inputLayouts)
-			//inputLayouts->Release();
+		for (int i = 0; i < (UINT)eCBType::End; i++)
+		{
+			delete constantBuffers[i];
+			constantBuffers[i] = nullptr;
+		}
 		
 	}
 }

@@ -18,23 +18,31 @@ namespace ME
     void CameraScript::Update()
     {
         Transform* tr = GetOwner()->GetComponent<Transform>();
-        Vector2 pos = tr->GetPosition();
+        Vector3 pos = tr->GetPosition();
 
-        if (Input::GetKey(eKeyCode::Right))
+        if (Input::GetKey(eKeyCode::A))
         {
-            pos.x += 100.0f * Time::DeltaTime();
+            pos += 20.0f * -tr->Right() * Time::DeltaTime();
         }
-        if (Input::GetKey(eKeyCode::Left))
+        if (Input::GetKey(eKeyCode::D))
         {
-            pos.x -= 100.0f * Time::DeltaTime();
+            pos += 20.0f * tr->Right() * Time::DeltaTime();
         }
-        if (Input::GetKey(eKeyCode::Up))
+        if (Input::GetKey(eKeyCode::W))
         {
-            pos.y -= 100.0f * Time::DeltaTime();
+            pos += 20.0f* tr->Forward() * Time::DeltaTime();
         }
-        if (Input::GetKey(eKeyCode::Down))
+        if (Input::GetKey(eKeyCode::S))
         {
-            pos.y += 100.0f * Time::DeltaTime();
+            pos += 20.0f * - tr->Forward() *Time::DeltaTime();
+        }
+        if (Input::GetKey(eKeyCode::E))
+        {
+            pos += 20.0f * tr->Up() * Time::DeltaTime();
+        }
+        if (Input::GetKey(eKeyCode::Q))
+        {
+            pos += 20.0f * -tr->Up() * Time::DeltaTime();
         }
 
         tr->SetPosition(pos);

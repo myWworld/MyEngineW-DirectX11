@@ -10,10 +10,10 @@ namespace ME::graphics
 
 	public:
 
-		ConstantBuffer();
+		ConstantBuffer(eCBType type);
 		~ConstantBuffer();
 
-		bool Create(eCBType type, UINT size, void* data = nullptr);
+		bool Create(UINT size, void* data = nullptr);
 
 		void SetData(void* data) const;
 		void Bind(eShaderStage stage) const;

@@ -66,7 +66,7 @@ namespace ME::graphics
 
 
 		void Initialize();
-		void Draw();
+		void Draw(UINT vertexCount , UINT StartVertexLocation);
 		
 		void DrawIndexed(UINT indexCount, UINT StartIndexLocation, INT BaseVertexLocation);
 		void Present();

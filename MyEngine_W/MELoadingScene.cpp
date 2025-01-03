@@ -78,6 +78,8 @@ namespace ME
 		}
 		m.unlock();
 
+		SceneManager::SetActiveScene(L"LoadingScene");
+
 		mbLoadCompleted = true;
 
 	}

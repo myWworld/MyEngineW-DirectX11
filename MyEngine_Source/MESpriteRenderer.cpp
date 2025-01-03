@@ -6,6 +6,8 @@
 #include "MERenderer.h"
 #include "MECamera.h"
 
+#include "METransform.h"
+
 #include "MEResources.h"
 
 
@@ -38,6 +40,11 @@ namespace ME {
 
 	void ME::SpriteRenderer::Render()
 	{
+		Transform* tr = GetOwner()->GetComponent<Transform>();
+
+		if (tr)
+			tr->Bind();
+
 		if (mMesh)
 			mMesh->Bind();
 

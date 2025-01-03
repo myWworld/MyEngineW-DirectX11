@@ -456,40 +456,10 @@ namespace ME::graphics
 
 	}
 
-	void GraphicDevice_DX11::Draw()
+	void GraphicDevice_DX11::Draw(UINT vertexCount, UINT StartVertexLocation)
 	{
 
-		Mesh* mesh = Resources::Find<Mesh>(L"RectMesh");
-		mesh->Bind();
-
-		Vector4 pos(-0.2f, 0.0f, 0.5f, 1.0f);
-		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].SetData(&pos);
-		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].Bind(eShaderStage::VS);
-
-		Material* material = ME::Resources::Find<Material>(L"SpriteMaterial");
-		material->Bind();
-
-		graphics::Texture* texture = Resources::Find<graphics::Texture>(L"TITLE");
-
-		if (texture)
-			texture->Bind(eShaderStage::PS, 0);
-
-		mContext->DrawIndexed(6, 0, 0);
-
-
-
-		mesh = Resources::Find<Mesh>(L"TriangleMesh");
-		mesh->Bind();
-
-		pos = Vector4(0.2f, 0.0f, 0.0f, 1.0f);
-		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].SetData(&pos);
-		renderer::constantBuffers[(UINT)graphics::eCBType::Transform].Bind(eShaderStage::VS);
-
-		material = ME::Resources::Find<Material>(L"TriangleMaterial");
-		material->Bind();
-
-
-		mContext->DrawIndexed(3, 0, 0);
+		mContext->Draw(vertexCount, StartVertexLocation);
 
 	}
 

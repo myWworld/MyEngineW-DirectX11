@@ -19,20 +19,39 @@ namespace ME
 		void LateUpdate()  override;
 		void Render()  override;
 		
-		void SetPosition(Vector2 pos) { mPosition = pos; }
-		void SetScale(Vector2 scale) { mScale = scale; }
-		void SetRotation(float rotation) { mRotation = rotation; }
+		void Bind();
 
-		Vector2 GetPosition() const{ return mPosition; }
+		Transform* GetParent() { return mParent; }
+		const Matrix GetWorldMatrix() { return mWorldMatrix; }
 
-		Vector2 GetScale() const{ return mScale; }
-		float GetRotation() const{ return mRotation; }
+		const Vector3 GetPosition() { return mPosition; }
+		const Vector3 GetRotation() { return mRotation; }
+		const Vector3 GetScale() { return mScale; }
+
+		void SetPosition(Vector3 position) {mPosition = position;}
+		void SetPosition(float x, float y, float z) { mPosition = Vector3(x, y, z); }
+		void SetRotation(Vector3 rotation) { mRotation = rotation; }
+		void SetRotation(float x, float y, float z) { mRotation = Vector3(x, y, z); }
+		void SetScale(Vector3 scale) { mScale = scale; }
+		void SetScale(float x, float y, float z) { mScale = Vector3(x, y, z); }
+
+		const Vector3 Forward() { return mForward; };
+		const Vector3 Right() { return mRight; };
+		const Vector3 Up() { return mUp; };
+
 
 	private:
-		Vector2 mPosition;
-		Vector2 mScale;
 		
-		float mRotation;
+		Transform* mParent;
+		Matrix mWorldMatrix;
+
+		Vector3 mPosition;
+		Vector3 mRotation;
+		Vector3 mScale;
+
+		Vector3 mForward;
+		Vector3 mRight;
+		Vector3 mUp;
 
 	};
 

@@ -21,13 +21,13 @@ namespace ME
 		virtual void OnCollisionStay(Collider* other);
 		virtual void OnCollisionExit(Collider* other);
 
-		Vector2 GetOffset() const{ return mOffset; }
-		void SetOffset(Vector2 offset) { mOffset = offset; }
+		Vector3 GetOffset() const{ return mOffset; }
+		void SetOffset(Vector3 offset) { mOffset = offset; }
 
 		UINT32 GetID() const{ return mID; }
-		Vector2 GetSize() const { return mSize; }
+		Vector3 GetSize() const { return mSize; }
 
-		void SetSize(Vector2 size) { mSize = size; }
+		void SetSize(Vector3 size) { mSize = size; }
 
 		enums::eColliderType GetColliderType() const{ return mType; }
 
@@ -36,8 +36,8 @@ namespace ME
 		static UINT32 mCollisionID;
 
 		UINT32 mID;
-		Vector2 mOffset;
-		Vector2 mSize;
+		Vector3 mOffset;
+		Vector3 mSize;
 
 		enums::eColliderType mType;
 

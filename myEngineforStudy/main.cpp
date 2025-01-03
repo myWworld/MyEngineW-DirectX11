@@ -50,7 +50,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_MYENGINEFORSTUDY, szWindowClass, MAX_LOADSTRING);
     MyRegisterClass(hInstance , szWindowClass, WndProc);
-    MyRegisterClass(hInstance, L"TILEWINDOW", WndTileProc);
+
 
     ME::LoadScenes();
 
@@ -136,8 +136,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance,const wchar_t * name,  WNDPROC proc)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // 인스턴스 핸들을 전역 변수에 저장합니다.
-   const UINT width = 900;
-   const UINT height = 600;
+   const UINT width = 1300;
+   const UINT height = 900;
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
       CW_USEDEFAULT, 0, width,height, nullptr, nullptr, hInstance, nullptr);

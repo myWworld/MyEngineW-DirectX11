@@ -24,7 +24,7 @@ namespace ME::object
 	}
 
 	template <typename T>
-	static T* Instantiate(ME::enums::eLayerType type, math::Vector2 position)
+	static T* Instantiate(ME::enums::eLayerType type, math::Vector3 position)
 	{
 		T* gameObject = new T();
 
