@@ -69,10 +69,11 @@ namespace ME
 
 		m.lock();
 		{
-			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\StartButton.png");
+			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\Statge1_1.png");
 
 			renderer::Initialize();
 
+			
 			SceneManager::CreateScene<TitleScene>(L"TitleScene");
 		
 		}

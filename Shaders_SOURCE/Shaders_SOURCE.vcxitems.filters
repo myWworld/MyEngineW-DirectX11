@@ -7,10 +7,16 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)TriangleVS.hlsl">
       <Filter>VS</Filter>
     </FxCompile>
-    <FxCompile Include="$(MSBuildThisFileDirectory)SpritePS.hlsl">
+    <FxCompile Include="$(MSBuildThisFileDirectory)SpriteDefaultPS.hlsl">
       <Filter>PS</Filter>
     </FxCompile>
-    <FxCompile Include="$(MSBuildThisFileDirectory)SpriteVS.hlsl">
+    <FxCompile Include="$(MSBuildThisFileDirectory)SpriteDefaultVS.hlsl">
+      <Filter>VS</Filter>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)WireFramePS.hlsl">
+      <Filter>PS</Filter>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)WireFrameVS.hlsl">
       <Filter>VS</Filter>
     </FxCompile>
   </ItemGroup>

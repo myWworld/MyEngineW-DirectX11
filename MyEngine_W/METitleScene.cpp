@@ -39,17 +39,25 @@ namespace ME
 
 		Camera* cameraComp = camera->AddComponent<Camera>();
 		cameraComp->SetProjectionMatrix(Camera::eProjectionType::Orthographic);
-		cameraComp->SetSize(200.0f);
+		cameraComp->SetSize(1000.0f);
 
 		CameraScript* cameraScript = camera->AddComponent<CameraScript>();
 		renderer::mainCamera = cameraComp;
 
-
-
+		
 	}
 
 	void ME::TitleScene::Update()
 	{
+		if (!mPlayer)
+		{
+			mPlayer = object::Instantiate<Player>(enums::eLayerType::BackGround, Vector3(0, 0, 0));
+
+
+			SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
+			sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
+			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
+		}
 		Scene::Update();
 	}
 
@@ -66,11 +74,16 @@ namespace ME
 
 	void TitleScene::OnEnter()
 	{
-		mPlayer = object::Instantiate<Player>(enums::eLayerType::Player);
+		if (!mPlayer)
+		{
 
-		SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
-		sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
-		sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
+			mPlayer = object::Instantiate<Player>(enums::eLayerType::BackGround, Vector3(0, 0, 0));
+
+
+			SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
+			sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
+			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
+		}
 
 
 

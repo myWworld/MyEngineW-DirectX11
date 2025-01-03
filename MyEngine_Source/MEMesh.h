@@ -13,10 +13,10 @@ namespace ME
 	public:
 
 
-		struct Data
+		struct MeshData
 		{
-			Data();
-			~Data();
+			MeshData();
+			~MeshData();
 
 			D3D11_PRIMITIVE_TOPOLOGY mTopology;
 			std::vector<graphics::Vertex> vertices;
@@ -45,7 +45,7 @@ namespace ME
 		graphics::VertexBuffer mVB;
 		graphics::IndexBuffer mIB;
 
-		Data mData;
+		MeshData mData;
 
 	};
 

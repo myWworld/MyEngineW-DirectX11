@@ -266,7 +266,7 @@ namespace ME::renderer
 		inputLayoutDesces[2].SemanticName = "TEXCOORD";
 		inputLayoutDesces[2].SemanticIndex = 0;
 
-		graphics::Shader* spriteShader = Resources::Find<graphics::Shader>(L"SpriteShader");
+		graphics::Shader* spriteShader = Resources::Find<graphics::Shader>(L"SpriteDefaultShader");
 		mesh->SetVertexBufferParams(3, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
 
 
@@ -285,7 +285,9 @@ namespace ME::renderer
 	void LoadShaders()
 	{
 		ME::Resources::Load<graphics::Shader>(L"TriangleShader", L"..\\Shaders_SOURCE\\Triangle");
-		ME::Resources::Load<graphics::Shader>(L"SpriteShader", L"..\\Shaders_SOURCE\\Sprite");
+		ME::Resources::Load<graphics::Shader>(L"SpriteDefaultShader", L"..\\Shaders_SOURCE\\SpriteDefault");
+		ME::Resources::Load<graphics::Shader>(L"WireFrameShader", L"..\\Shaders_SOURCE\\WireFrame");
+
 
 	}
 
@@ -297,8 +299,9 @@ namespace ME::renderer
 		Material* spriteMaterial = new Material();
 		ME::Resources::Insert(L"SpriteMaterial", spriteMaterial);
 
-		spriteMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"SpriteShader"));
+		spriteMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"SpriteDefaultShader"));
 		triangleMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"TriangleShader"));
+
 	}
 
 	void LoadConstantBuffers()

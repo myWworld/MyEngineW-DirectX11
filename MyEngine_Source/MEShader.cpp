@@ -1,8 +1,12 @@
 #include "MEShader.h"
+#include "MEResources.h"
+#include "MERenderer.h"
 
 
 namespace ME::graphics
 {
+	bool Shader::bWireFrame = false;
+
 	ME::graphics::Shader::Shader()
 		:Resource(enums::eResourceType::Shader)
 	{
@@ -62,11 +66,34 @@ namespace ME::graphics
 
 	void Shader::Bind()
 	{
+		if (bWireFrame)
+		{
+			Shader* wireframeShader = Resources::Find<Shader>(L"WireFrameShader");
+			Microsoft::WRL::ComPtr<ID3D11VertexShader> wireframeShaderVS = wireframeShader->GetVS();
+			Microsoft::WRL::ComPtr<ID3D11PixelShader>wireframeShaderPS = wireframeShader->GetPS();
+			Microsoft::WRL::ComPtr<ID3D11RasterizerState> wireframeRasterizerState = renderer::rasterizerStates[static_cast<UINT> (eRasterizerState::WireFrame)];
+
+			GetDevice()->BindVS(wireframeShaderVS.Get());
+			GetDevice()->BindPS(wireframeShaderPS.Get());
+
+			GetDevice()->BindRasterizerState(wireframeRasterizerState.Get());
+			GetDevice()->BindBlendState(renderer::blendStates[static_cast<UINT>(mBlendState)].Get(), nullptr, 0xffffff);
+			GetDevice()->BindDepthStencilState(renderer::depthStencilStates[static_cast<UINT>(mDepthStencilState)].Get(), 0);
+
+			return;
+
+		}
+
 		if (mVS)
 			GetDevice()->BindVS(mVS.Get());
 
 		if(mPS)
 			GetDevice()->BindPS(mPS.Get());
+
+
+		GetDevice()->BindRasterizerState(renderer::rasterizerStates[static_cast<UINT>(mRasterizerState)].Get());
+		GetDevice()->BindBlendState(renderer::blendStates[static_cast<UINT>(mBlendState)].Get(), nullptr, 0xffffff);
+		GetDevice()->BindDepthStencilState(renderer::depthStencilStates[static_cast<UINT>(mDepthStencilState)].Get(), 0);
 	}
 
 }
