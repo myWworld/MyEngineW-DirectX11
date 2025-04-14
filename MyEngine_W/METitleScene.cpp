@@ -13,6 +13,7 @@
 #include "MEGraphicDevice_DX11.h"
 #include "MEUIManager.h"
 #include "MEPlayer.h"
+#include "MEModel.h"
 
 #include "MECameraScript.h"
 
@@ -38,7 +39,7 @@ namespace ME
 		GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, Vector3(0,0,0));
 
 		Camera* cameraComp = camera->AddComponent<Camera>();
-		cameraComp->SetProjectionMatrix(Camera::eProjectionType::Orthographic);
+		cameraComp->SetProjectionMatrix(Camera::eProjectionType::Perspective);
 		cameraComp->SetSize(1000.0f);
 
 		CameraScript* cameraScript = camera->AddComponent<CameraScript>();
@@ -53,10 +54,16 @@ namespace ME
 		{
 			mPlayer = object::Instantiate<Player>(enums::eLayerType::BackGround, Vector3(0, 0, 0));
 
-
 			SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
 			sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
 			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
+
+			Model* model = new Model();
+			if (model->LoadModel(L"..\\Resources\\characterBase.fbx"))
+			{
+			
+			}
+			
 		}
 		Scene::Update();
 	}
@@ -83,6 +90,8 @@ namespace ME
 			SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
 			sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
 			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
+
+			
 		}
 
 

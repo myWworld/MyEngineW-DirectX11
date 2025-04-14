@@ -71,7 +71,7 @@ namespace ME
 		switch (type)
 		{
 		case eProjectionType::Perspective:
-			mProjectionMatrix = Matrix::CreatePerspectiveFieldOfViewLH(XM_2PI/6.0f, mAspectRatio, mNear, mFar);
+			mProjectionMatrix = Matrix::CreatePerspectiveFieldOfViewLH(XM_2PI/1.0f, mAspectRatio, mNear, mFar);
 			break;
 		case eProjectionType::Orthographic:
 			mProjectionMatrix = Matrix::CreateOrthographicLH(width / mSize, height / mSize, mNear, mFar);

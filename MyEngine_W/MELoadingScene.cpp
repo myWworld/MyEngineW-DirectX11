@@ -70,6 +70,7 @@ namespace ME
 		m.lock();
 		{
 			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\Statge1_1.png");
+		//	Resources::Load<graphics::Texture>(L"Character", L"..\\Resources\\characterBase.fbx");
 
 			renderer::Initialize();
 

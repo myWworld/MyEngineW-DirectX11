@@ -128,6 +128,9 @@
       <Filter>Graphics\GpuBuffer</Filter>
     </ClCompile>
     <ClCompile Include="$(MSBuildThisFileDirectory)MEInputLayout.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEModel.cpp">
+      <Filter>Resource\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -275,6 +278,9 @@
       <Filter>Graphics\GpuBuffer</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInputLayout.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEModel.h">
+      <Filter>Resource\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -366,6 +372,9 @@
     </Filter>
     <Filter Include="Resource\Shader">
       <UniqueIdentifier>{be8631b1-8b6e-4455-b4b7-647add188e51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Model">
+      <UniqueIdentifier>{a23cbadf-3167-4b64-befa-334fd9913179}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

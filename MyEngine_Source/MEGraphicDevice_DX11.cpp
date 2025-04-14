@@ -319,6 +319,9 @@ namespace ME::graphics
 
 	void GraphicDevice_DX11::BindSampler(eShaderStage stage, UINT StartSlot, UINT NumSamplers, ID3D11SamplerState* const* ppSamplers)
 	{
+		if (mContext == nullptr)
+			assert(NULL && "mContext is nullptr! BindSampler");
+
 		if (eShaderStage::VS == stage)
 			mContext->VSSetSamplers(StartSlot, NumSamplers, ppSamplers);
 		if (eShaderStage::HS == stage)

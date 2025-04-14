@@ -204,8 +204,8 @@ namespace ME::renderer
 		graphics::Shader* triangleShader = Resources::Find<graphics::Shader>(L"TriangleShader");
 		mesh->SetVertexBufferParams(2, inputLayoutDesces, triangleShader->GetVSBlob()->GetBufferPointer(), triangleShader->GetVSBlob()->GetBufferSize());
 
-		mesh->CreatIB(indices);
-		mesh->CreatVB(vertexes);
+		mesh->CreateIB(indices);
+		mesh->CreateVB(vertexes);
 
 		ME::Resources::Insert(L"TriangleMesh", mesh);
 	}
@@ -270,10 +270,47 @@ namespace ME::renderer
 		mesh->SetVertexBufferParams(3, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
 
 
-		mesh->CreatIB(indices);
-		mesh->CreatVB(vertexes);
+		mesh->CreateIB(indices);
+		mesh->CreateVB(vertexes);
 
 		ME::Resources::Insert(L"RectMesh", mesh);
+	}
+
+	void LoadModels(Mesh* mesh, const std::wstring& name)
+	{
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[4] = {};
+		inputLayoutDesces[0].AlignedByteOffset = 0;
+		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[0].InputSlot = 0;
+		inputLayoutDesces[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[0].SemanticName = "POSITION";
+		inputLayoutDesces[0].SemanticIndex = 0;
+
+		inputLayoutDesces[1].AlignedByteOffset = 12;
+		inputLayoutDesces[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutDesces[1].InputSlot = 0;
+		inputLayoutDesces[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[1].SemanticName = "COLOR";
+		inputLayoutDesces[1].SemanticIndex = 0;
+
+		inputLayoutDesces[2].AlignedByteOffset = 28; //12 + 16
+		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[2].InputSlot = 0;
+		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[2].SemanticName = "NORMAL";
+		inputLayoutDesces[2].SemanticIndex = 0;
+
+		inputLayoutDesces[3].AlignedByteOffset = 40; //12 + 16
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutDesces[3].InputSlot = 0;
+		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[3].SemanticName = "TEXCOORD";
+		inputLayoutDesces[3].SemanticIndex = 0;
+
+		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader");
+		mesh->SetVertexBufferParams(4, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+
+		ME::Resources::Insert(name, mesh);
 	}
 
 	void LoadMeshes()
@@ -287,6 +324,8 @@ namespace ME::renderer
 		ME::Resources::Load<graphics::Shader>(L"TriangleShader", L"..\\Shaders_SOURCE\\Triangle");
 		ME::Resources::Load<graphics::Shader>(L"SpriteDefaultShader", L"..\\Shaders_SOURCE\\SpriteDefault");
 		ME::Resources::Load<graphics::Shader>(L"WireFrameShader", L"..\\Shaders_SOURCE\\WireFrame");
+		ME::Resources::Load<graphics::Shader>(L"ModelShader", L"..\\Shaders_SOURCE\\Model");
+
 
 
 	}

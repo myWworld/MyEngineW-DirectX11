@@ -21,6 +21,13 @@ namespace ME
 		:Resource(enums::eResourceType::Mesh)
 	{
 	}
+
+	Mesh::Mesh(std::vector<graphics::Vertex> vertices, std::vector<unsigned int> indicies)
+		:Resource(enums::eResourceType::Mesh)
+	{
+		CreateVB(vertices);
+		CreateIB(indicies);
+	}
 	Mesh::~Mesh()
 	{
 	}
@@ -35,13 +42,13 @@ namespace ME
 	{
 		return S_OK;
 	}
-	bool Mesh::CreatVB(const std::vector<graphics::Vertex>& vertices)
+	bool Mesh::CreateVB(const std::vector<graphics::Vertex>& vertices)
 	{
 		mData.vertices = vertices;
 		return mVB.Create(vertices);
 
 	}
-	bool Mesh::CreatIB(const std::vector<UINT>& indices)
+	bool Mesh::CreateIB(const std::vector<UINT>& indices)
 	{
 		mData.indices = indices;
 		return mIB.Create(indices);

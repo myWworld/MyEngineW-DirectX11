@@ -25,13 +25,14 @@ namespace ME
 		};
 
 		Mesh();
+		Mesh(std::vector<graphics::Vertex> vertices, std::vector<unsigned int> indicies);
 		~Mesh();
 
 		virtual HRESULT Save(const std::wstring& path)override;
 		virtual HRESULT Load(const std::wstring& path) override;
 
-		bool CreatVB(const std::vector<graphics::Vertex>& vertices);
-		bool CreatIB(const std::vector<UINT>& indices);
+		bool CreateVB(const std::vector<graphics::Vertex>& vertices);
+		bool CreateIB(const std::vector<UINT>& indices);
 		void SetVertexBufferParams(UINT vertexCount, D3D11_INPUT_ELEMENT_DESC* layout, const void* pShaderByteCodeWithInputSignature
 			, SIZE_T BytecodeLength);
 		void Bind();
