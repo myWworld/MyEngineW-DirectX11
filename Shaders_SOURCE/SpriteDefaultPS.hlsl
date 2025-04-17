@@ -5,6 +5,7 @@ struct VSInput
 {
     float3 pos : POSITION;
     float4 color : COLOR;
+    float3 normal : NORMAL;
     float2 uv : TEXCOORD;
 };
 
@@ -13,6 +14,7 @@ struct VSOutput
 
     float4 pos : SV_Position;
     float4 color : COLOR;
+    float3 normal : NORMAL;
     float2 uv : TEXCOORD;
 };
 

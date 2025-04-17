@@ -49,6 +49,7 @@ namespace ME::enums
 		SpriteRenderer,
 		Animator,
 		Camera,
+		ModelRenderer,
 		AudioListener,
 		AudioSource,
 		End,

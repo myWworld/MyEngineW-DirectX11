@@ -3,7 +3,6 @@
 
 #include "MEResources.h"
 #include "MEShader.h"
-#include "MEMesh.h"
 
 #include "MEMaterial.h"
 
@@ -82,7 +81,7 @@ namespace ME::renderer
 		D3D11_RASTERIZER_DESC rsDesc = {};
 
 		rsDesc.AntialiasedLineEnable = false;
-		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
+		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
 		rsDesc.DepthBias = 0;
 		rsDesc.DepthBiasClamp = 0.0f;
 		rsDesc.DepthClipEnable = true;
@@ -244,7 +243,7 @@ namespace ME::renderer
 		indices.push_back(1);
 		indices.push_back(2);
 
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[3] = {};
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[4] = {};
 		inputLayoutDesces[0].AlignedByteOffset = 0;
 		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[0].InputSlot = 0;
@@ -260,14 +259,22 @@ namespace ME::renderer
 		inputLayoutDesces[1].SemanticIndex = 0;
 
 		inputLayoutDesces[2].AlignedByteOffset = 28; //12 + 16
-		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[2].InputSlot = 0;
 		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[2].SemanticName = "TEXCOORD";
+		inputLayoutDesces[2].SemanticName = "NORMAL";
 		inputLayoutDesces[2].SemanticIndex = 0;
 
+
+		inputLayoutDesces[3].AlignedByteOffset = 40; //12 + 16
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutDesces[3].InputSlot = 0;
+		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[3].SemanticName = "TEXCOORD";
+		inputLayoutDesces[3].SemanticIndex = 0;
+
 		graphics::Shader* spriteShader = Resources::Find<graphics::Shader>(L"SpriteDefaultShader");
-		mesh->SetVertexBufferParams(3, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
+		mesh->SetVertexBufferParams(4, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
 
 
 		mesh->CreateIB(indices);
@@ -276,7 +283,7 @@ namespace ME::renderer
 		ME::Resources::Insert(L"RectMesh", mesh);
 	}
 
-	void LoadModels(Mesh* mesh, const std::wstring& name)
+	void LoadModels(Mesh* mesh)
 	{
 		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[4] = {};
 		inputLayoutDesces[0].AlignedByteOffset = 0;
@@ -310,7 +317,6 @@ namespace ME::renderer
 		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader");
 		mesh->SetVertexBufferParams(4, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
 
-		ME::Resources::Insert(name, mesh);
 	}
 
 	void LoadMeshes()
@@ -338,9 +344,12 @@ namespace ME::renderer
 		Material* spriteMaterial = new Material();
 		ME::Resources::Insert(L"SpriteMaterial", spriteMaterial);
 
+		Material* modelMaterial = new Material();
+		ME::Resources::Insert(L"ModelMaterial", modelMaterial);
+
 		spriteMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"SpriteDefaultShader"));
 		triangleMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"TriangleShader"));
-
+		modelMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"ModelShader"));
 	}
 
 	void LoadConstantBuffers()

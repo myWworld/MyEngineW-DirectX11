@@ -19,11 +19,14 @@ namespace ME
 		void LateUpdate()  override;
 		void Render()  override;
 
-		void SetSprite(graphics::Texture* sprite) { mSprite = sprite; }
+		void SetSprite(graphics::Texture* sprite) { mTextures = sprite; }
 		void SetMaterial(Material* material) { mMaterial = material; }
 
 	private:
-		graphics::Texture* mSprite;
+
+
+
+		graphics::Texture* mTextures;
 		Material* mMaterial;
 		Mesh* mMesh;
 

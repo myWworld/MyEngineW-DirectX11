@@ -382,7 +382,7 @@ namespace ME::graphics
 
 	void GraphicDevice_DX11::ClearRenderTargetView()
 	{
-		FLOAT backgroundColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+		FLOAT backgroundColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 		mContext->ClearRenderTargetView(mRenderTargetView.Get(), backgroundColor);
 	}
 

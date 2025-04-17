@@ -58,6 +58,6 @@ namespace ME {
 	private:
 
 		static std::vector<Key> Keys;
-		static math::Vector2 mMousePosition; 
+		static math::Vector2 mMousePosition;
 	};
 }

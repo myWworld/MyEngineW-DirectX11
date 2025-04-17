@@ -32,6 +32,11 @@ namespace ME
 	private:
 
 		graphics::Texture* mAlbedoTexture;
+		std::vector<graphics::Texture*> mAlbedoTextures;
+		graphics::Texture* mNormalTexture;
+		graphics::Texture* mSpecularTexture;
+
+
 		graphics::Shader* mShader;
 
 		graphics::eRenderingMode mMode;

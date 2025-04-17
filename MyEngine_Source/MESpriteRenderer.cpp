@@ -15,7 +15,7 @@ namespace ME {
 
 	ME::SpriteRenderer::SpriteRenderer() 
 		:mMesh(nullptr)
-		,mSprite(nullptr)
+		,mTextures(nullptr)
 		,mMaterial(nullptr)
 		,Component(enums::eComponentType::SpriteRenderer)
 	{
@@ -51,8 +51,8 @@ namespace ME {
 		if (mMaterial)
 			mMaterial->BindShader();
 
-		if (mSprite)
-			mSprite->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Sprite);
+		if (mTextures)
+			mTextures->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Sprite);
 
 		if (mMesh)
 			graphics::GetDevice()->DrawIndexed(mMesh->GetIndexCount(), 0, 0);

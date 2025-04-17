@@ -66,6 +66,8 @@ namespace ME::graphics
 		return S_OK;
 	}
 
+
+
 	void Texture::Bind(eShaderStage stage, UINT startSlot)
 	{
 		graphics::GetDevice()->SetShaderResource(stage, startSlot, mSRV.GetAddressOf());

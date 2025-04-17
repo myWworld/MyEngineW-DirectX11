@@ -4,9 +4,12 @@
 #include "MEGameObject.h"
 #include "METime.h"
 
+
 namespace ME
 {
     CameraScript::CameraScript()
+        :mPrevMousePos(Vector2(0, 0))
+        ,mMouseSpeed(0.005f)
     {
     }
     CameraScript::~CameraScript()
@@ -19,6 +22,25 @@ namespace ME
     {
         Transform* tr = GetOwner()->GetComponent<Transform>();
         Vector3 pos = tr->GetPosition();
+
+        mCurMousePos = Input::GetMousePos();
+        float curMP = mCurMousePos.Length();
+        float prevMP = mPrevMousePos.Length();
+
+        if (abs(curMP - prevMP) > 1.0f)
+        {
+
+            Vector2 delta = mCurMousePos - mPrevMousePos;
+            mPrevMousePos = mCurMousePos;
+
+            float angle = delta.x * mMouseSpeed;
+  
+            Vector4 curPos = Vector4(pos.x, pos.y,pos.z, 1.0f);
+            Matrix rotation = Matrix::CreateRotationY(angle);
+            Vector4 newPos = Vector4::Transform(curPos, rotation);
+            pos = Vector3(newPos.x, newPos.y, newPos.z);
+
+        }
 
         if (Input::GetKey(eKeyCode::A))
         {

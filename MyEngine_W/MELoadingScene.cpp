@@ -71,7 +71,7 @@ namespace ME
 		{
 			Resources::Load<graphics::Texture>(L"TITLE", L"..\\Resources\\Statge1_1.png");
 		//	Resources::Load<graphics::Texture>(L"Character", L"..\\Resources\\characterBase.fbx");
-
+			Resources::Load<graphics::Texture>(L"HUMAN", L"..\\Resources\\humanTex.jpg");
 			renderer::Initialize();
 
 			

@@ -16,6 +16,7 @@
 #include "MEModel.h"
 
 #include "MECameraScript.h"
+#include "MEModelRenderer.h"
 
 extern ME::Application application;
 
@@ -59,9 +60,16 @@ namespace ME
 			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 
 			Model* model = new Model();
-			if (model->LoadModel(L"..\\Resources\\characterBase.fbx"))
+			if (model->LoadModel(L"..\\Resources\\character.fbx"))
 			{
-			
+				mPlayer->AddComponent<ModelRenderer>();
+				ModelRenderer* modelRenderer = mPlayer->GetComponent<ModelRenderer>();
+				modelRenderer->SetMesh(model->GetMeshes());
+			}
+			else
+			{
+				delete model;
+				model = nullptr;
 			}
 			
 		}
@@ -91,7 +99,27 @@ namespace ME
 			sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
 			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 
-			
+			Model* model = new Model();
+			if (model->LoadModel(L"..\\Resources\\characterBase.fbx"))
+			{
+				mPlayer->AddComponent<ModelRenderer>();
+				ModelRenderer* modelRenderer = mPlayer->GetComponent<ModelRenderer>();
+				modelRenderer->SetMesh(model->GetMeshes());
+
+				if(model->GetTextures().size() > 0)
+					modelRenderer->SetTextures(model->GetTextures());
+				else 
+					modelRenderer->SetTexture( Resources::Find<graphics::Texture>(L"HUMAN"));
+
+				
+				modelRenderer->SetMaterial(Resources::Find<Material>(L"ModelMaterial"));
+			}
+			else
+			{
+				delete model;
+				model = nullptr;
+			}
+
 		}
 
 

@@ -3,12 +3,13 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include "METexture.h"
+
 namespace ME
 {
 
     class Mesh;
-    class Texture;
-
+  
     class Model
     {
     public:
@@ -16,16 +17,18 @@ namespace ME
         ~Model();
 
         bool LoadModel(const std::wstring& path);
-        const std::vector<std::shared_ptr<Mesh>>& GetMeshes() { return m_meshes; }
+        const std::vector<Mesh*>& GetMeshes() { return mMeshes; }
+        const std::vector<graphics::Texture*>&GetTextures() { return mTextures; }
 
     private:
 
         void ProcessNode(aiNode* node, const aiScene* scene);
-        std::shared_ptr<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
-        std::vector<std::shared_ptr<Texture>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::wstring& typeName);
+        Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene);
+        std::vector<graphics::Texture*> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::wstring& typeName);
 
     private:
-        std::vector<std::shared_ptr<Mesh>> m_meshes;
+        std::vector<Mesh*> mMeshes;
+        std::vector<graphics::Texture *> mTextures;
 
     };
 

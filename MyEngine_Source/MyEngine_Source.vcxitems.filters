@@ -131,6 +131,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEModel.cpp">
       <Filter>Resource\Model</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEModelRenderer.cpp">
+      <Filter>Component\ModelRenderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -281,6 +284,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEModel.h">
       <Filter>Resource\Model</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEModelRenderer.h">
+      <Filter>Component\ModelRenderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -375,6 +381,9 @@
     </Filter>
     <Filter Include="Resource\Model">
       <UniqueIdentifier>{a23cbadf-3167-4b64-befa-334fd9913179}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\ModelRenderer">
+      <UniqueIdentifier>{782d890a-914c-42e5-a1f7-49d0fa4f3ae5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

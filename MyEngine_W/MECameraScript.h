@@ -1,5 +1,6 @@
 #pragma once
 #include "../MyEngine_Source/MEScript.h"
+#include "MEMath.h"
 
 namespace ME
 {
@@ -21,6 +22,10 @@ namespace ME
 
 
 	private:
+
+		Vector2 mPrevMousePos;
+		Vector2 mCurMousePos;
+		float mMouseSpeed;
 	};
 
 }
