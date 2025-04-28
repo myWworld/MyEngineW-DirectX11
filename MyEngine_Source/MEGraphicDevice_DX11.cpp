@@ -438,6 +438,7 @@ namespace ME::graphics
 
 #pragma region depthstencil desc
 
+			
 		D3D11_TEXTURE2D_DESC depthStencilDesc = {};
 		depthStencilDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;
 		depthStencilDesc.Format = DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT;

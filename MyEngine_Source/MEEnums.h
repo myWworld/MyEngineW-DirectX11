@@ -14,12 +14,21 @@ namespace ME::enums
 		Max = 20
 	};
 
+	enum class eModelType
+	{
+		Static,
+		StaticBone,
+		SkinnedMesh,
+		End,
+	};
+
 	enum class eResourceType
 	{
 		Texture,
 		Mesh,
 		Material,
 		Animation,
+		Skeleton,
 		AudioClip,
 		Shader,
 		Prefab,
@@ -50,6 +59,7 @@ namespace ME::enums
 		Animator,
 		Camera,
 		ModelRenderer,
+		Animator3D,
 		AudioListener,
 		AudioSource,
 		End,

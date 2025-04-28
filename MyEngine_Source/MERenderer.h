@@ -20,6 +20,7 @@ namespace ME::renderer
 	 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[(UINT)eDepthStencilState::End];
 
 	 void LoadModels(Mesh* mesh);
+	 void LoadStaticModels(Mesh* mesh);
 
 	void Initialize();
 	void Release();

@@ -25,6 +25,12 @@
     <FxCompile Include="$(MSBuildThisFileDirectory)ModelVS.hlsl">
       <Filter>VS</Filter>
     </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)StaticModelPS.hlsl">
+      <Filter>PS</Filter>
+    </FxCompile>
+    <FxCompile Include="$(MSBuildThisFileDirectory)StaticModelVS.hlsl">
+      <Filter>VS</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="PS">

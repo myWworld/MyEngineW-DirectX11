@@ -2,6 +2,7 @@
 #include "MEGameObject.h"
 
 
+
 namespace ME
 {
 	class Player:public GameObject
@@ -16,6 +17,9 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
+
+
+		
 
 
 	};

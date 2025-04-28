@@ -17,6 +17,7 @@
 
 #include "MECameraScript.h"
 #include "MEModelRenderer.h"
+#include "MEAnimator3D.h"
 
 extern ME::Application application;
 
@@ -51,28 +52,7 @@ namespace ME
 
 	void ME::TitleScene::Update()
 	{
-		if (!mPlayer)
-		{
-			mPlayer = object::Instantiate<Player>(enums::eLayerType::BackGround, Vector3(0, 0, 0));
-
-			SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
-			sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
-			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
-
-			Model* model = new Model();
-			if (model->LoadModel(L"..\\Resources\\character.fbx"))
-			{
-				mPlayer->AddComponent<ModelRenderer>();
-				ModelRenderer* modelRenderer = mPlayer->GetComponent<ModelRenderer>();
-				modelRenderer->SetMesh(model->GetMeshes());
-			}
-			else
-			{
-				delete model;
-				model = nullptr;
-			}
-			
-		}
+		
 		Scene::Update();
 	}
 
@@ -92,7 +72,8 @@ namespace ME
 		if (!mPlayer)
 		{
 
-			mPlayer = object::Instantiate<Player>(enums::eLayerType::BackGround, Vector3(0, 0, 0));
+			mPlayer = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(0, 0, 0));
+		
 
 
 			SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
@@ -100,7 +81,7 @@ namespace ME
 			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 
 			Model* model = new Model();
-			if (model->LoadModel(L"..\\Resources\\characterBase.fbx"))
+			if (model->LoadModel(L"..\\Resources\\male.fbx"))
 			{
 				mPlayer->AddComponent<ModelRenderer>();
 				ModelRenderer* modelRenderer = mPlayer->GetComponent<ModelRenderer>();
@@ -109,10 +90,14 @@ namespace ME
 				if(model->GetTextures().size() > 0)
 					modelRenderer->SetTextures(model->GetTextures());
 				else 
-					modelRenderer->SetTexture( Resources::Find<graphics::Texture>(L"HUMAN"));
+					modelRenderer->SetTexture( Resources::Find<graphics::Texture>(L"MALE"));
 
 				
 				modelRenderer->SetMaterial(Resources::Find<Material>(L"ModelMaterial"));
+				Animator3D* animator = mPlayer->AddComponent<Animator3D>();
+				animator->SetSkeleton(&model->GetSkeleton());
+				animator->CreateAnimation(L"Idle", L"..\\Resources\\Animation\\Idle.fbx");
+				animator->PlayAnimation(L"Idle", true);
 			}
 			else
 			{

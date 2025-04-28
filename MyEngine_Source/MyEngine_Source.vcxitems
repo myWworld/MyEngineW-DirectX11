@@ -17,10 +17,13 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ContentAndScript.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation3D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimator.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimator3D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAudioClip.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAudioListener.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAudioSource.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEBone.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider2D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECamera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECircleCollider2D.h" />
@@ -54,6 +57,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScenes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScript.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEShader.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MESkeleton.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MESpriteRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)METexture.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)METileMapRenderer.h" />
@@ -68,10 +72,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation3D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimator.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimator3D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAudioClip.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAudioListener.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAudioSource.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEBone.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider2D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECamera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECircleCollider2D.cpp" />
@@ -102,6 +109,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScenes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScript.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEShader.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MESkeleton.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MESpriteRenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)METexture.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)METileMapRenderer.cpp" />

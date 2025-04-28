@@ -134,6 +134,18 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEModelRenderer.cpp">
       <Filter>Component\ModelRenderer</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEBone.cpp">
+      <Filter>Resource\Bone</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MESkeleton.cpp">
+      <Filter>Resource\Skeleton</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimator3D.cpp">
+      <Filter>Component\Animator</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation3D.cpp">
+      <Filter>Resource\Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -287,6 +299,18 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEModelRenderer.h">
       <Filter>Component\ModelRenderer</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEBone.h">
+      <Filter>Resource\Bone</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MESkeleton.h">
+      <Filter>Resource\Skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimator3D.h">
+      <Filter>Component\Animator</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation3D.h">
+      <Filter>Resource\Animation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -384,6 +408,12 @@
     </Filter>
     <Filter Include="Component\ModelRenderer">
       <UniqueIdentifier>{782d890a-914c-42e5-a1f7-49d0fa4f3ae5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Bone">
+      <UniqueIdentifier>{5a529dfb-19c9-483f-a8ad-32217c8a9d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource\Skeleton">
+      <UniqueIdentifier>{6a3cb03a-5d5d-42d0-a9e2-7ec92966e20d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

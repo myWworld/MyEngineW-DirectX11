@@ -10,6 +10,7 @@
 #define CBUFFER(name, slot) static const int CB_GETBINDSLOT(name) = slot; struct alignas(16) name
 
 #define CBSLOT_TRANSFORM 0
+#define CBSLOT_ANIMATION 1
 
 namespace ME::graphics
 {
@@ -19,7 +20,23 @@ namespace ME::graphics
 		math::Vector3 pos;
 		math::Vector4 color;
 		math::Vector3 normal;
+		int boneIndicies[4];
+		float boneWeight[4];
 		math::Vector2 uv;
+
+
+		void AddBoneData(int boneIndex, float weight)
+		{
+			for (int i = 0; i < 4; i++)
+			{
+				if (boneWeight[i] == 0.0f)
+				{
+					boneIndicies[i] = boneIndex;
+					boneWeight[i] = weight;
+					return;
+				}
+			}
+		}
 	};
 
 
@@ -38,6 +55,7 @@ namespace ME::graphics
 	enum class eCBType
 	{
 		Transform,
+		Animation,
 		None,
 		End,
 	};
@@ -110,6 +128,12 @@ namespace ME::graphics
 		math::Matrix world;
 		math::Matrix view;
 		math::Matrix projection;
+
+	};
+
+	CBUFFER(AnimationCB, CBSLOT_ANIMATION)
+	{
+		math::Matrix BoneMatrices[256];
 
 	};
 

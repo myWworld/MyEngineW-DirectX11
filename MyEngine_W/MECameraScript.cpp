@@ -9,7 +9,7 @@ namespace ME
 {
     CameraScript::CameraScript()
         :mPrevMousePos(Vector2(0, 0))
-        ,mMouseSpeed(0.005f)
+        ,mMouseSpeed(0.5f)
     {
     }
     CameraScript::~CameraScript()
@@ -22,6 +22,7 @@ namespace ME
     {
         Transform* tr = GetOwner()->GetComponent<Transform>();
         Vector3 pos = tr->GetPosition();
+        Vector3 rotation = tr->GetRotation();
 
         mCurMousePos = Input::GetMousePos();
         float curMP = mCurMousePos.Length();
@@ -35,10 +36,9 @@ namespace ME
 
             float angle = delta.x * mMouseSpeed;
   
-            Vector4 curPos = Vector4(pos.x, pos.y,pos.z, 1.0f);
-            Matrix rotation = Matrix::CreateRotationY(angle);
-            Vector4 newPos = Vector4::Transform(curPos, rotation);
-            pos = Vector3(newPos.x, newPos.y, newPos.z);
+            rotation.y += angle; // Y축(위로 도는 방향) 회전값만 증가
+
+            tr->SetRotation(rotation); // 최종 회전값 반영
 
         }
 

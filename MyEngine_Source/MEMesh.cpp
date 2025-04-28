@@ -22,11 +22,12 @@ namespace ME
 	{
 	}
 
-	Mesh::Mesh(std::vector<graphics::Vertex> vertices, std::vector<unsigned int> indicies)
+	Mesh::Mesh(std::vector<graphics::Vertex>& vertices, std::vector<unsigned int>& indicies, std::vector<Bone>& bones)
 		:Resource(enums::eResourceType::Mesh)
 	{
 		CreateVB(vertices);
 		CreateIB(indicies);
+		mData.bones = bones;
 	}
 	Mesh::~Mesh()
 	{

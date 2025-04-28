@@ -64,19 +64,29 @@ void ModelRenderer::render()
                continue;
 
            mesh->Bind();
+
+           if(mesh->GetDiffuseTexture() != nullptr)
+		   {
+			   mesh->GetDiffuseTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
+		   }
+
+           if (mesh->GetSpecularTexture() != nullptr)
+           {
+               mesh->GetSpecularTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Specular);
+           }
        }
    }
 
-   if (mTextures.size() > 0)
-   {
-       for (auto texture : mTextures)
-       {
-           if (texture == nullptr)
-               continue;
-
-           texture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
-       }
-   }
+     if (mTextures.size() > 0)
+     {
+         for (auto texture : mTextures)
+         {
+             if (texture == nullptr)
+                 continue;
+    
+             texture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
+         }
+     }
 
     if (!mMeshes.empty())
     {

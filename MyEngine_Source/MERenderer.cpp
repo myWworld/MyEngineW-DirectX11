@@ -81,7 +81,7 @@ namespace ME::renderer
 		D3D11_RASTERIZER_DESC rsDesc = {};
 
 		rsDesc.AntialiasedLineEnable = false;
-		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
 		rsDesc.DepthBias = 0;
 		rsDesc.DepthBiasClamp = 0.0f;
 		rsDesc.DepthClipEnable = true;
@@ -285,6 +285,58 @@ namespace ME::renderer
 
 	void LoadModels(Mesh* mesh)
 	{
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[6] = {};
+		inputLayoutDesces[0].AlignedByteOffset = 0;
+		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[0].InputSlot = 0;
+		inputLayoutDesces[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[0].SemanticName = "POSITION";
+		inputLayoutDesces[0].SemanticIndex = 0;
+
+		inputLayoutDesces[1].AlignedByteOffset = 12;
+		inputLayoutDesces[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutDesces[1].InputSlot = 0;
+		inputLayoutDesces[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[1].SemanticName = "COLOR";
+		inputLayoutDesces[1].SemanticIndex = 0;
+
+		inputLayoutDesces[2].AlignedByteOffset = 28; //12 + 16
+		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[2].InputSlot = 0;
+		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[2].SemanticName = "NORMAL";
+		inputLayoutDesces[2].SemanticIndex = 0;
+
+
+		inputLayoutDesces[3].AlignedByteOffset = 40; //12 + 16
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[3].InputSlot = 0;
+		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[3].SemanticName = "BONEINDICES";
+		inputLayoutDesces[3].SemanticIndex = 0;
+
+
+		inputLayoutDesces[4].AlignedByteOffset = 56; //12 + 16
+		inputLayoutDesces[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[4].InputSlot = 0;
+		inputLayoutDesces[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[4].SemanticName = "BONEWEIGHTS";
+		inputLayoutDesces[4].SemanticIndex = 0;
+
+		inputLayoutDesces[5].AlignedByteOffset = 72; //12 + 16
+		inputLayoutDesces[5].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutDesces[5].InputSlot = 0;
+		inputLayoutDesces[5].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[5].SemanticName = "TEXCOORD";
+		inputLayoutDesces[5].SemanticIndex = 0;
+
+		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader");
+		mesh->SetVertexBufferParams(6, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+
+	}
+
+	void LoadStaticModels(Mesh* mesh)
+	{
 		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[4] = {};
 		inputLayoutDesces[0].AlignedByteOffset = 0;
 		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -307,6 +359,7 @@ namespace ME::renderer
 		inputLayoutDesces[2].SemanticName = "NORMAL";
 		inputLayoutDesces[2].SemanticIndex = 0;
 
+
 		inputLayoutDesces[3].AlignedByteOffset = 40; //12 + 16
 		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32_FLOAT;
 		inputLayoutDesces[3].InputSlot = 0;
@@ -314,7 +367,7 @@ namespace ME::renderer
 		inputLayoutDesces[3].SemanticName = "TEXCOORD";
 		inputLayoutDesces[3].SemanticIndex = 0;
 
-		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader");
+		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"StaticModelShader");
 		mesh->SetVertexBufferParams(4, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
 
 	}
@@ -331,6 +384,7 @@ namespace ME::renderer
 		ME::Resources::Load<graphics::Shader>(L"SpriteDefaultShader", L"..\\Shaders_SOURCE\\SpriteDefault");
 		ME::Resources::Load<graphics::Shader>(L"WireFrameShader", L"..\\Shaders_SOURCE\\WireFrame");
 		ME::Resources::Load<graphics::Shader>(L"ModelShader", L"..\\Shaders_SOURCE\\Model");
+		ME::Resources::Load<graphics::Shader>(L"StaticModelShader", L"..\\Shaders_SOURCE\\StaticModel");
 
 
 
@@ -347,15 +401,23 @@ namespace ME::renderer
 		Material* modelMaterial = new Material();
 		ME::Resources::Insert(L"ModelMaterial", modelMaterial);
 
+
+		Material* staticModelMaterial = new Material();
+		ME::Resources::Insert(L"StaticModelMaterial", modelMaterial);
+
 		spriteMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"SpriteDefaultShader"));
 		triangleMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"TriangleShader"));
 		modelMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"ModelShader"));
+		staticModelMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"StaticModelShader"));
 	}
 
 	void LoadConstantBuffers()
 	{
 		constantBuffers[CBSLOT_TRANSFORM] = new ConstantBuffer(eCBType::Transform);
 		constantBuffers[CBSLOT_TRANSFORM]->Create(sizeof(TransformCB));
+		constantBuffers[CBSLOT_ANIMATION] = new ConstantBuffer(eCBType::Animation);
+		constantBuffers[CBSLOT_ANIMATION]->Create(sizeof(AnimationCB));
+
 	}
 
 	void Initialize()
