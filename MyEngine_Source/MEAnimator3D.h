@@ -60,12 +60,20 @@ namespace ME
 		std::function<void()>& GetEndEvent(const std::wstring& name);
 
 		bool IsComplete() { return mActiveAnimation->IsComplete(); }
-		void SetSkeleton(Skeleton* skeleton) { mSkeleton = skeleton; }
+		void SetSkeleton(Skeleton* skeleton) { 
+			
+			mSkeleton = skeleton; 
+			this->mModelType = mSkeleton->GetModelType();
+		}
 		Skeleton* GetSkeleton() { return mSkeleton; }
 
 
 	private:
 
+		void boneTransformBind();
+
+	private:
+		
 		std::map<std::wstring, Animation3D*> mAnimations;
 
 		bool mbLoop;
@@ -76,9 +84,11 @@ namespace ME
 
 		//Event
 		std::map<std::wstring, Events*> mEvents;
+		enums::eModelType mModelType;
 
 	};
 
+	extern std::unordered_map<std::string, std::string> BoneNameManualMapping;
 
 }
 

@@ -40,7 +40,6 @@ namespace ME
         const aiScene* scene = importer.ReadFile(path_str,
             aiProcess_Triangulate |
             aiProcess_FlipUVs |
-            aiProcess_PreTransformVertices |   //  로컬 변환 미리 적용
             aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
             aiProcess_FindInvalidData |          //  잘못된 데이터 자동 제거
             aiProcess_OptimizeMeshes |           //  메쉬 최적화
@@ -87,12 +86,12 @@ namespace ME
             if (mesh->mNumBones > 0)
             {
                 renderer::LoadModels(mMesh);
-                mModelType = enums::eModelType::SkinnedMesh;
+                mSkeleton.SetModelType(enums::eModelType::SkinnedMesh);
             }
             else if (mesh->mNumBones == 0)
             {
                 renderer::LoadStaticModels(mMesh);
-                mModelType = enums::eModelType::Static;
+                mSkeleton.SetModelType(enums::eModelType::StaticBone);
             }
             
             mMeshes.push_back(mMesh);

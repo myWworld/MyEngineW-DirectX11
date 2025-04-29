@@ -119,7 +119,16 @@ namespace ME
 			aiNodeAnim* channel = anim->mChannels[i];
 
 			BoneAnimation boneAnim;
-			boneAnim.boneName = channel->mNodeName.C_Str();
+			std::string boneName = channel->mNodeName.C_Str();
+			size_t assimpFbxPos = boneName.find("$AssimpFbx$");
+
+			if (assimpFbxPos != std::string::npos)
+			{
+				continue;
+			}
+
+			boneName = extractBoneName(boneName);
+			boneAnim.boneName = boneName;
 
 			for (unsigned int pos = 0; pos < channel->mNumPositionKeys; pos++)
 			{
@@ -154,6 +163,36 @@ namespace ME
 			this->boneAnimations.push_back(boneAnim);
 		}
 
+	}
+
+	std::string Animation3D::extractBoneName(std::string& name)
+	{
+		size_t lastSlash = name.find_last_of("/|:");
+		std::string newName;
+
+		if (lastSlash != std::string::npos)
+		{
+			newName = name.substr(lastSlash + 1);
+		}
+		else
+		{
+			newName = name;
+		}
+
+		size_t assimpFbxPos = newName.find("$AssimpFbx$");
+		if(assimpFbxPos != std::string::npos)
+		{
+			newName = newName.substr(0, assimpFbxPos -1);
+		}
+
+		std::string finalName = "";
+
+		for (char c : newName)
+		{
+			finalName += std::tolower(static_cast<unsigned char>(c));
+		}
+		
+		return finalName;
 	}
 
 

@@ -15,6 +15,7 @@ namespace ME
 		, mAnimations{}
 		, mbLoop(false)
 		, mEvents{}
+		, mModelType(enums::eModelType::StaticBone)
 	{
 	}
 	Animator3D::~Animator3D()
@@ -74,22 +75,31 @@ namespace ME
 
 	void Animator3D::Bind()
 	{
+		
+
+		if (mModelType == enums::eModelType::SkinnedMesh)
+		{
+			graphics::AnimationCB cbData = {};
+
+			for (unsigned i = 0; i < mSkeleton->mBones.size(); i++)
+			{
+				cbData.BoneMatrices[i] = mSkeleton->mBones[i].FinalTransform;
+			}
+
+			graphics::ConstantBuffer* cb = renderer::constantBuffers[CBSLOT_ANIMATION];
+
+			cb->SetData(&cbData);
+			cb->Bind(graphics::eShaderStage::All);
+		}
+	
+	}
+
+	void Animator3D::boneTransformBind()
+	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
 		tr->Bind();
 
-
-
-		graphics::AnimationCB cbData = {};
 		
-		for (unsigned i = 0; i < mSkeleton->mBones.size(); i++)
-		{
-			cbData.BoneMatrices[i] = mSkeleton->mBones[i].FinalTransform;
-		}
-
-		graphics::ConstantBuffer* cb = renderer::constantBuffers[CBSLOT_ANIMATION];
-
-		cb->SetData(&cbData);
-		cb->Bind(graphics::eShaderStage::All);
 	}
 
 
@@ -184,4 +194,40 @@ namespace ME
 		Events* events = FindEvents(name);
 		return events->EndEvent.mEvent;
 	}
+
+
+	std::unordered_map<std::string, std::string> BoneNameManualMapping = {
+	{"hips", "pelvis"},
+	{"spine", "spine"},
+	{"spine1", "spine"},    // spine1, spine2는 spine으로 fallback
+	{"spine2", "spine"},
+	{"neck", "neck"},
+	{"head", "head"},
+
+	{"leftarm", "upper_arm_left"},
+	{"leftforearm", "forearm_left"},
+	{"lefthand", "hand_left"},
+
+	{"rightarm", "upper_arm_right"},
+	{"rightforearm", "forearm_right"},
+	{"righthand", "hand_right"},
+
+	{"leftupleg", "thigh_left"},
+	{"leftleg", "shin.l"},
+	{"leftfoot", "foot_left"},
+
+	{"rightupleg", "thigh_right"},
+	{"rightleg", "shin.r"},
+	{"rightfoot", "foot_right"},
+
+	// 손가락 일부 매핑 (모델에 없는 경우 생략하거나 무시)
+	{"lefthandthumb1", "thumb.01.l"},
+	{"lefthandthumb2", "thumb.02.l"},
+	{"righthandthumb1", "thumb.01.r"},
+	{"righthandthumb2", "thumb.02.r"},
+
+	{"lefthandmiddle1", "f_middle.01.l"},
+	{"righthandmiddle1", "f_middle.01.r"},
+
+	};
 }

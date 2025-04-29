@@ -1,5 +1,5 @@
 #include "MESkeleton.h"
-
+#include "MEAnimator3D.h"
 
 namespace ME
 {
@@ -67,6 +67,7 @@ namespace ME
 			newBone.mName = nodeName;
 			newBone.mLocalTransform = ConvertAIMatrixToMatrix(node->mTransformation);
 			mBoneNameToIndexMap[nodeName] = idx;
+			newBone.mIndex = idx;
 			mBones.push_back(newBone);
 		}
 
@@ -77,6 +78,28 @@ namespace ME
 
 
 	}
+
+	int Skeleton::GetBoneIndex(const std::string& name) const
+	{
+		auto iter = BoneNameManualMapping.find(name);
+
+		std::string newName = name;
+
+		if (iter != BoneNameManualMapping.end())
+		{
+			newName = iter->second;
+		}
+
+		auto it = mBoneNameToIndexMap.find(newName);
+
+		if (it != mBoneNameToIndexMap.end())
+		{
+			return it->second;
+		}
+		return -1;
+	}
+
+
 	void Skeleton::CalculateFinalTransform()
 	{
 		int rootIdx = GetBoneIndex(mRootBoneName);
@@ -96,9 +119,11 @@ namespace ME
 
 		for (auto child : bone.mChildren)
 		{
-			updateBoneRecursive(child->mIndex, globalMatrix);
+			updateBoneRecursive(child->mIndex, globalMatrix); //여기서 계속 0으로 무한 루프 도는듯
 		}
 	}
+
+
 
 
 	math::Matrix Skeleton::ConvertAIMatrixToMatrix(aiMatrix4x4& aiMat)
