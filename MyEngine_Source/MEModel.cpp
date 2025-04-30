@@ -51,20 +51,32 @@ namespace ME
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
+            std::string str = importer.GetErrorString();
+    
             return false;
         }
 
        
         std::wstring directory = path.substr(0, path.find_last_of('/') + 1);
-        ProcessNode(scene->mRootNode, scene);
-     
+        
         mSkeleton.RegisterBone(scene->mRootNode);
         mSkeleton.BuildSkeleton(scene->mRootNode);
+        
+        ProcessNode(scene->mRootNode, scene);
+    
+        if (mModelType == enums::eModelType::SkinnedMesh)
+        {
+            mSkeleton.RegisterSkinData(scene);
+        }
+
         return true;
     }
 
     void Model::ProcessNode(aiNode* node, const aiScene* scene)
     {
+        bool hasSkinnedBone = false;
+
+
         for (unsigned int i = 0; i < node->mNumMeshes; i++)
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
@@ -85,13 +97,14 @@ namespace ME
 
             if (mesh->mNumBones > 0)
             {
+                hasSkinnedBone = true;
                 renderer::LoadModels(mMesh);
-                mSkeleton.SetModelType(enums::eModelType::SkinnedMesh);
+                mMesh->SetSkinned(true);
             }
             else if (mesh->mNumBones == 0)
-            {
-                renderer::LoadStaticModels(mMesh);
-                mSkeleton.SetModelType(enums::eModelType::StaticBone);
+            {   
+                renderer::LoadStaticModels(mMesh);   
+                mMesh->SetSkinned(false);
             }
             
             mMeshes.push_back(mMesh);
@@ -101,6 +114,19 @@ namespace ME
         {
             ProcessNode(node->mChildren[i], scene);
         }
+
+
+        if(hasSkinnedBone && mbModelFixed == false)
+		{
+            mbModelFixed = true;
+			mSkeleton.SetModelType(enums::eModelType::SkinnedMesh);
+			mModelType = enums::eModelType::SkinnedMesh;
+		}
+		else if(hasSkinnedBone == false && mbModelFixed == false)
+		{
+			mSkeleton.SetModelType(enums::eModelType::Static);
+			mModelType = enums::eModelType::Static;
+		}
     }
     Mesh* Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     {
@@ -143,8 +169,9 @@ namespace ME
         {
             aiBone* bone = mesh->mBones[i];
             std::string boneName = bone->mName.C_Str();
+            boneName = mSkeleton.ExtractBoneName(boneName);
 
-            int boneIndex = bones.size();
+            int boneIndex = mSkeleton.GetBoneIndex(boneName);
             boneNameToIndex[boneName] = boneIndex;
 
             Bone newBone(boneName,boneIndex, math::Matrix::Identity);
@@ -157,6 +184,7 @@ namespace ME
                 float weight = bone->mWeights[j].mWeight;
 
                 vertices[vertexID].AddBoneData(boneIndex, weight);
+                
             }
    
         }

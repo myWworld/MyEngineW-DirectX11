@@ -300,7 +300,7 @@ namespace ME::renderer
 		inputLayoutDesces[1].SemanticName = "COLOR";
 		inputLayoutDesces[1].SemanticIndex = 0;
 
-		inputLayoutDesces[2].AlignedByteOffset = 28; //12 + 16
+		inputLayoutDesces[2].AlignedByteOffset = 28; 
 		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[2].InputSlot = 0;
 		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -308,22 +308,22 @@ namespace ME::renderer
 		inputLayoutDesces[2].SemanticIndex = 0;
 
 
-		inputLayoutDesces[3].AlignedByteOffset = 40; //12 + 16
-		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[3].AlignedByteOffset = 40; 
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32A32_SINT;
 		inputLayoutDesces[3].InputSlot = 0;
 		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputLayoutDesces[3].SemanticName = "BONEINDICES";
 		inputLayoutDesces[3].SemanticIndex = 0;
 
 
-		inputLayoutDesces[4].AlignedByteOffset = 56; //12 + 16
-		inputLayoutDesces[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[4].AlignedByteOffset = 56; 
+		inputLayoutDesces[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 		inputLayoutDesces[4].InputSlot = 0;
 		inputLayoutDesces[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputLayoutDesces[4].SemanticName = "BONEWEIGHTS";
 		inputLayoutDesces[4].SemanticIndex = 0;
 
-		inputLayoutDesces[5].AlignedByteOffset = 72; //12 + 16
+		inputLayoutDesces[5].AlignedByteOffset = 72; 
 		inputLayoutDesces[5].Format = DXGI_FORMAT_R32G32_FLOAT;
 		inputLayoutDesces[5].InputSlot = 0;
 		inputLayoutDesces[5].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -401,9 +401,8 @@ namespace ME::renderer
 		Material* modelMaterial = new Material();
 		ME::Resources::Insert(L"ModelMaterial", modelMaterial);
 
-
 		Material* staticModelMaterial = new Material();
-		ME::Resources::Insert(L"StaticModelMaterial", modelMaterial);
+		ME::Resources::Insert(L"StaticModelMaterial", staticModelMaterial);
 
 		spriteMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"SpriteDefaultShader"));
 		triangleMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"TriangleShader"));

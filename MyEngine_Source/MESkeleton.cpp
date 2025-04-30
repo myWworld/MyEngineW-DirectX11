@@ -31,6 +31,10 @@ namespace ME
 		{
 			mRootBoneName = nodeName;
 		}
+		else
+		{
+			nodeName = ExtractBoneName(nodeName);
+		}
 
 		if (mBoneNameToIndexMap.contains(nodeName))
 		{
@@ -39,6 +43,10 @@ namespace ME
 			if (node->mParent)
 			{
 				std::string parentName = node->mParent->mName.C_Str();
+
+				if (parentName != "RootNode")
+					parentName = ExtractBoneName(parentName);
+
 				if (mBoneNameToIndexMap.contains(parentName))
 				{
 					int parentIndex = mBoneNameToIndexMap[parentName];
@@ -60,6 +68,9 @@ namespace ME
 	{
 		std::string nodeName= node->mName.C_Str();
 
+		if(nodeName != "RootNode")
+			nodeName = ExtractBoneName(nodeName);
+
 		if (mBoneNameToIndexMap.find(nodeName) == mBoneNameToIndexMap.end())
 		{
 			int idx = static_cast<int>(mBones.size());
@@ -79,22 +90,64 @@ namespace ME
 
 	}
 
+	void Skeleton::RegisterSkinData(const aiScene* scene)
+	{
+		for (unsigned int i = 0; i < scene->mNumMeshes; i++)
+		{
+			aiMesh* mesh = scene->mMeshes[i];
+
+			for (unsigned int j = 0; j < mesh->mNumBones; j++)
+			{
+				aiBone* bone = mesh->mBones[j];
+				std::string boneName = bone->mName.C_Str();
+				boneName = ExtractBoneName(boneName);
+
+				auto iter = mBoneNameToIndexMap.find(boneName);
+
+				if (iter != mBoneNameToIndexMap.end())
+				{
+					int boneIndex = iter->second;
+					mBones[boneIndex].mOffsetMatrix = ConvertAIMatrixToMatrix(bone->mOffsetMatrix);
+				}
+				else
+				{
+					std::cerr << "Bone not found in skeleton(SkinData): " << boneName << std::endl;
+				}
+			}
+		}
+	}
+
 	int Skeleton::GetBoneIndex(const std::string& name) const
 	{
-		auto iter = BoneNameManualMapping.find(name);
+		//auto iter = BoneNameManualMapping.find(name);
+		//
+		//std::string newName = name;
+		//
+		//if (iter != BoneNameManualMapping.end())
+		//{
+		//	newName = iter->second;
+		//}
 
-		std::string newName = name;
-
-		if (iter != BoneNameManualMapping.end())
-		{
-			newName = iter->second;
-		}
-
-		auto it = mBoneNameToIndexMap.find(newName);
+		auto it = mBoneNameToIndexMap.find(name);
 
 		if (it != mBoneNameToIndexMap.end())
 		{
 			return it->second;
+		}
+		else
+		{
+			auto iter = BoneNameManualMapping.find(name);
+		
+			if (iter != BoneNameManualMapping.end())
+			{
+				std::string newName = iter->second;
+				auto it2 = mBoneNameToIndexMap.find(newName);
+
+				if (it2 != mBoneNameToIndexMap.end())
+				{
+					return it2->second;
+				}
+			}
 		}
 		return -1;
 	}
@@ -104,8 +157,11 @@ namespace ME
 	{
 		int rootIdx = GetBoneIndex(mRootBoneName);
 
-		if(rootIdx == -1 )
-			assert(false && "Root bone not found in skeleton.");
+		if (rootIdx == -1)
+		{
+			return;
+			//assert(false && "Root bone not found in skeleton.");
+		}
 
 		updateBoneRecursive(rootIdx, math::Matrix::Identity);
 	}
@@ -119,8 +175,27 @@ namespace ME
 
 		for (auto child : bone.mChildren)
 		{
-			updateBoneRecursive(child->mIndex, globalMatrix); //여기서 계속 0으로 무한 루프 도는듯
+			updateBoneRecursive(child->mIndex, globalMatrix); 
 		}
+	}
+
+	std::string Skeleton::ExtractBoneName(const std::string& name) const
+	{
+		std::string newName = name;
+
+		size_t pos = newName.find_last_of("/|:");
+
+		if (pos != std::string::npos)
+		{
+			newName = newName.substr(pos + 1);
+		}
+
+		transform(newName.begin(),newName.end(),newName.begin(), 
+			[](unsigned char c){
+			return std::tolower(static_cast<unsigned char>(c));
+		});
+
+		return newName;
 	}
 
 

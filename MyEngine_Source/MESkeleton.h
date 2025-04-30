@@ -35,13 +35,16 @@ namespace ME
 
 		void CalculateFinalTransform();
 		void RegisterBone(aiNode* node);
+		void RegisterSkinData(const aiScene* scene);
 
 		void SetModelType( enums::eModelType type) { mModelType = type; }
 		enums::eModelType GetModelType() { return mModelType; }
 
+		std::string ExtractBoneName(const std::string& name) const;
 
 	private:
 		void updateBoneRecursive(int boneIndex, const math::Matrix& parentTransform);
+		
 		
 		math::Matrix ConvertAIMatrixToMatrix(aiMatrix4x4& aiMat);
 	};

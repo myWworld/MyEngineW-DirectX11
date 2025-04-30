@@ -28,6 +28,7 @@ namespace ME::enums
 		Mesh,
 		Material,
 		Animation,
+		Animation3D,
 		Skeleton,
 		AudioClip,
 		Shader,

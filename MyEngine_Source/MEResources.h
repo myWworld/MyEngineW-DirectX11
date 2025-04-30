@@ -58,9 +58,10 @@ namespace ME
 		{
 			for (auto& iter : mResources)
 			{
-				if(iter.second != nullptr)
-					delete iter.second;
-			
+				if(iter.second == nullptr)
+					continue;
+				
+				delete iter.second;
 				iter.second = nullptr;
 			}
 		}

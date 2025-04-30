@@ -49,6 +49,9 @@ namespace ME
 		graphics::Texture* GetDiffuseTexture() { return diffuseTexture; }
 		graphics::Texture* GetSpecularTexture() { return specularTexture; }
 
+		void SetSkinned(bool skinned) { mbIsSkinned = skinned; }
+		bool IsSkinned() { return mbIsSkinned; }
+
 
 	private:
 
@@ -58,6 +61,8 @@ namespace ME
 
 		graphics::Texture* diffuseTexture;
 		graphics::Texture* specularTexture;
+
+		bool mbIsSkinned;
 
 		MeshData mData;
 

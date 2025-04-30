@@ -5,6 +5,8 @@
 #include "MERenderer.h"
 #include "METransform.h"
 #include "MEGameObject.h"
+#include "MEMesh.h"
+#include "MEMaterial.h"
 
 
 namespace ME
@@ -16,6 +18,11 @@ namespace ME
 		, mbLoop(false)
 		, mEvents{}
 		, mModelType(enums::eModelType::StaticBone)
+		, mSkeleton(nullptr)
+		, mMaterial(nullptr)
+		, mMeshes{}
+		, mTextures{}
+		, mModelMatrix{}
 	{
 	}
 	Animator3D::~Animator3D()
@@ -69,13 +76,65 @@ namespace ME
 		//{
 		//	mActiveAnimation->Render(hdc);
 		//}
-		Bind();
+		render();
 
 	}
 
+	void Animator3D::render()
+	{
+		Bind();
+
+
+		if (!mMeshes.empty())
+		{
+			for (auto mesh : mMeshes)
+			{
+				if (mesh == nullptr)
+					continue;
+
+				if (mesh->IsSkinned() == true)
+				{
+					mMaterial = Resources::Find<Material>(L"ModelMaterial");
+					mMaterial->BindShader();
+				}
+				else
+				{
+					mMaterial = Resources::Find<Material>(L"StaticModelMaterial");
+					mMaterial->BindShader();
+				}
+
+				mesh->Bind();
+
+				if (mesh->GetDiffuseTexture() != nullptr)
+				{
+					mesh->GetDiffuseTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
+				}
+
+				if (mesh->GetSpecularTexture() != nullptr)
+				{
+					mesh->GetSpecularTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Specular);
+				}
+
+				if (!mesh->GetSpecularTexture() && !mesh->GetDiffuseTexture() && !mTextures.empty())
+				{
+					for (auto texture : mTextures)
+					{
+						if (texture)
+							texture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
+					}
+				}
+
+				graphics::GetDevice()->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+			
+			}
+		}
+
+	}
+
+
 	void Animator3D::Bind()
 	{
-		
+		boneTransformBind();
 
 		if (mModelType == enums::eModelType::SkinnedMesh)
 		{
@@ -91,15 +150,17 @@ namespace ME
 			cb->SetData(&cbData);
 			cb->Bind(graphics::eShaderStage::All);
 		}
+
+		
 	
 	}
 
 	void Animator3D::boneTransformBind()
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
+		Vector3 position = tr->GetPosition();
 		tr->Bind();
 
-		
 	}
 
 
@@ -197,37 +258,8 @@ namespace ME
 
 
 	std::unordered_map<std::string, std::string> BoneNameManualMapping = {
-	{"hips", "pelvis"},
-	{"spine", "spine"},
-	{"spine1", "spine"},    // spine1, spine2는 spine으로 fallback
-	{"spine2", "spine"},
-	{"neck", "neck"},
-	{"head", "head"},
-
-	{"leftarm", "upper_arm_left"},
-	{"leftforearm", "forearm_left"},
-	{"lefthand", "hand_left"},
-
-	{"rightarm", "upper_arm_right"},
-	{"rightforearm", "forearm_right"},
-	{"righthand", "hand_right"},
-
-	{"leftupleg", "thigh_left"},
-	{"leftleg", "shin.l"},
-	{"leftfoot", "foot_left"},
-
-	{"rightupleg", "thigh_right"},
-	{"rightleg", "shin.r"},
-	{"rightfoot", "foot_right"},
-
-	// 손가락 일부 매핑 (모델에 없는 경우 생략하거나 무시)
-	{"lefthandthumb1", "thumb.01.l"},
-	{"lefthandthumb2", "thumb.02.l"},
-	{"righthandthumb1", "thumb.01.r"},
-	{"righthandthumb2", "thumb.02.r"},
-
-	{"lefthandmiddle1", "f_middle.01.l"},
-	{"righthandmiddle1", "f_middle.01.r"},
+	
+		{"righttoe_end", "rightfoottoebase_end"},
 
 	};
 }

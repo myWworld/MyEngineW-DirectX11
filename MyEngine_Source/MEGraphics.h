@@ -20,10 +20,9 @@ namespace ME::graphics
 		math::Vector3 pos;
 		math::Vector4 color;
 		math::Vector3 normal;
-		int boneIndicies[4];
-		float boneWeight[4];
+		int boneIndices[4] = { 0 };
+		float boneWeight[4] = { 0.0f };
 		math::Vector2 uv;
-
 
 		void AddBoneData(int boneIndex, float weight)
 		{
@@ -31,7 +30,7 @@ namespace ME::graphics
 			{
 				if (boneWeight[i] == 0.0f)
 				{
-					boneIndicies[i] = boneIndex;
+					boneIndices[i] = boneIndex;
 					boneWeight[i] = weight;
 					return;
 				}

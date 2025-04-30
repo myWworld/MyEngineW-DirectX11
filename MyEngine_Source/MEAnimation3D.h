@@ -65,12 +65,15 @@ namespace ME
 	private:
 
 		void CreateFromAssimp(aiAnimation* anim);
+
 		std::string extractBoneName(std::string& name);
+		
 		math::Matrix InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime);
 		math::Vector3 InterpolatePosition(const	std::vector<VectorKey>& pos, float currentTime);
 		math::Quaternion InterpolateRotation(const std::vector<QuatKey>& rotation, float currentTime);
 		math::Vector3 InterpolateScale(const std::vector<VectorKey>& scale, float currentTime);
 
+	
 	private:
 
 		class Animator3D* mAnimator;

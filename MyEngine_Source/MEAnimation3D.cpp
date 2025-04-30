@@ -12,9 +12,11 @@
 namespace ME
 {
 	Animation3D::Animation3D()
-		:Resource(enums::eResourceType::Animation)
+		:Resource(enums::eResourceType::Animation3D)
 		, mAnimator(nullptr)
 		, mbComplete(false)
+		,mSkeleton(nullptr)
+		,mTime(0.0f)
 	{
 	}
 
@@ -53,6 +55,9 @@ namespace ME
 
 		for (auto bones : boneAnimations)
 		{
+			if (mSkeleton == nullptr)
+				return;
+
 			int boneindex = mSkeleton->GetBoneIndex(bones.boneName);
 
 			if (boneindex == -1)
@@ -73,6 +78,8 @@ namespace ME
 	{
 		
 	}
+
+
 
 	void Animation3D::CreateAnimation(const std::wstring& name, const std::wstring& path)
 	{

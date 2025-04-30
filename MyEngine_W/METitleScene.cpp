@@ -31,6 +31,7 @@ namespace ME
 
 	ME::TitleScene::~TitleScene()
 	{
+		
 	}
 
 	void ME::TitleScene::Initialize()
@@ -73,28 +74,32 @@ namespace ME
 		{
 
 			mPlayer = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(0, 0, 0));
-		
-
-
-			SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
-			sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
-			sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
-
+			Transform* tr = mPlayer->GetComponent<Transform>();
+			tr->SetScale(Vector3(3.f, 3.f, 3.f));
+			//SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
+			//sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
+			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
+			//
 			Model* model = new Model();
-			if (model->LoadModel(L"..\\Resources\\male.fbx"))
+			if (model->LoadModel(L"..\\Resources\\Soldier.fbx"))
 			{
-				mPlayer->AddComponent<ModelRenderer>();
-				ModelRenderer* modelRenderer = mPlayer->GetComponent<ModelRenderer>();
-				modelRenderer->SetMesh(model->GetMeshes());
 
-				if(model->GetTextures().size() > 0)
-					modelRenderer->SetTextures(model->GetTextures());
-				else 
-					modelRenderer->SetTexture( Resources::Find<graphics::Texture>(L"MALE"));
+				//ModelRenderer* modelRenderer = mPlayer->AddComponent<ModelRenderer>();
+				//modelRenderer->SetMesh(model->GetMeshes());
+				//modelRenderer->SetMaterial(Resources::Find<Material>(L"StaticModelMaterial"));
+				//modelRenderer->SetTextures(model->GetTextures());
+				//modelRenderer->SetTexture(Resources::Find<graphics::Texture>(L"SOLDIER"));
 
-				
-				modelRenderer->SetMaterial(Resources::Find<Material>(L"ModelMaterial"));
+
 				Animator3D* animator = mPlayer->AddComponent<Animator3D>();
+				animator->SetMesh(model->GetMeshes());
+				
+				if(model->GetTextures().size() > 0)
+					animator->SetTextures(model->GetTextures());
+				else 
+					animator->SetTexture( Resources::Find<graphics::Texture>(L"SOLDIER"));
+				
+				
 				animator->SetSkeleton(&model->GetSkeleton());
 				animator->CreateAnimation(L"Idle", L"..\\Resources\\Animation\\Idle.fbx");
 				animator->PlayAnimation(L"Idle", true);

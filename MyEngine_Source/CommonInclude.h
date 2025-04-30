@@ -12,6 +12,8 @@
 #include<filesystem>
 #include<bitset>
 #include<string>
+#include <iostream>
+#include <fstream>
 
 #include <thread>
 #include <mutex>

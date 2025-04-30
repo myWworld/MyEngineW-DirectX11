@@ -6,9 +6,12 @@
 #include "CommonInclude.h"
 #include "MESkeleton.h"
 
+
 namespace ME
 {
-
+	class Material;
+	class graphics::Texture;
+	class Mesh;
 
 	class Animator3D :public Component
 	{
@@ -67,12 +70,29 @@ namespace ME
 		}
 		Skeleton* GetSkeleton() { return mSkeleton; }
 
+		//void setModelMatrix(const Matrix& model);
+		void SetMesh(const std::vector<Mesh*>& meshes_) { mMeshes = meshes_; }
+
+		void SetTextures(const std::vector<graphics::Texture*>& textures) { mTextures = textures; }
+		void SetTexture(graphics::Texture* texture) { mTextures.push_back(texture); }
+		void SetMaterial(Material* material) { mMaterial = material; }
+
+
 
 	private:
 
 		void boneTransformBind();
+		void render();
 
 	private:
+
+
+		Matrix mModelMatrix;
+
+		std::vector<Mesh*> mMeshes;
+		std::vector<graphics::Texture* >mTextures;
+		Material* mMaterial;
+
 		
 		std::map<std::wstring, Animation3D*> mAnimations;
 

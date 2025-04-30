@@ -22,11 +22,15 @@ namespace ME
         const std::vector<graphics::Texture*>&GetTextures() { return mTextures; }
         Skeleton& GetSkeleton() { return mSkeleton; }
 
+        enums::eModelType GetModelType() { return mModelType; }
+
     private:
 
         void ProcessNode(aiNode* node, const aiScene* scene);
         Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene);
         std::vector<graphics::Texture*> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::wstring& typeName);
+
+
     
 
         math::Matrix ConvertAIMatrixToMatrix(aiMatrix4x4& mat);
@@ -37,7 +41,8 @@ namespace ME
         Skeleton mSkeleton;
 
         enums::eModelType mModelType;
-        
+
+        bool mbModelFixed = false;
 
     };
 
