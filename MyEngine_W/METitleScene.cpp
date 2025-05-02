@@ -19,6 +19,8 @@
 #include "MEModelRenderer.h"
 #include "MEAnimator3D.h"
 
+#include "MEPlayerScript.h"
+
 extern ME::Application application;
 
 namespace ME
@@ -75,13 +77,14 @@ namespace ME
 
 			mPlayer = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(0, 0, 0));
 			Transform* tr = mPlayer->GetComponent<Transform>();
-			tr->SetScale(Vector3(3.f, 3.f, 3.f));
+			tr->SetScale(Vector3(0.2f,0.2f,0.2f));
 			//SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
 			//sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
 			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 			//
+			mPlayer->AddComponent<PlayerScript>();
 			Model* model = new Model();
-			if (model->LoadModel(L"..\\Resources\\Soldier.fbx"))
+			if (model->LoadModel(L"..\\Resources\\alien.fbx"))
 			{
 
 				//ModelRenderer* modelRenderer = mPlayer->AddComponent<ModelRenderer>();
@@ -97,12 +100,13 @@ namespace ME
 				if(model->GetTextures().size() > 0)
 					animator->SetTextures(model->GetTextures());
 				else 
-					animator->SetTexture( Resources::Find<graphics::Texture>(L"SOLDIER"));
+					animator->SetTexture( Resources::Find<graphics::Texture>(L"ALIEN"));
 				
 				
 				animator->SetSkeleton(&model->GetSkeleton());
-				animator->CreateAnimation(L"Idle", L"..\\Resources\\Animation\\Idle.fbx");
-				animator->PlayAnimation(L"Idle", true);
+				animator->CreateAnimation(L"Idle", L"..\\Resources\\Animation\\Idle2.fbx");
+				animator->CreateAnimation(L"FORWARDWALK", L"..\\Resources\\Animation\\ForwardWalk.fbx");
+				animator->PlayAnimation(L"FORWARDWALK", true);
 			}
 			else
 			{

@@ -50,8 +50,13 @@ namespace ME
 				if (mBoneNameToIndexMap.contains(parentName))
 				{
 					int parentIndex = mBoneNameToIndexMap[parentName];
-					mBones[boneIndex].mParent = &mBones[parentIndex];
-					mBones[parentIndex].mChildren.push_back(&mBones[boneIndex]);
+
+					auto& children = mBones[parentIndex].mChildren;
+					if (std::find(children.begin(), children.end(), &mBones[boneIndex]) == children.end())
+					{
+						mBones[boneIndex].mParent = &mBones[parentIndex];
+						children.push_back(&mBones[boneIndex]);
+					}
 				}
 			}
 		}
@@ -63,6 +68,8 @@ namespace ME
 		}
 	}
 
+
+	
 
 	void Skeleton::RegisterBone(aiNode* node)
 	{
@@ -86,6 +93,7 @@ namespace ME
 		{
 			RegisterBone(node->mChildren[i]);
 		}
+
 
 
 	}
@@ -128,7 +136,10 @@ namespace ME
 		//	newName = iter->second;
 		//}
 
+		std::string modifiedName = ExtractBoneName(name);
+
 		auto it = mBoneNameToIndexMap.find(name);
+
 
 		if (it != mBoneNameToIndexMap.end())
 		{
@@ -163,11 +174,21 @@ namespace ME
 			//assert(false && "Root bone not found in skeleton.");
 		}
 
+		visited.clear();
+
 		updateBoneRecursive(rootIdx, math::Matrix::Identity);
 	}
 
 	void Skeleton::updateBoneRecursive(int boneIndex, const math::Matrix& parentTransform)
 	{
+		if (visited.contains(boneIndex))
+		{
+			return;
+		}
+
+		visited.insert(boneIndex);
+
+
 		Bone& bone = mBones[boneIndex];
 
 		math::Matrix globalMatrix = bone.mLocalTransform * parentTransform;
@@ -185,20 +206,26 @@ namespace ME
 
 		size_t pos = newName.find_last_of("/|:");
 
+
 		if (pos != std::string::npos)
 		{
 			newName = newName.substr(pos + 1);
 		}
 
-		transform(newName.begin(),newName.end(),newName.begin(), 
-			[](unsigned char c){
-			return std::tolower(static_cast<unsigned char>(c));
-		});
+		size_t assimpFbxPos = newName.find("$AssimpFbx$");
 
+		if (assimpFbxPos != std::string::npos)
+		{
+			newName = newName.substr(0, assimpFbxPos - 1);
+		}
+
+		//transform(newName.begin(), newName.end(), newName.begin(),
+		//	[](unsigned char c) {
+		//		return std::tolower(static_cast<unsigned char>(c));
+		//	});
+	   
 		return newName;
 	}
-
-
 
 
 	math::Matrix Skeleton::ConvertAIMatrixToMatrix(aiMatrix4x4& aiMat)

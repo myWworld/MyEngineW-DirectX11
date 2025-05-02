@@ -36,6 +36,24 @@ namespace ME::graphics
 				}
 			}
 		}
+
+		void NormalizeBoneWeights()
+		{
+			float totalWeight = 0.0f;
+			for (int i = 0; i < 4; ++i)
+				totalWeight += boneWeight[i];
+
+			if (totalWeight > 0.0f)
+			{
+				for (int i = 0; i < 4; ++i)
+					boneWeight[i] /= totalWeight;
+			}
+			else
+			{
+				boneIndices[0] = 0;
+				boneWeight[0] = 1.0f;
+			}
+		}
 	};
 
 

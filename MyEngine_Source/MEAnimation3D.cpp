@@ -45,13 +45,16 @@ namespace ME
 			return;
 
 		mTime += Time::DeltaTime();
+		float timeInTicks = mTime * mTickersPerSecond;
 
-		if (mTime > mDuration)
+		if (timeInTicks > mDuration)
 		{
 			mbComplete = true;
 			mTime = mDuration;
 			return;
 		}
+
+		float animationTime = mTime * mTickersPerSecond;
 
 		for (auto bones : boneAnimations)
 		{
@@ -63,7 +66,7 @@ namespace ME
 			if (boneindex == -1)
 				continue;
 
-			math::Matrix localTransform = InterpolateLocalTransform(bones, mTime);
+			math::Matrix localTransform = InterpolateLocalTransform(bones, animationTime);
 			mSkeleton->mBones[boneindex].mLocalTransform = localTransform;
 
 		}
@@ -90,7 +93,7 @@ namespace ME
 		std::string path_str = std::string(path.begin(), path.end());
 
 		const aiScene* animScene = importer.ReadFile(path_str,
-			aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_LimitBoneWeights
+			aiProcess_Triangulate | aiProcess_FlipUVs 
 		);
 
 
@@ -127,13 +130,7 @@ namespace ME
 
 			BoneAnimation boneAnim;
 			std::string boneName = channel->mNodeName.C_Str();
-			size_t assimpFbxPos = boneName.find("$AssimpFbx$");
-
-			if (assimpFbxPos != std::string::npos)
-			{
-				continue;
-			}
-
+		
 			boneName = extractBoneName(boneName);
 			boneAnim.boneName = boneName;
 
@@ -192,14 +189,14 @@ namespace ME
 			newName = newName.substr(0, assimpFbxPos -1);
 		}
 
-		std::string finalName = "";
-
-		for (char c : newName)
-		{
-			finalName += std::tolower(static_cast<unsigned char>(c));
-		}
-		
-		return finalName;
+		//std::string finalName = "";
+		//
+		//for (char c : newName)
+		//{
+		//	finalName += std::tolower(static_cast<unsigned char>(c));
+		//}
+		//
+		return newName;
 	}
 
 

@@ -23,6 +23,7 @@
     <ClInclude Include="MELoadingScene.h" />
     <ClInclude Include="MELoadScene.h" />
     <ClInclude Include="MEPlayer.h" />
+    <ClInclude Include="MEPlayerScript.h" />
     <ClInclude Include="MEPlayScene.h" />
     <ClInclude Include="METile.h" />
     <ClInclude Include="METitleScene.h" />
@@ -32,6 +33,7 @@
     <ClCompile Include="MECameraScript.cpp" />
     <ClCompile Include="MELoadingScene.cpp" />
     <ClCompile Include="MEPlayer.cpp" />
+    <ClCompile Include="MEPlayerScript.cpp" />
     <ClCompile Include="MEPlayScene.cpp" />
     <ClCompile Include="METile.cpp" />
     <ClCompile Include="METitleScene.cpp" />

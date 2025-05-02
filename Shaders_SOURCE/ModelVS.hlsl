@@ -39,7 +39,7 @@ VSOutput main(VSInput input)
         }
     }
     
-  
+    
     
     float4 pos = mul(skinPos, WorldMatrix);
     float4 viewPos = mul(pos, ViewMatrix);

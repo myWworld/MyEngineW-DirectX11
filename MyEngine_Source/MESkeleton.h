@@ -23,6 +23,8 @@ namespace ME
 
 		enums::eModelType mModelType;
 
+		std::unordered_set<int> visited;
+
 	public:
 
 

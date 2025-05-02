@@ -41,12 +41,13 @@ namespace ME
             aiProcess_Triangulate |
             aiProcess_FlipUVs |
             aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
-            aiProcess_FindInvalidData |          //  잘못된 데이터 자동 제거
+                    //  잘못된 데이터 자동 제거
             aiProcess_OptimizeMeshes |           //  메쉬 최적화
             aiProcess_ImproveCacheLocality   |   //  GPU 캐시 최적화
             aiProcess_MakeLeftHanded |
             aiProcess_JoinIdenticalVertices |
-            aiProcess_FlipWindingOrder  //  좌표계 변환
+            aiProcess_FlipWindingOrder | //  좌표계 변환  
+            aiProcessPreset_TargetRealtime_Quality
         );
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
@@ -175,7 +176,7 @@ namespace ME
             boneNameToIndex[boneName] = boneIndex;
 
             Bone newBone(boneName,boneIndex, math::Matrix::Identity);
-            newBone.mOffsetMatrix = ConvertAIMatrixToMatrix( bone->mOffsetMatrix);
+            newBone.mOffsetMatrix = ConvertAIMatrixToMatrix(bone->mOffsetMatrix);
             bones.push_back(newBone);
 
             for (unsigned int j = 0; j < bone->mNumWeights; j++)
@@ -187,6 +188,11 @@ namespace ME
                 
             }
    
+        }
+
+        for (auto& vertex : vertices)
+        {
+            vertex.NormalizeBoneWeights();
         }
 
         for (unsigned int i = 0; i < mesh->mNumFaces; i++)
@@ -250,6 +256,7 @@ namespace ME
 
      math::Matrix Model::ConvertAIMatrixToMatrix(aiMatrix4x4& aiMat)
      {
+      
          math::Matrix mat;
 
          mat._11 = aiMat.a1; mat._12 = aiMat.b1; mat._13 = aiMat.c1; mat._14 = aiMat.d1;

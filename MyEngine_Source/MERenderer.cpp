@@ -81,7 +81,7 @@ namespace ME::renderer
 		D3D11_RASTERIZER_DESC rsDesc = {};
 
 		rsDesc.AntialiasedLineEnable = false;
-		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
+		rsDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
 		rsDesc.DepthBias = 0;
 		rsDesc.DepthBiasClamp = 0.0f;
 		rsDesc.DepthClipEnable = true;

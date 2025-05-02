@@ -23,6 +23,9 @@
     <ClInclude Include="MEPlayer.h">
       <Filter>Contents</Filter>
     </ClInclude>
+    <ClInclude Include="MEPlayerScript.h">
+      <Filter>Script\Player</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -39,6 +42,9 @@
     </Filter>
     <Filter Include="Script\Others">
       <UniqueIdentifier>{9d60996d-cdf5-4934-89a8-dd0212567add}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Script\Player">
+      <UniqueIdentifier>{033ce6d9-340d-44df-81ec-9f8555e85837}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -60,6 +66,9 @@
     <ClCompile Include="MEPlayScene.cpp" />
     <ClCompile Include="MEPlayer.cpp">
       <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="MEPlayerScript.cpp">
+      <Filter>Script\Player</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
