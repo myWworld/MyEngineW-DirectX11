@@ -59,7 +59,7 @@ namespace ME
 
     void  PlayerScript::Idle()
     {
-        mAnimator->PlayAnimation(L"Idle");
+     //   mAnimator->PlayAnimation(L"Idle");
     }
     void PlayerScript::Move()
     {

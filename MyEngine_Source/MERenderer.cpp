@@ -309,7 +309,7 @@ namespace ME::renderer
 
 
 		inputLayoutDesces[3].AlignedByteOffset = 40; 
-		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32A32_SINT;
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32A32_UINT;
 		inputLayoutDesces[3].InputSlot = 0;
 		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputLayoutDesces[3].SemanticName = "BONEINDICES";

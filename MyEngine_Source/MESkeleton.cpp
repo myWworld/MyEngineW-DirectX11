@@ -31,10 +31,10 @@ namespace ME
 		{
 			mRootBoneName = nodeName;
 		}
-		else
-		{
-			nodeName = ExtractBoneName(nodeName);
-		}
+		//else
+		//{
+		//	nodeName = ExtractBoneName(nodeName);
+		//}
 
 		if (mBoneNameToIndexMap.contains(nodeName))
 		{
@@ -44,8 +44,8 @@ namespace ME
 			{
 				std::string parentName = node->mParent->mName.C_Str();
 
-				if (parentName != "RootNode")
-					parentName = ExtractBoneName(parentName);
+				//if (parentName != "RootNode")
+				//	parentName = ExtractBoneName(parentName);
 
 				if (mBoneNameToIndexMap.contains(parentName))
 				{
@@ -71,19 +71,26 @@ namespace ME
 
 	
 
-	void Skeleton::RegisterBone(aiNode* node)
+	void Skeleton::RegisterBone(aiNode* node, std::unordered_map<std::string, math::Matrix>& preRot)
 	{
 		std::string nodeName= node->mName.C_Str();
+		bool bSkiped = false;
 
-		if(nodeName != "RootNode")
-			nodeName = ExtractBoneName(nodeName);
+		//if(nodeName != "RootNode")
+		//	nodeName = ExtractBoneName(nodeName);
 
-		if (mBoneNameToIndexMap.find(nodeName) == mBoneNameToIndexMap.end())
+		if (mBoneNameToIndexMap.find(nodeName) == mBoneNameToIndexMap.end() && bSkiped == false)
 		{
 			int idx = static_cast<int>(mBones.size());
 			Bone newBone;
 			newBone.mName = nodeName;
+		
+			math::Matrix pureRotation = preRot[nodeName];
+
+			mBonesTransform.push_back(pureRotation);
+
 			newBone.mLocalTransform = ConvertAIMatrixToMatrix(node->mTransformation);
+
 			mBoneNameToIndexMap[nodeName] = idx;
 			newBone.mIndex = idx;
 			mBones.push_back(newBone);
@@ -91,7 +98,7 @@ namespace ME
 
 		for (unsigned int i = 0; i < node->mNumChildren; i++)
 		{
-			RegisterBone(node->mChildren[i]);
+			RegisterBone(node->mChildren[i],preRot);
 		}
 
 
@@ -108,13 +115,14 @@ namespace ME
 			{
 				aiBone* bone = mesh->mBones[j];
 				std::string boneName = bone->mName.C_Str();
-				boneName = ExtractBoneName(boneName);
+				//boneName = ExtractBoneName(boneName);
 
 				auto iter = mBoneNameToIndexMap.find(boneName);
 
+	
 				if (iter != mBoneNameToIndexMap.end())
 				{
-					int boneIndex = iter->second;
+					int boneIndex = iter->second;				
 					mBones[boneIndex].mOffsetMatrix = ConvertAIMatrixToMatrix(bone->mOffsetMatrix);
 				}
 				else
@@ -123,6 +131,35 @@ namespace ME
 				}
 			}
 		}
+	}
+
+	int Skeleton::GetBoneIndexToMatchWithAnim(const std::string& name) const
+	{
+	
+
+		auto it = mBoneNameToIndexMap.find(name);
+
+
+		if (it != mBoneNameToIndexMap.end())
+		{
+			return it->second;
+		}
+		else
+		{
+			auto iter = BoneNameManualMapping.find(name);
+
+			if (iter != BoneNameManualMapping.end())
+			{
+				std::string newName = iter->second;
+				auto it2 = mBoneNameToIndexMap.find(newName);
+
+				if (it2 != mBoneNameToIndexMap.end())
+				{
+					return it2->second;
+				}
+			}
+		}
+		return -1;
 	}
 
 	int Skeleton::GetBoneIndex(const std::string& name) const
@@ -136,7 +173,7 @@ namespace ME
 		//	newName = iter->second;
 		//}
 
-		std::string modifiedName = ExtractBoneName(name);
+	//	std::string modifiedName = ExtractBoneName(name);
 
 		auto it = mBoneNameToIndexMap.find(name);
 
@@ -174,25 +211,20 @@ namespace ME
 			//assert(false && "Root bone not found in skeleton.");
 		}
 
-		visited.clear();
 
 		updateBoneRecursive(rootIdx, math::Matrix::Identity);
 	}
 
 	void Skeleton::updateBoneRecursive(int boneIndex, const math::Matrix& parentTransform)
 	{
-		if (visited.contains(boneIndex))
-		{
-			return;
-		}
-
-		visited.insert(boneIndex);
-
-
+		
 		Bone& bone = mBones[boneIndex];
 
-		math::Matrix globalMatrix = bone.mLocalTransform * parentTransform;
-		bone.FinalTransform = globalMatrix * bone.mOffsetMatrix;
+		math::Matrix globalMatrix;
+
+		globalMatrix = bone.mLocalTransform * parentTransform;
+
+		bone.FinalTransform = bone.mOffsetMatrix * globalMatrix;
 
 		for (auto child : bone.mChildren)
 		{

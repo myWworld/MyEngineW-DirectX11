@@ -143,6 +143,7 @@ namespace ME
 			for (unsigned i = 0; i < mSkeleton->mBones.size(); i++)
 			{
 				cbData.BoneMatrices[i] = mSkeleton->mBones[i].FinalTransform;
+		
 			}
 
 			graphics::ConstantBuffer* cb = renderer::constantBuffers[CBSLOT_ANIMATION];

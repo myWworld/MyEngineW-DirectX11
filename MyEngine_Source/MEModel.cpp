@@ -36,17 +36,20 @@ namespace ME
     {
         Assimp::Importer importer;
         std::string path_str = std::string(path.begin(), path.end());
+        importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
+        auto preRot = LoadPreRotationsWithFBXSDK(path);
 
         const aiScene* scene = importer.ReadFile(path_str,
             aiProcess_Triangulate |
             aiProcess_FlipUVs |
             aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
                     //  잘못된 데이터 자동 제거
-            aiProcess_OptimizeMeshes |           //  메쉬 최적화
+          //  aiProcess_OptimizeMeshes |           //  메쉬 최적화
             aiProcess_ImproveCacheLocality   |   //  GPU 캐시 최적화
-            aiProcess_MakeLeftHanded |
+           // aiProcess_MakeLeftHanded |
             aiProcess_JoinIdenticalVertices |
-            aiProcess_FlipWindingOrder | //  좌표계 변환  
+            //aiProcess_FlipWindingOrder | //  좌표계 변환  
             aiProcessPreset_TargetRealtime_Quality
         );
 
@@ -60,7 +63,7 @@ namespace ME
        
         std::wstring directory = path.substr(0, path.find_last_of('/') + 1);
         
-        mSkeleton.RegisterBone(scene->mRootNode);
+        mSkeleton.RegisterBone(scene->mRootNode, preRot);
         mSkeleton.BuildSkeleton(scene->mRootNode);
         
         ProcessNode(scene->mRootNode, scene);
@@ -82,17 +85,7 @@ namespace ME
         {
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 
-            std::string meshName = mesh->mName.C_Str();
-
-            if (meshName.find("Teeth") != std::string::npos ||
-                meshName.find("EyeLeft") != std::string::npos ||
-                meshName.find("EyeRight") != std::string::npos)
-            {
-                // 이 메쉬는 스킵 (입, 눈)
-                continue;
-            }
-       
-            
+            std::string meshName = mesh->mName.C_Str();      
 
             Mesh* mMesh = ProcessMesh(mesh, scene);
 
@@ -170,7 +163,7 @@ namespace ME
         {
             aiBone* bone = mesh->mBones[i];
             std::string boneName = bone->mName.C_Str();
-            boneName = mSkeleton.ExtractBoneName(boneName);
+           // boneName = mSkeleton.ExtractBoneName(boneName);
 
             int boneIndex = mSkeleton.GetBoneIndex(boneName);
             boneNameToIndex[boneName] = boneIndex;
@@ -253,6 +246,51 @@ namespace ME
          return textures;
     }
 
+     std::unordered_map<std::string, math::Matrix> Model::LoadPreRotationsWithFBXSDK(const std::wstring& wpath)
+     {
+         std::unordered_map<std::string, math::Matrix> bonePreRotations;
+
+         FbxManager* pManager = FbxManager::Create();
+         FbxIOSettings* ios = FbxIOSettings::Create(pManager, IOSROOT);
+         pManager->SetIOSettings(ios);
+
+         FbxImporter* pImporter = FbxImporter::Create(pManager, "");
+         std::string path = std::string(wpath.begin(), wpath.end());
+
+         FbxScene* pScene = FbxScene::Create(pManager, "TempScene");
+
+         if (!pImporter->Initialize(path.c_str(), -1, pManager->GetIOSettings()) || !pImporter->Import(pScene)) {
+             std::cerr << "FBX SDK Load Error: " << pImporter->GetStatus().GetErrorString() << std::endl;
+             return bonePreRotations;
+         }
+
+         pImporter->Destroy();
+
+         std::function<void(FbxNode*)> Traverse;
+         Traverse = [&](FbxNode* node) {
+
+             std::string nodeName = node->GetName();
+             
+             FbxVector4 preRot = node->GetPreRotation(FbxNode::eSourcePivot);
+             
+             FbxAMatrix localMat = node->EvaluateLocalTransform();
+
+             Matrix local;
+             for (int row = 0; row < 4; ++row)
+                 for (int col = 0; col < 4; ++col)
+                     (&local._11)[row * 4 + col] = static_cast<float>(localMat.Get(row, col));
+
+             bonePreRotations[nodeName] = local;
+
+             for (int i = 0; i < node->GetChildCount(); ++i)
+                 Traverse(node->GetChild(i));
+             };
+
+         Traverse(pScene->GetRootNode());
+
+         pManager->Destroy();
+         return bonePreRotations;
+     }
 
      math::Matrix Model::ConvertAIMatrixToMatrix(aiMatrix4x4& aiMat)
      {

@@ -44,7 +44,10 @@ namespace ME
 		if (mbComplete)
 			return;
 
+
+
 		mTime += Time::DeltaTime();
+
 		float timeInTicks = mTime * mTickersPerSecond;
 
 		if (timeInTicks > mDuration)
@@ -61,12 +64,14 @@ namespace ME
 			if (mSkeleton == nullptr)
 				return;
 
-			int boneindex = mSkeleton->GetBoneIndex(bones.boneName);
+			int boneindex = mSkeleton->GetBoneIndexToMatchWithAnim(bones.boneName);
 
 			if (boneindex == -1)
 				continue;
 
-			math::Matrix localTransform = InterpolateLocalTransform(bones, animationTime);
+			math::Matrix localTransform;
+
+			localTransform = InterpolateLocalTransform(bones, animationTime, bones.boneName);
 			mSkeleton->mBones[boneindex].mLocalTransform = localTransform;
 
 		}
@@ -92,10 +97,20 @@ namespace ME
 		Assimp::Importer importer;
 		std::string path_str = std::string(path.begin(), path.end());
 
-		const aiScene* animScene = importer.ReadFile(path_str,
-			aiProcess_Triangulate | aiProcess_FlipUVs 
-		);
+		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 
+		const aiScene* animScene = importer.ReadFile(path_str,
+			aiProcess_Triangulate |
+			aiProcess_FlipUVs |
+			aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
+			//  잘못된 데이터 자동 제거
+			//aiProcess_OptimizeMeshes |           //  메쉬 최적화
+			aiProcess_ImproveCacheLocality |   //  GPU 캐시 최적화
+			//aiProcess_MakeLeftHanded |
+			aiProcess_JoinIdenticalVertices |
+			//aiProcess_FlipWindingOrder | //  좌표계 변환  
+			aiProcessPreset_TargetRealtime_Quality
+		);
 
 		if (animScene && animScene->mNumAnimations > 0)
 		{
@@ -110,7 +125,7 @@ namespace ME
 	}
 	void Animation3D::Reset()
 	{
-		mTime = 0;
+		mTime = -0.0001f;
 		mbComplete = false;
 	}
 
@@ -171,22 +186,22 @@ namespace ME
 
 	std::string Animation3D::extractBoneName(std::string& name)
 	{
-		size_t lastSlash = name.find_last_of("/|:");
-		std::string newName;
+		//size_t lastSlash = name.find_last_of("/|:");
+		//std::string newName;
+		//
+		//if (lastSlash != std::string::npos)
+		//{
+		//	newName = name.substr(lastSlash + 1);
+		//}
+		//else
+		//{
+		//	newName = name;
+		//}
 
-		if (lastSlash != std::string::npos)
-		{
-			newName = name.substr(lastSlash + 1);
-		}
-		else
-		{
-			newName = name;
-		}
-
-		size_t assimpFbxPos = newName.find("$AssimpFbx$");
+		size_t assimpFbxPos = name.find("$AssimpFbx$");
 		if(assimpFbxPos != std::string::npos)
 		{
-			newName = newName.substr(0, assimpFbxPos -1);
+			name = name.substr(0, assimpFbxPos -1);
 		}
 
 		//std::string finalName = "";
@@ -196,14 +211,30 @@ namespace ME
 		//	finalName += std::tolower(static_cast<unsigned char>(c));
 		//}
 		//
-		return newName;
+		return name;
 	}
 
 
-	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime)
+	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime, std::string boneName)
 	{
 		Vector3 interpolatedPos = InterpolatePosition(boneAnim.positions, currentTime);
+
+
 		Quaternion interpolatedRot = InterpolateRotation(boneAnim.rotations, currentTime);
+		int boneIdx = mSkeleton->GetBoneIndex(boneName);
+
+
+		//Quaternion finalRot = interpolatedRot;
+		//
+		//
+		Matrix baseTransform = Matrix::Identity;
+		if (boneIdx != -1)
+		{
+			 baseTransform = mSkeleton->mBonesTransform[boneIdx];
+		
+		
+		}
+		//
 		Vector3 interpolatedScale = InterpolateScale(boneAnim.scales, currentTime);
 
 		Matrix transform =
@@ -211,8 +242,11 @@ namespace ME
 			Matrix::CreateFromQuaternion(interpolatedRot) *
 			Matrix::CreateTranslation(interpolatedPos);
 
+		transform = transform * baseTransform;
+
 		return transform;
 	}
+
 
 
 	math::Vector3 Animation3D::InterpolatePosition(const	std::vector<VectorKey>& pos, float currentTime)

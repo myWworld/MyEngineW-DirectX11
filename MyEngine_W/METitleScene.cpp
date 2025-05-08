@@ -106,7 +106,8 @@ namespace ME
 				animator->SetSkeleton(&model->GetSkeleton());
 				animator->CreateAnimation(L"Idle", L"..\\Resources\\Animation\\Idle2.fbx");
 				animator->CreateAnimation(L"FORWARDWALK", L"..\\Resources\\Animation\\ForwardWalk.fbx");
-				animator->PlayAnimation(L"FORWARDWALK", true);
+				animator->CreateAnimation(L"DANCE", L"..\\Resources\\Animation\\SillyDancing.fbx");
+				animator->PlayAnimation(L"DANCE", true);
 			}
 			else
 			{

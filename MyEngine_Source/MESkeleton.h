@@ -19,6 +19,7 @@ namespace ME
 
 		std::vector<Bone> mBones;
 		std::unordered_map<std::string, int> mBoneNameToIndexMap;
+		std::vector<Matrix> mBonesTransform;
 		std::string mRootBoneName;
 
 		enums::eModelType mModelType;
@@ -34,9 +35,10 @@ namespace ME
 		void BuildSkeleton(aiNode* node);
 
 		int GetBoneIndex(const std::string& name) const;
+		int GetBoneIndexToMatchWithAnim(const std::string& name) const;
 
 		void CalculateFinalTransform();
-		void RegisterBone(aiNode* node);
+		void RegisterBone(aiNode* node, std::unordered_map<std::string, math::Matrix>& preRot);
 		void RegisterSkinData(const aiScene* scene);
 
 		void SetModelType( enums::eModelType type) { mModelType = type; }
