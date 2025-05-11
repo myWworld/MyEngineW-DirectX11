@@ -20,12 +20,17 @@ namespace ME
 		void Render()override;
 
 
+		void SetTarget(GameObject* obj) { mtarget = obj; }
+
 
 	private:
 
 		Vector2 mPrevMousePos;
 		Vector2 mCurMousePos;
 		float mMouseSpeed;
+
+		Vector3 mTargetPos;
+		GameObject* mtarget;
 	};
 
 }

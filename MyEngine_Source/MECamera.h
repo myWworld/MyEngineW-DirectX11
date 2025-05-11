@@ -35,6 +35,8 @@ namespace ME
 		void SetProjectionMatrix(eProjectionType type) { mProjectionType = type; }
 		void SetSize(float size) { mSize = size; }
 
+		void SetTarget(GameObject* obj) { mtarget = obj; }
+
 		
 
 	private:
@@ -53,6 +55,9 @@ namespace ME
 		float mNear;
 		float mFar;
 		float mSize;
+
+		Vector3 mTargetPos;
+		GameObject* mtarget;
 	
 	};
 

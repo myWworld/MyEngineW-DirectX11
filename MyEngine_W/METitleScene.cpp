@@ -78,6 +78,8 @@ namespace ME
 			mPlayer = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(0, 0, 0));
 			Transform* tr = mPlayer->GetComponent<Transform>();
 			tr->SetScale(Vector3(0.2f,0.2f,0.2f));
+			renderer::mainCamera->SetTarget(mPlayer);
+			
 			//SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
 			//sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
 			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));

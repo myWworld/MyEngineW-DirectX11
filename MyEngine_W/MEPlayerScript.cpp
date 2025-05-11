@@ -59,7 +59,7 @@ namespace ME
 
     void  PlayerScript::Idle()
     {
-     //   mAnimator->PlayAnimation(L"Idle");
+        mAnimator->PlayAnimation(L"Idle");
     }
     void PlayerScript::Move()
     {
@@ -114,7 +114,7 @@ namespace ME
         //     pos += 20.0f * -tr->Up() * Time::DeltaTime();
         // }
        
-        tr->SetPosition(pos);
+        //tr->SetPosition(pos);
 
         if (Input::GetKeyUp(eKeyCode::Left) &&
             Input::GetKeyUp(eKeyCode::Right) &&

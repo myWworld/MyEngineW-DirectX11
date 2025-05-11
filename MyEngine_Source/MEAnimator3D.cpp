@@ -200,11 +200,13 @@ namespace ME
 
 	}
 	void Animator3D::PlayAnimation(const std::wstring& name, bool loop)
-	{
+ 	{
 		Animation3D* animation = FindAnimation(name);
 		if (animation == nullptr)
 			return;
 
+		if (mActiveAnimation && mActiveAnimation == animation)
+			return;
 
 		if (mActiveAnimation)
 		{

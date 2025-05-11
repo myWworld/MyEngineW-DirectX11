@@ -11,12 +11,14 @@
 
 namespace ME
 {
+
 	Animation3D::Animation3D()
 		:Resource(enums::eResourceType::Animation3D)
 		, mAnimator(nullptr)
 		, mbComplete(false)
 		,mSkeleton(nullptr)
 		,mTime(0.0f)
+		,mPrevRootPos(Vector3::Zero)
 	{
 	}
 
@@ -59,6 +61,10 @@ namespace ME
 
 		float animationTime = mTime * mTickersPerSecond;
 
+		std::unordered_set<std::string> updatedBones;
+
+		Vector3 currentRootPos = Vector3::Zero;
+
 		for (auto bones : boneAnimations)
 		{
 			if (mSkeleton == nullptr)
@@ -70,16 +76,36 @@ namespace ME
 				continue;
 
 			math::Matrix localTransform;
-
+			
 			localTransform = InterpolateLocalTransform(bones, animationTime, bones.boneName);
 			mSkeleton->mBones[boneindex].mLocalTransform = localTransform;
 
+			updatedBones.insert(bones.boneName);
+			
+			if (bones.boneName == "mixamorig:Hips" || bones.boneName == "Hips")
+				currentRootPos = localTransform.Translation();
 		}
+
+		for (auto& bone : mSkeleton->mBones)
+		{
+			if (updatedBones.find(bone.mName) == updatedBones.end())
+			{
+				bone.mLocalTransform = bone.mDefaultLocalTransform; // 원래 포즈 유지
+			}
+		}
+
+		Transform* tr = mAnimator->GetOwner()->GetComponent<Transform>();
+
+		if (mAnimator->GetApplyRootMotion() && !mbComplete)
+		{
+			Vector3 delta = currentRootPos - mPrevRootPos;
+			mRootMotionTotalOffset += delta;
+			tr->SetPosition(mRootMotionBasePosition + mRootMotionTotalOffset);
+		}
+		mPrevRootPos = currentRootPos;
 
 		mSkeleton->CalculateFinalTransform();
 
-
-	
 	}
 
 	void Animation3D::Render()
@@ -127,6 +153,9 @@ namespace ME
 	{
 		mTime = -0.0001f;
 		mbComplete = false;
+		mPrevRootPos = Vector3::Zero;
+		mRootMotionTotalOffset = Vector3::Zero;
+		mRootMotionBasePosition = mAnimator->GetOwner()->GetComponent<Transform>()->GetPosition();
 	}
 
 	void Animation3D::CreateFromAssimp(aiAnimation* anim)
@@ -228,19 +257,19 @@ namespace ME
 		//
 		//
 		Matrix baseTransform = Matrix::Identity;
+		
 		if (boneIdx != -1)
 		{
 			 baseTransform = mSkeleton->mBonesTransform[boneIdx];
-		
-		
 		}
 		//
 		Vector3 interpolatedScale = InterpolateScale(boneAnim.scales, currentTime);
 
 		Matrix transform =
-			Matrix::CreateScale(interpolatedScale) *
 			Matrix::CreateFromQuaternion(interpolatedRot) *
 			Matrix::CreateTranslation(interpolatedPos);
+
+		//Matrix::CreateScale(interpolatedScale) *
 
 		transform = transform * baseTransform;
 

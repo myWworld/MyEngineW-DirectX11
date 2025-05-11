@@ -15,6 +15,7 @@ namespace ME
 		math::Matrix mOffsetMatrix;
 		math::Matrix mLocalTransform;
 		math::Matrix FinalTransform;
+		math::Matrix mDefaultLocalTransform;
 
 		Bone* mParent;
 		std::vector<Bone*> mChildren;

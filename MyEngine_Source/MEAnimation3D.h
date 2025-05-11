@@ -56,6 +56,10 @@ namespace ME
 
 	public:
 
+		Vector3 mPrevRootPos = Vector3::Zero;
+		Vector3 mRootMotionTotalOffset = Vector3::Zero;
+		Vector3 mRootMotionBasePosition = Vector3::Zero;
+
 		std::wstring mName;
 		float mDuration;
 		float mTickersPerSecond;

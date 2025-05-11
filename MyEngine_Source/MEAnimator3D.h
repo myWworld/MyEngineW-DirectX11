@@ -77,6 +77,8 @@ namespace ME
 		void SetTexture(graphics::Texture* texture) { mTextures.push_back(texture); }
 		void SetMaterial(Material* material) { mMaterial = material; }
 
+		void SetApplyRootMotion(bool apply) { mbApplyRootMotion = apply; }
+		bool GetApplyRootMotion() { return mbApplyRootMotion; }
 
 
 	private:
@@ -85,6 +87,7 @@ namespace ME
 		void render();
 
 	private:
+
 
 
 		Matrix mModelMatrix;
@@ -97,7 +100,8 @@ namespace ME
 		std::map<std::wstring, Animation3D*> mAnimations;
 
 		bool mbLoop;
-		
+		bool mbApplyRootMotion = true;
+
 		Animation3D* mActiveAnimation;
 		Skeleton* mSkeleton;
 

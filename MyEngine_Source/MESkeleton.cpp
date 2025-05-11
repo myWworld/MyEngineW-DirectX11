@@ -85,11 +85,23 @@ namespace ME
 			Bone newBone;
 			newBone.mName = nodeName;
 		
-			math::Matrix pureRotation = preRot[nodeName];
+			auto it = preRot.find(nodeName);
+			Matrix pureRotation = Matrix::Identity;
+			if (it != preRot.end())
+				pureRotation = it->second;
 
 			mBonesTransform.push_back(pureRotation);
 
-			newBone.mLocalTransform = ConvertAIMatrixToMatrix(node->mTransformation);
+			Matrix local = ConvertAIMatrixToMatrix(node->mTransformation);
+
+			it = preRot.find(nodeName);
+			if (it != preRot.end())
+			{
+				local = local * it->second;
+			}
+
+			newBone.mLocalTransform = local;
+			newBone.mDefaultLocalTransform = local;
 
 			mBoneNameToIndexMap[nodeName] = idx;
 			newBone.mIndex = idx;
