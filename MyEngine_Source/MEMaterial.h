@@ -36,6 +36,9 @@ namespace ME
 		graphics::Texture* mNormalTexture;
 		graphics::Texture* mSpecularTexture;
 
+		XMFLOAT3 AmbientColor;
+		XMFLOAT3 DiffuseColor;
+		XMFLOAT3 SpecularColor;
 
 		graphics::Shader* mShader;
 

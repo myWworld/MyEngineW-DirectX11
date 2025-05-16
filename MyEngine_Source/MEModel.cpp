@@ -213,7 +213,13 @@ namespace ME
            std::vector<ME::Texture*> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, L"texture_specular");
            mTextures.insert(mTextures.end(), specularMaps.begin(), specularMaps.end());
            if (!specularMaps.empty())
-               newMesh->SetDiffuseTexture(specularMaps[0]);
+               newMesh->SetSpecularTexture(specularMaps[0]);
+
+           std::vector<ME::Texture*> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, L"texture_normal");
+          
+           mTextures.insert(mTextures.end(), normalMaps.begin(), normalMaps.end());
+           if (!normalMaps.empty())
+               newMesh->SetNormalTexture(normalMaps[0]);
         }
 
      
@@ -229,10 +235,20 @@ namespace ME
              mat->GetTexture(type, i, &str);
              Texture* texture = new Texture();
              const char* cstr = str.C_Str();
-         	 std::string new_str(cstr);
-             std::wstring path = std::wstring(new_str.begin(), new_str.end());
+         	 
+             std::string new_str(cstr);
+             
+             std::string texStr = new_str;
+             
+             if (texStr.find("..") == 0)
+                 texStr = texStr.substr(3);
+
+             std::filesystem::path base = std::filesystem::absolute(L"..\\Resources\\");
+             std::filesystem::path fullPath = base / texStr;
+        // OK!
+
           
-             if (texture->Load(path) == S_OK)
+             if (texture->Load(fullPath.wstring()) == S_OK)
              {
                  textures.push_back(texture);
              }

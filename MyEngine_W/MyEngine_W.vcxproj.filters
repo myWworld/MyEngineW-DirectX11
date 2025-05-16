@@ -26,6 +26,10 @@
     <ClInclude Include="MEPlayerScript.h">
       <Filter>Script\Player</Filter>
     </ClInclude>
+    <ClInclude Include="MEGunScript.h" />
+    <ClInclude Include="MEGun.h">
+      <Filter>Contents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -69,6 +73,10 @@
     </ClCompile>
     <ClCompile Include="MEPlayerScript.cpp">
       <Filter>Script\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="MEGunScript.cpp" />
+    <ClCompile Include="MEGun.cpp">
+      <Filter>Contents</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

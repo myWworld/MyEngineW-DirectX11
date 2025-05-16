@@ -100,6 +100,7 @@ namespace ME
 		{
 			Vector3 delta = currentRootPos - mPrevRootPos;
 			mRootMotionTotalOffset += delta;
+			delta.y = 0;
 			tr->SetPosition(mRootMotionBasePosition + mRootMotionTotalOffset);
 		}
 		mPrevRootPos = currentRootPos;
@@ -248,6 +249,11 @@ namespace ME
 	{
 		Vector3 interpolatedPos = InterpolatePosition(boneAnim.positions, currentTime);
 
+		if (boneName == "Hips" || boneName == "mixamorig:Hips")
+		{
+			if (!mAnimator->GetApplyRootMotion())
+				interpolatedPos = Vector3::Zero;
+		}
 
 		Quaternion interpolatedRot = InterpolateRotation(boneAnim.rotations, currentTime);
 		int boneIdx = mSkeleton->GetBoneIndex(boneName);

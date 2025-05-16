@@ -115,6 +115,11 @@ namespace ME
 					mesh->GetSpecularTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Specular);
 				}
 
+				if (mesh->GetNormalTexture() != nullptr)
+				{
+					mesh->GetNormalTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Normal);
+				}
+
 				if (!mesh->GetSpecularTexture() && !mesh->GetDiffuseTexture() && !mTextures.empty())
 				{
 					for (auto texture : mTextures)

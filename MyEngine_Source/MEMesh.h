@@ -45,9 +45,11 @@ namespace ME
 
 		void SetDiffuseTexture(graphics::Texture* texture) { diffuseTexture = texture; }
 		void SetSpecularTexture(graphics::Texture* texture) { specularTexture = texture; }
+		void SetNormalTexture(graphics::Texture* texture) { normalTexture = texture; }
 
 		graphics::Texture* GetDiffuseTexture() { return diffuseTexture; }
 		graphics::Texture* GetSpecularTexture() { return specularTexture; }
+		graphics::Texture* GetNormalTexture() { return normalTexture; }
 
 		void SetSkinned(bool skinned) { mbIsSkinned = skinned; }
 		bool IsSkinned() { return mbIsSkinned; }
@@ -61,6 +63,7 @@ namespace ME
 
 		graphics::Texture* diffuseTexture;
 		graphics::Texture* specularTexture;
+		graphics::Texture* normalTexture;
 
 		bool mbIsSkinned;
 

@@ -20,6 +20,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MECameraScript.h" />
+    <ClInclude Include="MEGun.h" />
+    <ClInclude Include="MEGunScript.h" />
     <ClInclude Include="MELoadingScene.h" />
     <ClInclude Include="MELoadScene.h" />
     <ClInclude Include="MEPlayer.h" />
@@ -31,6 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MECameraScript.cpp" />
+    <ClCompile Include="MEGun.cpp" />
+    <ClCompile Include="MEGunScript.cpp" />
     <ClCompile Include="MELoadingScene.cpp" />
     <ClCompile Include="MEPlayer.cpp" />
     <ClCompile Include="MEPlayerScript.cpp" />

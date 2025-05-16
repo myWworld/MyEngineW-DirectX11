@@ -19,7 +19,10 @@ namespace ME
 		,mNear(1.0f)
 		,mFar(1000.0f)
 		,mSize(1.0f)
-	
+		,mCameraPitch(0.0f)
+		, mCameraRoll(0.0f)
+		, mCameraYaw(0.0f)
+		, mForward(Vector3::Forward)
 	{
 	}
 	Camera::~Camera()
@@ -32,7 +35,10 @@ namespace ME
 
 	void Camera::Update()
 	{	
-		
+		if (mCamScript == nullptr)
+		{
+			mCamScript = GetOwner()->GetComponent<CameraScript>();
+		}
 	}
 
 	void Camera::LateUpdate()
@@ -57,20 +63,32 @@ namespace ME
 
 		if (mtarget != nullptr)
 		{
-			Transform* targetTr = mtarget->GetComponent<Transform>();
-			Vector3 targetPos = targetTr->GetPosition();
+			mTargetPos = mtarget->GetComponent<Transform>()->GetPosition();
+			
+			Transform* camTr = GetOwner()->GetComponent<Transform>();
 
-			// 카메라 위치를 타겟 기준으로 오프셋
-			pos = targetPos + Vector3(0.0f, 60.0f, -45.0f);
-			tr->SetPosition(pos);
+			mCameraPitch = std::clamp(mCameraPitch, XMConvertToRadians(-89.0f), XMConvertToRadians(89.0f));
 
-			// 타겟 방향 계산
-			Vector3 forward = targetPos - pos;
-			if (forward.LengthSquared() < 0.0001f)
-				forward = Vector3::Forward;
-			else
-				forward.Normalize();
+			Matrix yawRot = Matrix::CreateRotationY(mCameraYaw);
+			Vector3 offset = Vector3(0.0f, 50, -35); // 높이는 고정
+			Vector3 camPos = mTargetPos + Vector3::Transform(offset, yawRot);
+
+			// 그다음 pitch 포함한 회전으로 forward 구해서 target 지정
+			Matrix fullRot = Matrix::CreateRotationX(mCameraPitch) * Matrix::CreateRotationY(mCameraYaw);
+			Vector3 camForward = Vector3::Transform(Vector3::Forward, fullRot);
+			mForward = camForward;
+			Vector3 camTarget = camPos + camForward;
+			
+			Quaternion rot = Quaternion::CreateFromRotationMatrix(fullRot);
+
+			// Transform에 회전 적용
+			tr->SetRotation(rot.ToEuler());
+
+			mViewMatrix = Matrix::CreateLookAtLH(camPos, camTarget, Vector3::Up);
+
+			return;
 		}
+		
 		
 
 		mViewMatrix = Matrix::CreateLookToLH(pos, forward, up);
@@ -84,7 +102,7 @@ namespace ME
 		float width = (winRect.right - winRect.left);
 		float height = (winRect.bottom - winRect.top);
 		mAspectRatio = width / height;
-		float fovY = XMConvertToRadians(70.0f);
+		float fovY = XMConvertToRadians(50.0f);
 
 		switch (type)
 		{

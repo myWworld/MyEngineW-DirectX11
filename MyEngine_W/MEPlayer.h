@@ -18,6 +18,11 @@ namespace ME
 		void Render()override;
 
 
+	
+	public:
+
+		Vector3 RightHand;
+		Vector3 LeftHand;
 
 		
 

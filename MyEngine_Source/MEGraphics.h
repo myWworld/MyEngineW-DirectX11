@@ -118,6 +118,7 @@ namespace ME::graphics
 
 	enum class eBlendState
 	{
+		Opaque,
 		AlphaBlend,
 		OneOne,
 		End,

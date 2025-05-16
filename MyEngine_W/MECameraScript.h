@@ -23,6 +23,7 @@ namespace ME
 		void SetTarget(GameObject* obj) { mtarget = obj; }
 
 
+
 	private:
 
 		Vector2 mPrevMousePos;
@@ -31,6 +32,9 @@ namespace ME
 
 		Vector3 mTargetPos;
 		GameObject* mtarget;
+
+		float cameraYaw = 0.0f;
+		float cameraPitch = 0.0f;
 	};
 
 }

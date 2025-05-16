@@ -212,6 +212,23 @@ namespace ME
 		return -1;
 	}
 
+	Bone* Skeleton::GetLeftHandTransform()
+	{
+		auto it = mBoneNameToIndexMap.find("mixamorig:LeftHand");
+		int idx = it->second;
+
+		return  &mBones[idx];
+	
+	}
+
+	Bone* Skeleton::GetRightHandTransform()
+	{
+		auto it = mBoneNameToIndexMap.find("mixamorig:RightHand");
+		int idx = it->second;
+
+		return &mBones[idx];
+	}
+
 
 	void Skeleton::CalculateFinalTransform()
 	{

@@ -1,5 +1,6 @@
 #pragma once
 #include "MEComponent.h"
+#include "../MyEngine_W/MECameraScript.h"
 
 namespace ME
 {
@@ -36,8 +37,17 @@ namespace ME
 		void SetSize(float size) { mSize = size; }
 
 		void SetTarget(GameObject* obj) { mtarget = obj; }
+		GameObject* GetTarget() { return mtarget; }
 
-		
+		Vector3 GetForward() { return mForward; }
+
+		void SetPitch(float pitch) { mCameraPitch = pitch; }
+		void SetRoll(float roll) { mCameraRoll = roll; }
+		void SetYaw(float yaw) { mCameraYaw = yaw; }
+
+		float GetYaw() { return mCameraYaw; }
+		float GetPitch() { return mCameraPitch; }
+		float GetRoll() { return mCameraRoll; }
 
 	private:
 
@@ -58,6 +68,14 @@ namespace ME
 
 		Vector3 mTargetPos;
 		GameObject* mtarget;
+
+		float mCameraYaw;
+		float mCameraPitch;
+		float mCameraRoll;
+
+		Vector3 mForward;
+
+		CameraScript* mCamScript;
 	
 	};
 

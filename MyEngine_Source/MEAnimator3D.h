@@ -80,6 +80,7 @@ namespace ME
 		void SetApplyRootMotion(bool apply) { mbApplyRootMotion = apply; }
 		bool GetApplyRootMotion() { return mbApplyRootMotion; }
 
+	
 
 	private:
 
@@ -100,7 +101,7 @@ namespace ME
 		std::map<std::wstring, Animation3D*> mAnimations;
 
 		bool mbLoop;
-		bool mbApplyRootMotion = true;
+		bool mbApplyRootMotion = false;
 
 		Animation3D* mActiveAnimation;
 		Skeleton* mSkeleton;

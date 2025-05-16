@@ -4,6 +4,7 @@
 
 namespace ME
 {
+	class Model;
 	class TitleScene:public Scene
 	{
 	public:
@@ -21,8 +22,8 @@ namespace ME
 
 	private:
 
-		void MakeBG();
-
+		void MakeCharacter(Model* model);
+		void MakeGun();
 
 	private:
 

@@ -121,7 +121,7 @@ namespace ME::renderer
 		bsDesc.AlphaToCoverageEnable = false;
 		bsDesc.IndependentBlendEnable = false;
 
-		bsDesc.RenderTarget[0].BlendEnable = true;
+		bsDesc.RenderTarget[0].BlendEnable = false;
 		bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
 		bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
 		bsDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
@@ -129,6 +129,12 @@ namespace ME::renderer
 		bsDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
 		bsDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
 		bsDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+
+		GetDevice()->CreateBlendState(&bsDesc, blendStates[(UINT)eBlendState::Opaque].GetAddressOf());
+
+		bsDesc.RenderTarget[0].BlendEnable = true;
+		bsDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		bsDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
 
 		GetDevice()->CreateBlendState(&bsDesc, blendStates[(UINT)eBlendState::AlphaBlend].GetAddressOf());
 
@@ -330,7 +336,10 @@ namespace ME::renderer
 		inputLayoutDesces[5].SemanticName = "TEXCOORD";
 		inputLayoutDesces[5].SemanticIndex = 0;
 
+
 		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader");
+		modelShader->SetBlendState(graphics::eBlendState::Opaque);
+
 		mesh->SetVertexBufferParams(6, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
 
 	}
@@ -368,6 +377,7 @@ namespace ME::renderer
 		inputLayoutDesces[3].SemanticIndex = 0;
 
 		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"StaticModelShader");
+		modelShader->SetBlendState(graphics::eBlendState::Opaque);
 		mesh->SetVertexBufferParams(4, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
 
 	}

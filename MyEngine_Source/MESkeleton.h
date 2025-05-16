@@ -46,6 +46,9 @@ namespace ME
 
 		std::string ExtractBoneName(const std::string& name) const;
 
+		Bone* GetLeftHandTransform();
+		Bone* GetRightHandTransform();
+
 	private:
 		void updateBoneRecursive(int boneIndex, const math::Matrix& parentTransform);
 		
