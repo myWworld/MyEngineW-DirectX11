@@ -9,7 +9,14 @@ namespace ME
 	class CameraScript:public Script
 	{
 	public:
-
+		enum class perspective
+		{
+			FirstPerson,
+			ThirdPerson,
+			TopDown,
+			FreeCamera
+		};
+	
 
 		CameraScript();
 		~CameraScript();
@@ -22,6 +29,7 @@ namespace ME
 
 		void SetTarget(GameObject* obj) { mtarget = obj; }
 
+		perspective GetPerspective() const { return mPerspective; }
 
 
 	private:
@@ -35,6 +43,8 @@ namespace ME
 
 		float cameraYaw = 0.0f;
 		float cameraPitch = 0.0f;
+
+		perspective mPerspective = perspective::ThirdPerson;
 	};
 
 }

@@ -28,12 +28,16 @@ namespace ME
 			mPlayerScript = mOwner->GetComponent<PlayerScript>();
 		}
 
+		Player* GetGunOwner() { return mOwner; }
 
 	private:
 
 
 		 Player* mOwner;
 		 PlayerScript * mPlayerScript;
+
+		 Vector3 mPrevPlayerPos = Vector3::Zero;
+		 Vector3 mCurPlayerPos = Vector3::Zero;
 	};
 
 }

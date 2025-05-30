@@ -68,22 +68,25 @@ void ModelRenderer::render()
            if(mesh->GetDiffuseTexture() != nullptr)
 		   {
 			   mesh->GetDiffuseTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
-		   }
+               mbHasEmbeddedTextures = true;
+           }
 
            if (mesh->GetSpecularTexture() != nullptr)
            {
                mesh->GetSpecularTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Specular);
+               mbHasEmbeddedTextures = true;
            }
 
 
            if (mesh->GetNormalTexture() != nullptr)
            {
                mesh->GetNormalTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Normal);
+               mbHasEmbeddedTextures = true;
            }
        }
    }
 
-    //if (mTextures.size() > 0)
+    //if (!mbHasEmbeddedTextures)
     //{
     //    for (auto texture : mTextures)
     //    {

@@ -8,8 +8,8 @@ namespace ME::enums
 		BackGround,
 		Block,
 		Floor,
-		Items,
 		Player,
+		Items,
 		Particle,
 		Max = 20
 	};
@@ -55,11 +55,11 @@ namespace ME::enums
 		Trasnform,
 		Collider,
 		Rigidbody,
-		Script,
 		SpriteRenderer,
 		Animator,
 		ModelRenderer,
 		Animator3D,
+		Script,
 		Camera,
 		AudioListener,
 		AudioSource,

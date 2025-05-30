@@ -16,6 +16,7 @@ namespace ME
 		math::Matrix mLocalTransform;
 		math::Matrix FinalTransform;
 		math::Matrix mDefaultLocalTransform;
+		math::Matrix mWolrdTransform;
 
 		Bone* mParent;
 		std::vector<Bone*> mChildren;

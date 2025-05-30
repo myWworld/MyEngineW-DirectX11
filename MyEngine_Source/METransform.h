@@ -28,12 +28,22 @@ namespace ME
 		const Vector3 GetRotation() { return mRotation; }
 		const Vector3 GetScale() { return mScale; }
 
-		void SetPosition(Vector3 position) {mPosition = position;}
+		void SetPosition(Vector3 position) 
+		{
+			mPosition = position;
+			mbSetWorldMatrix = false; // Reset world matrix flag when position changes
+		}
 		void SetPosition(float x, float y, float z) { mPosition = Vector3(x, y, z); }
 		void SetRotation(Vector3 rotation) { mRotation = rotation; }
 		void SetRotation(float x, float y, float z) { mRotation = Vector3(x, y, z); }
 		void SetScale(Vector3 scale) { mScale = scale; }
 		void SetScale(float x, float y, float z) { mScale = Vector3(x, y, z); }
+
+		void SetWorldMatrix(Matrix worldMatrix)
+		{
+			mWorldMatrix = worldMatrix;
+			mbSetWorldMatrix = true;
+		}
 
 		const Vector3 Forward() { return mForward; };
 		const Vector3 Right() { return mRight; };
@@ -42,6 +52,8 @@ namespace ME
 
 	private:
 		
+		bool mbSetWorldMatrix = false;
+
 		Transform* mParent;
 		Matrix mWorldMatrix;
 

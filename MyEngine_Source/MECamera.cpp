@@ -70,7 +70,19 @@ namespace ME
 			mCameraPitch = std::clamp(mCameraPitch, XMConvertToRadians(-89.0f), XMConvertToRadians(89.0f));
 
 			Matrix yawRot = Matrix::CreateRotationY(mCameraYaw);
-			Vector3 offset = Vector3(0.0f, 50, -35); // 높이는 고정
+			Vector3 offset = Vector3::Zero; // 높이는 고정
+			
+			if (mCamScript->GetPerspective() == CameraScript::perspective::ThirdPerson)
+			{
+				offset = Vector3(0.0f, 270, -75);
+				mFovY = 75.0f;
+			}
+			else
+			{
+				mFovY = 75.0f;
+				offset = Vector3(0.0f, 200, 45);
+			}
+		
 			Vector3 camPos = mTargetPos + Vector3::Transform(offset, yawRot);
 
 			// 그다음 pitch 포함한 회전으로 forward 구해서 target 지정
@@ -83,6 +95,7 @@ namespace ME
 
 			// Transform에 회전 적용
 			tr->SetRotation(rot.ToEuler());
+			tr->SetPosition(camPos);
 
 			mViewMatrix = Matrix::CreateLookAtLH(camPos, camTarget, Vector3::Up);
 
@@ -102,7 +115,7 @@ namespace ME
 		float width = (winRect.right - winRect.left);
 		float height = (winRect.bottom - winRect.top);
 		mAspectRatio = width / height;
-		float fovY = XMConvertToRadians(50.0f);
+		float fovY = XMConvertToRadians(mFovY);
 
 		switch (type)
 		{

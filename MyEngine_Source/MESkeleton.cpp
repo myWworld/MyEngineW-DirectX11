@@ -253,6 +253,8 @@ namespace ME
 
 		globalMatrix = bone.mLocalTransform * parentTransform;
 
+		bone.mWolrdTransform = globalMatrix;
+
 		bone.FinalTransform = bone.mOffsetMatrix * globalMatrix;
 
 		for (auto child : bone.mChildren)

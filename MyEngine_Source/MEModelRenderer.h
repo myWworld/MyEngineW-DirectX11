@@ -44,6 +44,8 @@ namespace ME
         std::vector<graphics::Texture* >mTextures;
         Material* mMaterial;
 
+        bool mbHasEmbeddedTextures = false; // Flag to check if textures are embedded in the model
+
        
     };
 

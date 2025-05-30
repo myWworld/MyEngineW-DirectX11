@@ -144,7 +144,7 @@ namespace ME
             tr->SetPosition(pos);
         }
 
-        if (Input::GetKey(eKeyCode::T))
+        if (Input::GetKeyDown(eKeyCode::T))
         {
             if (mbHoldingGun == false)
                 mbHoldingGun = true;

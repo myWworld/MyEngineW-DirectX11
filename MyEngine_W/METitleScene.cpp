@@ -79,7 +79,7 @@ namespace ME
 
 			mPlayer = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(0, 0, 0));
 			Transform* tr = mPlayer->GetComponent<Transform>();
-			tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
+			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
 			renderer::mainCamera->SetTarget(mPlayer);
 
 			//SpriteRenderer* sr = mPlayer->AddComponent<SpriteRenderer>();
@@ -151,12 +151,13 @@ namespace ME
 
 		Gun* m4 = object::Instantiate<Gun>(enums::eLayerType::Items, Vector3(0, 10, 35));
 		Transform* tr = m4->GetComponent<Transform>();
-		tr->SetScale(Vector3(2.0f, 2.0f, 2.0f));
+		//tr->SetScale(Vector3(7.0f, 7.0f, 7.0f));
+	//	tr->SetRotation(Vector3(0.0f, 180.0f, 0.0f));
 		GunScript* gunScript = m4->AddComponent<GunScript>();
 		gunScript->SetGunOnwer(static_cast<Player*>(mPlayer));
 	
 
-		if (gun->LoadModel(L"..\\Resources\\beretta m9\\beretta m9.fbx"))
+		if (gun->LoadModel(L"..\\Resources\\Pistol.fbx"))
 		{
 
 			ModelRenderer* modelRenderer = m4->AddComponent<ModelRenderer>();

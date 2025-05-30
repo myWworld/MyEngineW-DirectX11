@@ -16,6 +16,8 @@ namespace ME
 			Orthographic,
 		};
 
+
+
 		static Matrix GetGpuViewMatrix() { return ViewMatrix; }
 		static Matrix GetGpuProjectionMatrix() { return ProjectionMatrix; }
 		static void SetGpuViewMatrix(Matrix matrix) { ViewMatrix = matrix; }
@@ -65,6 +67,8 @@ namespace ME
 		float mNear;
 		float mFar;
 		float mSize;
+
+		float mFovY = 50.0f;
 
 		Vector3 mTargetPos;
 		GameObject* mtarget;
