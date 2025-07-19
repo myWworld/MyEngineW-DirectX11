@@ -5,10 +5,21 @@
 #include "METime.h"
 #include "MEAnimator3D.h"
 #include "MERenderer.h"
+#include "Bullet.h"
+#include "MEObject.h"
+#include "MEBulletScript.h"
+#include "MEModel.h"
+#include "MEModelRenderer.h"
+#include "MEResources.h"
+#include "MEMaterial.h"
+#include "METexture.h"
 
 namespace ME
 {
 	GunScript::GunScript()
+		:mCoolDownTime(0.2f)
+		, mCoolDownTimer(0.0f)
+		, mbCanShoot(false)
 	{
 	}
 	GunScript::~GunScript()
@@ -25,6 +36,24 @@ namespace ME
 			Transform* playerTr = GetGunOwner()->GetComponent<Transform>();
 
 			mCurPlayerPos = playerTr->GetPosition();
+		}
+
+		if (mbCanShoot == false)
+		{
+			mCoolDownTimer += Time::DeltaTime();
+
+			if (mCoolDownTimer > mCoolDownTime)
+			{
+				mbCanShoot = true;
+				mCoolDownTimer = 0.0f;
+			}
+		}
+
+		if (Input::GetKeyDown(eKeyCode::LeftMous))
+		{
+			if(mbCanShoot == true && mPlayerScript->IsUsingGun())
+				makeBullet();
+			
 		}
 	}
 	void GunScript::LateUpdate()
@@ -88,5 +117,42 @@ namespace ME
 	}
 	void GunScript::Render()
 	{
+	}
+
+	void GunScript::makeBullet()
+	{
+		Transform* tr = GetOwner()->GetComponent<Transform>();
+		Vector3 gunPos = tr->GetPosition();
+	
+
+		Vector3 spawnPos = gunPos;
+		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Particle,spawnPos);
+		bullet->AddComponent<BulletScript>();
+		Transform* bulletTr = bullet->GetComponent<Transform>();
+		bulletTr->SetScale(.1f, .1f, .1f);
+		bulletTr->SetRotation(tr->GetRotation());
+
+		Model* bullet_model = new Model();
+
+		if (bullet_model->LoadModel(L"..\\Resources\\Bullet.fbx"))
+		{
+
+			ModelRenderer* modelRenderer = bullet->AddComponent<ModelRenderer>();
+			modelRenderer->SetMesh(bullet_model->GetMeshes());
+			modelRenderer->SetMaterial(Resources::Find<Material>(L"StaticModelMaterial"));
+
+			if (bullet_model->GetTextures().size() > 0)
+				modelRenderer->SetTextures(bullet_model->GetTextures());
+			else
+				modelRenderer->SetTexture(Resources::Find<graphics::Texture>(L"PISTOL"));
+
+			bullet->SetModel(bullet_model);
+		}
+		else
+		{
+			delete bullet_model;
+			bullet_model = nullptr;
+		}
+
 	}
 }

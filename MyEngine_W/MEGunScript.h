@@ -32,12 +32,21 @@ namespace ME
 
 	private:
 
+		void makeBullet();
+
+	private:
+
 
 		 Player* mOwner;
 		 PlayerScript * mPlayerScript;
 
 		 Vector3 mPrevPlayerPos = Vector3::Zero;
 		 Vector3 mCurPlayerPos = Vector3::Zero;
+
+		 float mCoolDownTime;
+		 float mCoolDownTimer;
+
+		 bool mbCanShoot;
 	};
 
 }

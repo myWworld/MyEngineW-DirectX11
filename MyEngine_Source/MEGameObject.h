@@ -2,11 +2,9 @@
 #include "CommonInclude.h"
 #include "MEComponent.h"
 
-
-
 namespace ME {
 	
-		
+	class Model;
 	class GameObject
 	{
 	public:
@@ -88,6 +86,14 @@ namespace ME {
 
 		enums::eLayerType GetLayerType() const{ return mLayerType; }
 
+		void SetModel(Model* model_)
+		{
+			model = model_;
+		}
+
+		Model* GetModel() { return model; }
+
+	
 
 	private:
 		
@@ -97,6 +103,7 @@ namespace ME {
 	private:
 
 		std::vector<Component*> mComponents;
+		Model* model;
 
 		eState mState;
 		enums::eLayerType mLayerType;

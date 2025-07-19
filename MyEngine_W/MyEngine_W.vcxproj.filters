@@ -26,9 +26,17 @@
     <ClInclude Include="MEPlayerScript.h">
       <Filter>Script\Player</Filter>
     </ClInclude>
-    <ClInclude Include="MEGunScript.h" />
     <ClInclude Include="MEGun.h">
       <Filter>Contents</Filter>
+    </ClInclude>
+    <ClInclude Include="MEBulletScript.h">
+      <Filter>Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.h">
+      <Filter>Contents</Filter>
+    </ClInclude>
+    <ClInclude Include="MEGunScript.h">
+      <Filter>Script\Others</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -74,9 +82,17 @@
     <ClCompile Include="MEPlayerScript.cpp">
       <Filter>Script\Player</Filter>
     </ClCompile>
-    <ClCompile Include="MEGunScript.cpp" />
     <ClCompile Include="MEGun.cpp">
       <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="MEBulletScript.cpp">
+      <Filter>Script</Filter>
+    </ClCompile>
+    <ClCompile Include="Bullet.cpp">
+      <Filter>Contents</Filter>
+    </ClCompile>
+    <ClCompile Include="MEGunScript.cpp">
+      <Filter>Script\Others</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

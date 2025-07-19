@@ -135,7 +135,7 @@ namespace ME
             }
 
         
-            directionChange();
+          
             mbIsMoving = true;
             mState = State::Walk;
        
@@ -143,6 +143,8 @@ namespace ME
       
             tr->SetPosition(pos);
         }
+
+        directionChange();
 
         if (Input::GetKeyDown(eKeyCode::T))
         {

@@ -14,6 +14,11 @@ namespace ME
 			if (gameObj == nullptr)
 				continue;
 
+			if (gameObj->GetModel() != nullptr)
+			{
+				delete gameObj->GetModel();
+			}
+
 			delete gameObj;
 			gameObj = nullptr;
 		}
@@ -99,12 +104,21 @@ namespace ME
 			; iter != mGameObjects.end()
 			; )
 		{
+
 			GameObject::eState active = (*iter)->GetState();
 
 			if (active == GameObject::eState::Dead)
 			{
 				GameObject* deathObj = (*iter);
 				iter = mGameObjects.erase(iter);
+
+				if (deathObj == nullptr)
+					continue;
+
+				if (deathObj->GetModel() != nullptr)
+				{
+					delete deathObj->GetModel();
+				}
 
 				delete deathObj;
 				deathObj = nullptr;
@@ -121,6 +135,10 @@ namespace ME
 
 	void Layer::EraseGameObject(GameObject* eraseGameObj)
 	{
+
+		if (eraseGameObj == nullptr)
+			return;
+
 		std::erase_if(mGameObjects,
 			[=](GameObject* gameObj)
 			{
@@ -144,6 +162,9 @@ namespace ME
 	{
 		for (GameObject* gameObj : mGameObjects)
 		{
+			if (gameObj == nullptr)
+				continue;
+
 			GameObject::eState active = gameObj->GetState();
 
 			if (active == GameObject::eState::Dead)
@@ -157,7 +178,15 @@ namespace ME
 	{
 		for (GameObject* obj : deleteObjs)
 		{
+			if (obj == nullptr)
+				continue;
+
+			if (obj->GetModel() != nullptr)
+			{
+				delete obj->GetModel();
+			}
 			delete obj;
+			
 			obj = nullptr;
 		}
 	}
