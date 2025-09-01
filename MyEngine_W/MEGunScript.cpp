@@ -21,6 +21,8 @@ namespace ME
 		:mCoolDownTime(0.2f)
 		, mCoolDownTimer(0.0f)
 		, mbCanShoot(false)
+		,mPlayerScript(nullptr)
+		,mEnemyScript(nullptr)
 	{
 	}
 	GunScript::~GunScript()
@@ -50,7 +52,7 @@ namespace ME
 			}
 		}
 
-		if (Input::GetKeyDown(eKeyCode::LeftMous))
+		if (mPlayerType == PlayerType::Player && Input::GetKeyDown(eKeyCode::LeftMous))
 		{
 			if(mbCanShoot == true && mPlayerScript->IsUsingGun())
 				makeBullet();
@@ -59,62 +61,70 @@ namespace ME
 	}
 	void GunScript::LateUpdate()
 	{
-		if (mPlayerScript->IsUsingGun())
+		if (mPlayerType == PlayerType::Player)
 		{
-			Transform* tr = GetOwner()->GetComponent<Transform>();
-			Transform* playerTr = GetGunOwner()->GetComponent<Transform>();
-
-			Vector3 moveOffset = mCurPlayerPos - mPrevPlayerPos;
-
-
-			Bone* leftHand = mPlayerScript->GetLeftHandBone();
-
-			Matrix handLocal = leftHand->FinalTransform;
-
-			Matrix playerWorldMatrix = playerTr->GetWorldMatrix();
-			
-			Matrix handMatrix = handLocal * playerWorldMatrix;
-			// 손 위치 & 회전 추출
-			Vector3 handPos = handMatrix.Translation();
-			Quaternion handRot = Quaternion::CreateFromRotationMatrix(handMatrix);
-			
-			
-			// 최종 위치 & 회전
-			Vector3 gunPos = handPos;
-			Quaternion gunRot = handRot;
-			
-			Vector3 offset = Vector3(96.0f, 152.0f, 22.0f);
-			Vector3 finalPos = gunPos + Vector3::Transform(offset, Matrix::CreateFromQuaternion(gunRot));
-			
-			Matrix worldMatrix = Matrix::CreateFromQuaternion(gunRot) * Matrix::CreateTranslation(finalPos);
-			
-
-			Vector3 camForward = renderer::mainCamera->GetForward();
-			camForward.y = 0.0f;
-			camForward.Normalize();
-
-			if (camForward.LengthSquared() > 0.0001f)
+			if (mPlayerScript->IsUsingGun())
 			{
-				float yawRad = atan2f(camForward.x, camForward.z);
-				float yawDeg = XMConvertToDegrees(yawRad);
+				Transform* tr = GetOwner()->GetComponent<Transform>();
+				Transform* playerTr = GetGunOwner()->GetComponent<Transform>();
 
-				Vector3 rt = tr->GetRotation();
-				rt.y = yawDeg;
-				tr->SetRotation(rt);
+				Vector3 moveOffset = mCurPlayerPos - mPrevPlayerPos;
+
+
+				Bone* leftHand = mPlayerScript->GetLeftHandBone();
+
+				Matrix handLocal = leftHand->FinalTransform;
+
+				Matrix playerWorldMatrix = playerTr->GetWorldMatrix();
+
+				Matrix handMatrix = handLocal * playerWorldMatrix;
+				// 손 위치 & 회전 추출
+				Vector3 handPos = handMatrix.Translation();
+				Quaternion handRot = Quaternion::CreateFromRotationMatrix(handMatrix);
+
+
+				// 최종 위치 & 회전
+				Vector3 gunPos = handPos;
+				Quaternion gunRot = handRot;
+
+				Vector3 offset = Vector3(96.0f, 152.0f, 22.0f);
+				Vector3 finalPos = gunPos + Vector3::Transform(offset, Matrix::CreateFromQuaternion(gunRot));
+
+				Matrix worldMatrix = Matrix::CreateFromQuaternion(gunRot) * Matrix::CreateTranslation(finalPos);
+
+
+				Vector3 camForward = renderer::mainCamera->GetForward();
+				camForward.y = 0.0f;
+				camForward.Normalize();
+
+				if (camForward.LengthSquared() > 0.0001f)
+				{
+					float yawRad = atan2f(camForward.x, camForward.z);
+					float yawDeg = XMConvertToDegrees(yawRad);
+
+					Vector3 rt = tr->GetRotation();
+					rt.y = yawDeg;
+					tr->SetRotation(rt);
+				}
+
+				Vector3 pos;
+				Quaternion rot;
+				Vector3 scale;
+				worldMatrix.Decompose(scale, rot, pos);
+				tr->SetPosition(pos);
+				//tr->SetRotation(rot.ToEuler());
+				scale = tr->GetScale();
+				tr->SetScale(scale);
+
 			}
-			
-			Vector3 pos;
-			Quaternion rot;
-			Vector3 scale;
-			worldMatrix.Decompose(scale, rot, pos);
-			tr->SetPosition(pos);
-			//tr->SetRotation(rot.ToEuler());
-			scale = tr->GetScale();
-			tr->SetScale(scale);
 
+			mPrevPlayerPos = mCurPlayerPos;
 		}
-
-		mPrevPlayerPos = mCurPlayerPos;
+		else if(mPlayerType == PlayerType::Enemy)
+		{
+			
+		}
+		
 	}
 	void GunScript::Render()
 	{

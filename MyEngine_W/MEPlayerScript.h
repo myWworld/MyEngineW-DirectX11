@@ -12,6 +12,12 @@ namespace ME
 	{
 	public:
 
+		enum class PlayerType
+		{
+			Player,
+			Enemy,
+			End,
+		};
 
 		enum class State
 		{
@@ -50,6 +56,11 @@ namespace ME
 		Bone* GetLeftHandBone() { return mLeftHandBone; }
 		Bone* GetRightHandBone() { return mRightHandBone; }
 
+		void SetPlayerType(PlayerType type)
+		{
+			mPlayerType = type;
+		}
+
 	private:
 
 		void Idle();
@@ -58,6 +69,7 @@ namespace ME
 		void Die();
 
 		void Translate();
+		void randomAction();
 
 		void directionChange();
 
@@ -80,6 +92,8 @@ namespace ME
 
 		Bone* mLeftHandBone;
 		Bone* mRightHandBone;
+
+		PlayerType mPlayerType;
 	};
 
 }

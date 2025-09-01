@@ -26,6 +26,8 @@ namespace ME
         {
             mAnimator = GetOwner()->GetComponent< Animator3D>();
         }
+        
+        translateTime += Time::DeltaTime();
 
         if (mbUseHands)
         {
@@ -37,14 +39,20 @@ namespace ME
             }
         }
 
-        Translate();
+        if (translateTime > translateTimer)
+        {
+            translateTime = 0.0f;
+            randomState();
+        }
+
 
         switch (mState)
         {
         case ME::EnemyScript::State::Idle:
             Idle();
             break;
-        case ME::EnemyScript::State::Walk:
+        case ME::EnemyScript::State::Patrol:
+            Translate();
             Move();
             break;
         case ME::EnemyScript::State::Run:
@@ -74,7 +82,7 @@ namespace ME
     }
     void EnemyScript::Move()
     {
-        if (mState == State::Walk)
+        if (mState == State::Patrol)
         {
             mAnimator->PlayAnimation(L"PISTOLWALK");
         }
@@ -99,60 +107,52 @@ namespace ME
         Transform* tr = GetOwner()->GetComponent<Transform>();
         Vector3 pos = tr->GetPosition();
 
-        bool forward = Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W);
-        bool back = Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S);
-        bool left = Input::GetKey(eKeyCode::Left) || Input::GetKey(eKeyCode::A);
-        bool right = Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D);
+        int randDir = rand() % (int)Direction::End;
+        mTargetDirection = (Direction)randDir;
+        Vector3 dir = Vector3::Zero;
 
-        if (!forward && !back && !left && !right)
+        switch (mTargetDirection)
         {
-            mState = State::Idle;
-            mbIsMoving = false;
+        case ME::EnemyScript::Direction::Forward:
+            dir = tr->Forward();
+            break;
+        case ME::EnemyScript::Direction::ForwardLeft:
+            dir = tr->Forward() - tr->Right();
+            break;
+        case ME::EnemyScript::Direction::ForwardRight:
+            dir = tr->Forward() + tr->Right();
+            break;
+        case ME::EnemyScript::Direction::Left:
+            dir = -tr->Right();
+            break;
+        case ME::EnemyScript::Direction::Right:
+            dir = tr->Right();
+            break;
+        case ME::EnemyScript::Direction::Back:
+            dir = -tr->Forward() ;
+            break;
+        case ME::EnemyScript::Direction::BackLeft:
+            dir = -tr->Forward() - tr->Right();
+            break;
+        case ME::EnemyScript::Direction::BackRight:
+            dir = -tr->Forward() + tr->Right();
+            break;
+        default:
+            break;
         }
-        else
-        {
 
-            if (left)
-            {
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                mTargetDirection = Direction::Left;
-            }
-            if (Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D))
-            {
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                mTargetDirection = Direction::Right;
-            }
-            if (Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W))
-            {
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                mTargetDirection = Direction::Forward;
-
-            }
-            if (Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S))
-            {
-                mTargetDirection = Direction::Back;
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-            }
-
-
+        dir.Normalize();
+        pos += dir * 30.0f;
 
             mbIsMoving = true;
-            mState = State::Walk;
+            mState = State::Patrol;
 
             mDirection = mTargetDirection;
 
             tr->SetPosition(pos);
-        }
+        
 
-        directionChange();
-
-        if (Input::GetKeyDown(eKeyCode::T))
-        {
-            if (mbHoldingGun == false)
-                mbHoldingGun = true;
-            else
-                mbHoldingGun = false;
-        }
+     //   directionChange();
 
 
     }
@@ -207,5 +207,24 @@ namespace ME
         //else if (mDirection == mTargetDirection)
         //    return;
 
+    }
+    void EnemyScript::randomState()
+    {
+  
+            int prob = rand() % 10 + 1;
+
+            if (prob <= 3)
+            {
+                mState = State::Idle;
+            }
+            else if (prob <= 7)
+            {
+                mState = State::Patrol;
+            }
+            else
+            {
+                mState = State::Attack;
+            }
+        
     }
 }

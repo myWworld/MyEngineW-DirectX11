@@ -22,6 +22,7 @@
 #include "MEBoxCollider3D.h"
 
 #include "MEPlayerScript.h"
+#include "MEEnemyScript.h"
 #include "MEGunScript.h"
 #include "MEGun.h"
 
@@ -54,6 +55,7 @@ namespace ME
 		CameraScript* cameraScript = camera->AddComponent<CameraScript>();
 		renderer::mainCamera = cameraComp;
 
+	
 
 	}
 
@@ -90,9 +92,19 @@ namespace ME
 			//
 			mPlayer->AddComponent<PlayerScript>();
 			Model* model = new Model();
-			MakeCharacter(model);
+			MakeCharacter(model, mPlayer);
 
-			MakeGun();
+			MakeGun(mPlayer);
+
+			GameObject* enemy = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(10, 0, 0));
+			Transform* transform = enemy->GetComponent<Transform>();
+			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
+
+			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
+			Model* enemyModel = new Model();
+			MakeCharacter(enemyModel, enemy);
+
+			MakeGun(enemy, true);
 		}
 
 
@@ -111,7 +123,7 @@ namespace ME
 
 	}
 
-	void TitleScene::MakeCharacter(Model* model)
+	void TitleScene::MakeCharacter(Model* model, GameObject* player)
 	{
 		if (model->LoadModel(L"..\\Resources\\alien.fbx"))
 		{
@@ -122,11 +134,11 @@ namespace ME
 			//modelRenderer->SetTextures(model->GetTextures());
 			//modelRenderer->SetTexture(Resources::Find<graphics::Texture>(L"SOLDIER"));
 
-			Animator3D* animator = mPlayer->AddComponent<Animator3D>();
+			Animator3D* animator = player->AddComponent<Animator3D>();
 			animator->SetMesh(model->GetMeshes());
 
 		//	Rigidbody* rb = mPlayer->AddComponent<Rigidbody>();
-			Collider* col = mPlayer->AddComponent<BoxCollider3D>();
+			Collider* col = player->AddComponent<BoxCollider3D>();
 			
 
 			if (model->GetTextures().size() > 0)
@@ -151,7 +163,7 @@ namespace ME
 		}
 	}
 
-	void TitleScene::MakeGun()
+	void TitleScene::MakeGun(GameObject* player, bool bIsEnemy )
 	{
 		Model* gun = new Model();
 
@@ -160,7 +172,7 @@ namespace ME
 		//tr->SetScale(Vector3(7.0f, 7.0f, 7.0f));
 	//	tr->SetRotation(Vector3(0.0f, 180.0f, 0.0f));
 		GunScript* gunScript = m4->AddComponent<GunScript>();
-		gunScript->SetGunOnwer(static_cast<Player*>(mPlayer));
+		gunScript->SetGunOnwer(static_cast<Player*>(player), bIsEnemy);
 	
 
 		if (gun->LoadModel(L"..\\Resources\\Pistol.fbx"))

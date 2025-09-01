@@ -12,6 +12,7 @@ namespace ME
 	{
 	public:
 
+	
 
 		enum class State
 		{
@@ -32,7 +33,7 @@ namespace ME
 			Back,
 			BackLeft,
 			BackRight,
-			Up,
+			End,
 
 		};
 
@@ -61,6 +62,8 @@ namespace ME
 
 		void directionChange();
 
+		void randomState();
+
 	private:
 
 		Vector2 mPrevMousePos;
@@ -72,7 +75,7 @@ namespace ME
 		bool mbIsMoving;
 
 		bool mbUseHands = true;
-		bool mbHoldingGun = false;
+		bool mbHoldingGun = true;
 
 		State mState = State::Idle;
 		Direction mDirection = Direction::Forward;
@@ -80,6 +83,9 @@ namespace ME
 
 		Bone* mLeftHandBone;
 		Bone* mRightHandBone;
+
+		float translateTimer = 0.0f;
+		float translateTime = 2.0f;
 	};
 
 }

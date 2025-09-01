@@ -12,6 +12,7 @@ namespace ME
         :mPrevMousePos(Vector2(0, 0))
         , mMouseSpeed(0.5f)
         , mbIsMoving(false)
+        , mPlayerType(PlayerType::Player)
     {
     }
     PlayerScript::~PlayerScript()
@@ -99,42 +100,63 @@ namespace ME
         Transform* tr = GetOwner()->GetComponent<Transform>();
         Vector3 pos = tr->GetPosition();
 
-        bool forward = Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W);
-        bool back = Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S);
-        bool left = Input::GetKey(eKeyCode::Left) || Input::GetKey(eKeyCode::A);
-        bool right = Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D);
-
-        if ( !forward&& !back && !left && !right)
+        if (mPlayerType == PlayerType::Player)
         {
-            mState = State::Idle;
-            mbIsMoving = false;
+
+            bool forward = Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W);
+            bool back = Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S);
+            bool left = Input::GetKey(eKeyCode::Left) || Input::GetKey(eKeyCode::A);
+            bool right = Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D);
+
+            if (!forward && !back && !left && !right)
+            {
+                mState = State::Idle;
+                mbIsMoving = false;
+            }
+            else
+            {
+
+                if (left)
+                {
+                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
+                    mTargetDirection = Direction::Left;
+                }
+                if (Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D))
+                {
+                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
+                    mTargetDirection = Direction::Right;
+                }
+                if (Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W))
+                {
+                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
+                    mTargetDirection = Direction::Forward;
+
+                }
+                if (Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S))
+                {
+                    mTargetDirection = Direction::Back;
+                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
+                }
+
+            }
+
+            if (Input::GetKeyDown(eKeyCode::T))
+            {
+                if (mbHoldingGun == false)
+                    mbHoldingGun = true;
+                else
+                    mbHoldingGun = false;
+            }
+            directionChange();
+
         }
-        else
+        else if (mPlayerType == PlayerType::Enemy)
         {
- 
-            if (left)
-            {
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                mTargetDirection = Direction::Left;
-            }
-            if (Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D))
-            {
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                mTargetDirection = Direction::Right;
-            }
-            if (Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W))
-            {
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                mTargetDirection = Direction::Forward;
+            randomAction();
 
-            }
-            if (Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S))
-            {
-                mTargetDirection = Direction::Back;
-                pos += 20.0f * tr->Forward() * Time::DeltaTime();
-            }
-
-        
+            if(mbHoldingGun == false)
+                mbHoldingGun = true;
+        }
           
             mbIsMoving = true;
             mState = State::Walk;
@@ -142,21 +164,29 @@ namespace ME
             mDirection = mTargetDirection;
       
             tr->SetPosition(pos);
-        }
+        
 
-        directionChange();
-
-        if (Input::GetKeyDown(eKeyCode::T))
-        {
-            if (mbHoldingGun == false)
-                mbHoldingGun = true;
-            else
-                mbHoldingGun = false;
-        }
 
    
     }
 
+    void PlayerScript::randomAction()
+    {
+        int prob = rand() % 10 + 1;
+
+        if (prob <= 3)
+        {
+            mState = State::Idle;
+        }
+        else if (prob <= 7)
+        {
+            mState = State::Walk;
+        }
+        else
+        {
+            mState = State::Attack;
+        }
+    }
 
 
     void PlayerScript::directionChange()

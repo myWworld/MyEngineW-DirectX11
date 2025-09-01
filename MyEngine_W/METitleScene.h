@@ -22,8 +22,8 @@ namespace ME
 
 	private:
 
-		void MakeCharacter(Model* model);
-		void MakeGun();
+		void MakeCharacter(Model* model, GameObject* player);
+		void MakeGun(GameObject* player, bool bIsEnemy = false);
 
 	private:
 

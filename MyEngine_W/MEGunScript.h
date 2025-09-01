@@ -5,6 +5,7 @@
 
 #include "MEPlayer.h"
 #include "MEPlayerScript.h"
+#include "MEEnemyScript.h"
 
 namespace ME
 {
@@ -14,6 +15,12 @@ namespace ME
 	{
 	public:
 
+		enum class PlayerType
+		{
+			Player,
+			Enemy,
+			End,
+		};
 
 		GunScript();
 		~GunScript();
@@ -23,10 +30,23 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
-		void SetGunOnwer( Player* player) 
-		{ mOwner = player; 
-			mPlayerScript = mOwner->GetComponent<PlayerScript>();
+		void SetGunOnwer(Player* player, bool bIsEnemy = false)
+		{
+			mOwner = player;
+
+			if (bIsEnemy == false)
+			{
+				mPlayerType = PlayerType::Player;
+				mPlayerScript = mOwner->GetComponent<PlayerScript>();
+			}
+			else
+			{
+				mPlayerType = PlayerType::Enemy;
+				mEnemyScript = mOwner->GetComponent<EnemyScript>();
+			}
+		
 		}
+
 
 		Player* GetGunOwner() { return mOwner; }
 
@@ -39,6 +59,9 @@ namespace ME
 
 		 Player* mOwner;
 		 PlayerScript * mPlayerScript;
+		 EnemyScript* mEnemyScript;
+
+		 PlayerType mPlayerType;
 
 		 Vector3 mPrevPlayerPos = Vector3::Zero;
 		 Vector3 mCurPlayerPos = Vector3::Zero;
