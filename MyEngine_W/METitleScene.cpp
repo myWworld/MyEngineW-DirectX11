@@ -18,6 +18,8 @@
 #include "MECameraScript.h"
 #include "MEModelRenderer.h"
 #include "MEAnimator3D.h"
+#include "MERigidbody.h"
+#include "MEBoxCollider3D.h"
 
 #include "MEPlayerScript.h"
 #include "MEGunScript.h"
@@ -122,6 +124,10 @@ namespace ME
 
 			Animator3D* animator = mPlayer->AddComponent<Animator3D>();
 			animator->SetMesh(model->GetMeshes());
+
+		//	Rigidbody* rb = mPlayer->AddComponent<Rigidbody>();
+			Collider* col = mPlayer->AddComponent<BoxCollider3D>();
+			
 
 			if (model->GetTextures().size() > 0)
 				animator->SetTextures(model->GetTextures());

@@ -22,6 +22,7 @@
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="MEBulletScript.h" />
     <ClInclude Include="MECameraScript.h" />
+    <ClInclude Include="MEEnemyScript.h" />
     <ClInclude Include="MEGun.h" />
     <ClInclude Include="MEGunScript.h" />
     <ClInclude Include="MELoadingScene.h" />
@@ -37,6 +38,7 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="MEBulletScript.cpp" />
     <ClCompile Include="MECameraScript.cpp" />
+    <ClCompile Include="MEEnemyScript.cpp" />
     <ClCompile Include="MEGun.cpp" />
     <ClCompile Include="MEGunScript.cpp" />
     <ClCompile Include="MELoadingScene.cpp" />

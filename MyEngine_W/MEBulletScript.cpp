@@ -20,12 +20,12 @@ namespace ME
 	{
 		mDeadTimer += Time::DeltaTime();
 
-		Transform* tr = GetOwner()->GetComponent<Transform>();
-		Vector3 pos = tr->GetPosition();
-
-		pos += tr->Forward() * 4.0f;
-		
-		tr->SetPosition(pos);
+		//Transform* tr = GetOwner()->GetComponent<Transform>();
+		//Vector3 pos = tr->GetPosition();
+		//
+		//pos += tr->Forward() * 4.0f;
+		//
+		//tr->SetPosition(pos);
 
 
 		if (mDeadTime < mDeadTimer)

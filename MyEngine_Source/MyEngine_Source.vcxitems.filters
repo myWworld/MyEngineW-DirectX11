@@ -146,6 +146,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation3D.cpp">
       <Filter>Resource\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.cpp">
+      <Filter>Component\Collider</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -310,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation3D.h">
       <Filter>Resource\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.h">
+      <Filter>Component\Collider</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,15 @@ namespace ME
 	class Rigidbody : public Component
 	{
 	public:
+
+		enum class eForceMode
+		{
+			Force,      // F = ma → 매 프레임 힘으로 누적 (dt 반영)
+			Impulse,    // 순간 임펄스 → 속도에 즉시 반영 (dt 무관)
+			VelocityChange, // 질량 무시하고 바로 속도에 반영
+			Acceleration,   // 질량 무시, 가속도로 누적
+		};
+
 		Rigidbody();
 		~Rigidbody();
 
@@ -17,17 +26,33 @@ namespace ME
 		void LateUpdate()  override;
 		void Render()  override;
 
-		void SetMass(float mass) { mMass = mass; }
-		void AddForce(Vector2 force) { mForce = force; }
-		void SetGround(bool ground) { mbGround = ground; }
-		void SetVelocity(Vector2 velocity) { mVelocity = velocity; }
+		void SetMass(float mass) {
+			
+			mMass = mass; 
+			mGravity = Vector3(0.0f, gravity * mMass, 0.0f);
+		}
+		void AddForce(Vector3 force) { sumAccel += force; }
 
-		Vector2 GetVelocity() const{return mVelocity;}
-		Vector2 GetForce() { return mForce; }
+		void AddForce(const Vector3& v, eForceMode mode)
+		{
+			switch (mode) {
+			case eForceMode::Force:          sumForce += v;      break; // N
+			case eForceMode::Acceleration:   sumAccel += v;      break; // m/s^2
+			case eForceMode::Impulse:        sumImpulse += v;      break; // N·s
+			case eForceMode::VelocityChange: sumVelChange += v;    break; // m/s
+			}
+		}
+		
+		void SetGround(bool ground) { mbGround = ground; }
+		void SetVelocity(Vector3 velocity) { mVelocity = velocity; }
+		
+
+		Vector3 GetVelocity() const{return mVelocity;}
+		Vector3 GetForce() { return mForce; }
 		bool IsGround() { return mbGround; }
 
 	
-		void SetNeedGravity(bool isAffected, Vector2 gravity = Vector2(0,0))
+		void SetNeedGravity(bool isAffected, Vector3 gravity = Vector3(0,0,0))
 		{
 			if (isAffected == false)
 				mbIsAffectedByGravity = false;
@@ -37,7 +62,11 @@ namespace ME
 				
 			mGravity = gravity;
 
-		}
+		}	
+
+		void ClearForces();
+
+
 
 		
 	private:
@@ -47,12 +76,18 @@ namespace ME
 
 		float mMass;
 		float mFriction;
+		float mAirDrag;
+		float gravity;
 		
-		Vector2 mAccelation;
-		Vector2 mForce;
-		Vector2 mVelocity;
-		Vector2 mLimitVelocity;
-		Vector2 mGravity;
+		Vector3 mAccelation;
+		Vector3 mForce;
+		Vector3 mVelocity;
+		Vector3 mLimitVelocity;
+		Vector3 mGravity;
+
+		eForceMode curForceMode;
+
+		Vector3 sumForce{ 0,0,0 }, sumAccel{ 0,0,0 }, sumImpulse{ 0,0,0 }, sumVelChange{ 0,0,0 };
 
 	};
 

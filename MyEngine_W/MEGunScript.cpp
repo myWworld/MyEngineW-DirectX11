@@ -13,6 +13,7 @@
 #include "MEResources.h"
 #include "MEMaterial.h"
 #include "METexture.h"
+#include "MERigidbody.h"
 
 namespace ME
 {
@@ -128,6 +129,10 @@ namespace ME
 		Vector3 spawnPos = gunPos;
 		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Particle,spawnPos);
 		bullet->AddComponent<BulletScript>();
+		
+		Rigidbody* rb = bullet->AddComponent<Rigidbody>();
+		rb->SetMass(2.0f);
+
 		Transform* bulletTr = bullet->GetComponent<Transform>();
 		bulletTr->SetScale(.1f, .1f, .1f);
 		bulletTr->SetRotation(tr->GetRotation());
@@ -147,6 +152,12 @@ namespace ME
 				modelRenderer->SetTexture(Resources::Find<graphics::Texture>(L"PISTOL"));
 
 			bullet->SetModel(bullet_model);
+
+			Vector3 dir = tr->Forward();
+			dir.Normalize();
+			dir = (dir + tr->Up() * 0.01f);
+			dir.Normalize();
+			rb->AddForce(dir * 5000.0f, Rigidbody::eForceMode::Impulse);
 		}
 		else
 		{

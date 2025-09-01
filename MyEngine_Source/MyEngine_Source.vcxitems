@@ -25,6 +25,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAudioSource.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBone.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider2D.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECamera.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECircleCollider2D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECollider.h" />
@@ -80,6 +81,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAudioSource.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBone.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider2D.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECamera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECircleCollider2D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECollider.cpp" />

@@ -38,6 +38,7 @@
     <ClInclude Include="MEGunScript.h">
       <Filter>Script\Others</Filter>
     </ClInclude>
+    <ClInclude Include="MEEnemyScript.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -94,5 +95,6 @@
     <ClCompile Include="MEGunScript.cpp">
       <Filter>Script\Others</Filter>
     </ClCompile>
+    <ClCompile Include="MEEnemyScript.cpp" />
   </ItemGroup>
 </Project>

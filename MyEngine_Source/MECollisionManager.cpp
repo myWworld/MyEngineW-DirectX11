@@ -169,6 +169,8 @@ namespace ME
 		enums::eColliderType leftType = left->GetColliderType();
 		enums::eColliderType rightType = right->GetColliderType();
 
+
+#pragma region Handle 2D collider
 		if (leftType == enums::eColliderType::Rect2D
 			&& rightType == enums::eColliderType::Rect2D)
 		{
@@ -258,6 +260,49 @@ namespace ME
 			}
 
 		}
+#pragma endregion
+
+#pragma region Handle 3D collider
+
+		if (leftType == enums::eColliderType::Box3D
+			&& rightType == enums::eColliderType::Box3D)
+		{
+			Vector3 leftCenterPos = leftPos + (leftSize / 2.0f);
+			Vector3 rightCenterPos = rightPos + (rightSize / 2.0f);
+
+
+			if (leftBC->IsRotate())
+			{
+
+				leftCenterPos = leftBC->GetCentralPoint();
+
+				leftSize.y = leftBC->GetHeight();
+				leftSize.x = leftBC->GetWidth();
+
+			}
+
+			if (rightBC->IsRotate())
+			{
+				rightCenterPos = rightBC->GetCentralPoint();
+
+				rightSize.y = rightBC->GetHeight();
+				rightSize.x = rightBC->GetWidth();
+
+			}
+
+
+
+			//AABB Ãæµ¹ rect-rect
+			if (fabs(leftCenterPos.x - rightCenterPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
+				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f))
+			{
+				return true;
+			}
+
+		}
+
+#pragma endregion
+
 
 
 		return false;

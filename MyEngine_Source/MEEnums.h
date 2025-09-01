@@ -40,6 +40,10 @@ namespace ME::enums
 	{
 		Rect2D,
 		Circle2D,
+		Box3D,
+		Sphere3D,
+		Capsule3D,
+		End,
 	};
 
 	enum class eUIType

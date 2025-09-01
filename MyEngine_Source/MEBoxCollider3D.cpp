@@ -1,4 +1,4 @@
-#include "MEBoxCollider2D.h"
+#include "MEBoxCollider3D.h"
 #include "METransform.h"
 #include "MEGameObject.h"
 #include "MERenderer.h"
@@ -7,25 +7,25 @@
 
 namespace ME
 {
-	BoxCollider2D::BoxCollider2D()
-		:Collider(enums::eColliderType::Rect2D)
-		,mRot(0)
-		,mbIsRotate(false)
+	BoxCollider3D::BoxCollider3D()
+		:Collider(enums::eColliderType::Box3D)
+		, mRot(0)
+		, mbIsRotate(false)
 	{
 
 	}
-	BoxCollider2D::~BoxCollider2D()
+	BoxCollider3D::~BoxCollider3D()
 	{
 	}
-	void BoxCollider2D::Initialize()
+	void BoxCollider3D::Initialize()
 	{
 	}
-	void BoxCollider2D::Update()
+	void BoxCollider3D::Update()
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
 		Vector3 pos = tr->GetPosition();
 
-		Vector3 offset = GetOwner()->GetComponent<BoxCollider2D>()->GetOffset();
+		Vector3 offset = GetOwner()->GetComponent<BoxCollider3D>()->GetOffset();
 		float width = (100.0f * GetSize().x);
 		float height = (100.0f * GetSize().y);
 
@@ -34,25 +34,25 @@ namespace ME
 		if (mRot != 0)
 			mCentralPoint = RotateCollider(mRot, pos.x + offset.x, pos.y + offset.y, width, height);
 	}
-	void BoxCollider2D::LateUpdate()
+	void BoxCollider3D::LateUpdate()
 	{
 	}
-	void BoxCollider2D::Render()
+	void BoxCollider3D::Render()
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
 		Vector3 pos = tr->GetPosition();
-		
 
-		
+
+
 	}
 
-	Vector3 BoxCollider2D::RotateCollider(float rot, int x ,int y, int width,int height)//, HDC hdc)
+	Vector3 BoxCollider3D::RotateCollider(float rot, int x, int y, int width, int height)//, HDC hdc)
 	{
-		
+
 		float radian = rot * (3.14159265f / 180.0f);
 
 		POINT points[4];
-	
+
 		points[0].x = x;
 		points[0].y = y;
 
@@ -69,7 +69,7 @@ namespace ME
 		points[3].y = y + (int)(height * cos(radian));
 
 		// 회전된 사각형 그리기
-	//	Polygon(hdc, points, 4);
+		//Polygon(hdc, points, 4);
 
 
 		float midx = (points[0].x + points[1].x + points[2].x + points[3].x) / 4;
@@ -79,8 +79,8 @@ namespace ME
 
 		mHeight = max(fabs(points[1].y - points[2].y), fabs(points[0].y - points[3].y));
 
-	
-		mPoint =  points;
+
+		mPoint = points;
 
 		Vector3 centralPoint = Vector3(midx, midy, 0.0f);
 
