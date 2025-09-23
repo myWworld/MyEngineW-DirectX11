@@ -10,6 +10,7 @@ namespace ME::enums
 		Floor,
 		Player,
 		Items,
+		Bullet,
 		Particle,
 		Max = 20
 	};

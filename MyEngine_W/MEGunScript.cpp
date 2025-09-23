@@ -14,6 +14,7 @@
 #include "MEMaterial.h"
 #include "METexture.h"
 #include "MERigidbody.h"
+#include "MEBoxCollider3D.h"
 
 namespace ME
 {
@@ -216,9 +217,9 @@ namespace ME
 	
 
 		Vector3 spawnPos = gunPos;
-		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Particle,spawnPos);
+		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Bullet, spawnPos);
 		bullet->AddComponent<BulletScript>();
-		
+		bullet->AddComponent<BoxCollider3D>();
 		Rigidbody* rb = bullet->AddComponent<Rigidbody>();
 		rb->SetMass(2.0f);
 

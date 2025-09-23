@@ -3,6 +3,7 @@
 #include "MESceneManager.h"
 #include "MECollider.h"
 #include "MEBoxCollider2D.h"
+#include "MEBoxCollider3D.h"
 
 namespace ME
 {
@@ -33,7 +34,7 @@ namespace ME
 	{
 	}
 
-	void ME::CollisionManager::Render( )
+	void ME::CollisionManager::Render()
 	{
 	}
 
@@ -166,6 +167,9 @@ namespace ME
 		BoxCollider2D* leftBC = (static_cast<BoxCollider2D*>(left));
 		BoxCollider2D* rightBC = (static_cast<BoxCollider2D*>(right));
 
+		BoxCollider3D* leftBC3D = (static_cast<BoxCollider3D*>(left));
+		BoxCollider3D* rightBC3D = (static_cast<BoxCollider3D*>(right));
+
 		enums::eColliderType leftType = left->GetColliderType();
 		enums::eColliderType rightType = right->GetColliderType();
 
@@ -271,22 +275,22 @@ namespace ME
 			Vector3 rightCenterPos = rightPos + (rightSize / 2.0f);
 
 
-			if (leftBC->IsRotate())
+			if (leftBC3D->IsRotate())
 			{
 
-				leftCenterPos = leftBC->GetCentralPoint();
+				leftCenterPos = leftBC3D->GetCentralPoint();
 
-				leftSize.y = leftBC->GetHeight();
-				leftSize.x = leftBC->GetWidth();
+				leftSize.y = leftBC3D->GetHeight();
+				leftSize.x = leftBC3D->GetWidth();
 
 			}
 
-			if (rightBC->IsRotate())
+			if (rightBC3D->IsRotate())
 			{
-				rightCenterPos = rightBC->GetCentralPoint();
+				rightCenterPos = rightBC3D->GetCentralPoint();
 
-				rightSize.y = rightBC->GetHeight();
-				rightSize.x = rightBC->GetWidth();
+				rightSize.y = rightBC3D->GetHeight();
+				rightSize.x = rightBC3D->GetWidth();
 
 			}
 
@@ -294,7 +298,7 @@ namespace ME
 
 			//AABB Ãæµ¹ rect-rect
 			if (fabs(leftCenterPos.x - rightCenterPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
-				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f))
+				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f)  && fabs(leftCenterPos.z - rightCenterPos.z) < fabs(leftSize.z / 2.0f + rightSize.z / 2.0f))
 			{
 				return true;
 			}

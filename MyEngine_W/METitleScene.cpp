@@ -25,6 +25,7 @@
 #include "MEEnemyScript.h"
 #include "MEGunScript.h"
 #include "MEGun.h"
+#include "MECollisionManager.h"
 
 extern ME::Application application;
 
@@ -55,7 +56,8 @@ namespace ME
 		CameraScript* cameraScript = camera->AddComponent<CameraScript>();
 		renderer::mainCamera = cameraComp;
 
-	
+		CollisionManager::CollisionLayerCheck(enums::eLayerType::Player, enums::eLayerType::Bullet, true);
+		CollisionManager::CollisionLayerCheck(enums::eLayerType::Bullet, enums::eLayerType::Player, true);
 
 	}
 
@@ -153,6 +155,7 @@ namespace ME
 			animator->CreateAnimation(L"PISTOLWALK", L"..\\Resources\\Animation\\PistolWalk.fbx");
 			animator->CreateAnimation(L"PISTOLIDLE", L"..\\Resources\\Animation\\PistolIdle.fbx");
 			animator->CreateAnimation(L"PISTOLIDLE2", L"..\\Resources\\Animation\\PistolIdle2.fbx");
+			animator->CreateAnimation(L"HIT", L"..\\Resources\\Animation\\HitReaction.fbx");
 			animator->CreateAnimation(L"DANCE", L"..\\Resources\\Animation\\SillyDancing.fbx");
 			animator->PlayAnimation(L"PISTOLIDLE", true);
 		}

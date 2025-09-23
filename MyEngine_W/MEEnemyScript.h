@@ -45,6 +45,11 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
+
+		void OnCollisionEnter(Collider* other) override;
+		void OnCollisionStay(Collider* other) override ;
+		void OnCollisionExit(Collider* other) override ;
+
 		bool IsMoving() { return mbIsMoving; }
 		bool IsUsingGun() { return mbHoldingGun; }
 

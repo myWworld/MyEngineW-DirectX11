@@ -80,6 +80,7 @@ namespace ME
     {
     }
 
+  
     void  EnemyScript::Idle()
     {
         mAnimator->PlayAnimation(L"PISTOLIDLE");
@@ -264,4 +265,25 @@ namespace ME
             }
         
     }
+
+    void EnemyScript::OnCollisionEnter(Collider* other)
+    {
+        GameObject* owner = other->GetOwner();
+
+        if (owner != nullptr && owner->GetLayerType() == enums::eLayerType::Bullet)
+        {
+            mAnimator->PlayAnimation(L"HIT");
+        }
+
+    }
+
+    void EnemyScript::OnCollisionStay(Collider* other)
+    {
+    }
+
+    void EnemyScript::OnCollisionExit(Collider* other)
+    {
+    }
+
+
 }
