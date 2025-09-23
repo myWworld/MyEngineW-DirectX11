@@ -70,6 +70,10 @@ namespace ME
 		 float mCoolDownTimer;
 
 		 bool mbCanShoot;
+
+		 float mCoolDownTimeForEnemy;
+		 float mCoolDownTimerForEnemy;
+
 	};
 
 }

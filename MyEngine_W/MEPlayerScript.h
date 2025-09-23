@@ -11,6 +11,8 @@ namespace ME
 	class PlayerScript :public Script
 	{
 	public:
+		
+
 
 		enum class PlayerType
 		{
@@ -89,6 +91,8 @@ namespace ME
 		State mState = State::Idle;
 		Direction mDirection = Direction::Forward;
 		Direction mTargetDirection = Direction::Forward;
+
+	
 
 		Bone* mLeftHandBone;
 		Bone* mRightHandBone;

@@ -60,7 +60,7 @@ namespace ME
 
 		void Translate();
 
-		void directionChange();
+		void directionChange(Vector3 newDir);
 
 		void randomState();
 
@@ -86,6 +86,8 @@ namespace ME
 
 		float translateTimer = 0.0f;
 		float translateTime = 2.0f;
+
+		bool mbTurn = false;
 	};
 
 }

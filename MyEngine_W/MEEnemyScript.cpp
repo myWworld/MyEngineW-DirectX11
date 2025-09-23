@@ -12,6 +12,7 @@ namespace ME
         :mPrevMousePos(Vector2(0, 0))
         , mMouseSpeed(0.5f)
         , mbIsMoving(false)
+        ,translateTimer(2.5f)
     {
     }
     EnemyScript::~EnemyScript()
@@ -26,6 +27,9 @@ namespace ME
         {
             mAnimator = GetOwner()->GetComponent< Animator3D>();
         }
+
+        if (mbHoldingGun == false)
+            mbHoldingGun = true;
         
         translateTime += Time::DeltaTime();
 
@@ -107,8 +111,8 @@ namespace ME
         Transform* tr = GetOwner()->GetComponent<Transform>();
         Vector3 pos = tr->GetPosition();
 
-        int randDir = rand() % (int)Direction::End;
-        mTargetDirection = (Direction)randDir;
+       // int randDir = rand() % (int)Direction::End;
+       // mTargetDirection = (Direction)randDir;
         Vector3 dir = Vector3::Zero;
 
         switch (mTargetDirection)
@@ -142,7 +146,7 @@ namespace ME
         }
 
         dir.Normalize();
-        pos += dir * 30.0f;
+        pos += dir * 150.0f * Time::DeltaTime();
 
             mbIsMoving = true;
             mState = State::Patrol;
@@ -151,33 +155,62 @@ namespace ME
 
             tr->SetPosition(pos);
         
-
-     //   directionChange();
-
+            if (mbTurn == false)
+            {
+                directionChange(dir);
+                mbTurn = true;
+            }
 
     }
 
 
 
-    void EnemyScript::directionChange()
+    void EnemyScript::directionChange(Vector3 newDir)
     {
 
 
         Transform* tr = GetOwner()->GetComponent<Transform>();
 
-        Vector3 camForward = renderer::mainCamera->GetForward();
-        camForward.y = 0.0f;
-        camForward.Normalize();
+        Vector3 curDir = tr->Forward();
 
-        if (camForward.LengthSquared() > 0.0001f)
+        float angle = Degree((acos(curDir.Dot(newDir))));
+
+        auto degClamp = [](int newDeg)  -> int {
+
+            if (newDeg > 360)
+            {
+                return  newDeg -= 360;
+            }
+
+            return newDeg;
+        };
+
+        angle = degClamp(angle);
+
+        if (angle > 5.0f)
         {
-            float yawRad = atan2f(camForward.x, camForward.z);
-            float yawDeg = XMConvertToDegrees(yawRad);
-
             Vector3 rt = tr->GetRotation();
-            rt.y = yawDeg;
+            
+            rt.y = degClamp(rt.y + angle);
+
+            
+            
             tr->SetRotation(rt);
         }
+
+        //Vector3 camForward = renderer::mainCamera->GetForward();
+        //camForward.y = 0.0f;
+        //camForward.Normalize();
+        //
+        //if (camForward.LengthSquared() > 0.0001f)
+        //{
+        //    float yawRad = atan2f(camForward.x, camForward.z);
+        //    float yawDeg = XMConvertToDegrees(yawRad);
+        //
+        //    Vector3 rt = tr->GetRotation();
+        //    rt.y = yawDeg;
+        //    tr->SetRotation(rt);
+        //}
 
 
         //if (mDirection == Direction::Forward && mTargetDirection == Direction::Back
@@ -220,6 +253,10 @@ namespace ME
             else if (prob <= 7)
             {
                 mState = State::Patrol;
+
+                int randDir = rand() % (int)Direction::End;
+                mTargetDirection = (Direction)randDir;
+                mbTurn = false;
             }
             else
             {

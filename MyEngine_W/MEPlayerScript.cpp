@@ -39,6 +39,7 @@ namespace ME
         }
 
         Translate();
+
    
         switch (mState)
         {
@@ -96,49 +97,16 @@ namespace ME
 
     void PlayerScript::Translate()
     {
+        directionChange();
 
         Transform* tr = GetOwner()->GetComponent<Transform>();
         Vector3 pos = tr->GetPosition();
 
-        if (mPlayerType == PlayerType::Player)
-        {
 
             bool forward = Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W);
             bool back = Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S);
             bool left = Input::GetKey(eKeyCode::Left) || Input::GetKey(eKeyCode::A);
             bool right = Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D);
-
-            if (!forward && !back && !left && !right)
-            {
-                mState = State::Idle;
-                mbIsMoving = false;
-            }
-            else
-            {
-
-                if (left)
-                {
-                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                    mTargetDirection = Direction::Left;
-                }
-                if (Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D))
-                {
-                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                    mTargetDirection = Direction::Right;
-                }
-                if (Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W))
-                {
-                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                    mTargetDirection = Direction::Forward;
-
-                }
-                if (Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S))
-                {
-                    mTargetDirection = Direction::Back;
-                    pos += 20.0f * tr->Forward() * Time::DeltaTime();
-                }
-
-            }
 
             if (Input::GetKeyDown(eKeyCode::T))
             {
@@ -147,16 +115,44 @@ namespace ME
                 else
                     mbHoldingGun = false;
             }
-            directionChange();
 
-        }
-        else if (mPlayerType == PlayerType::Enemy)
-        {
-            randomAction();
+            if (!forward && !back && !left && !right)
+            {
+                mState = State::Idle;
+                mbIsMoving = false;
+                return;
+            }
+            else
+            {
 
-            if(mbHoldingGun == false)
-                mbHoldingGun = true;
-        }
+                if (left)
+                {
+                    pos += 150.0f* tr->Forward() * Time::DeltaTime();
+                    mTargetDirection = Direction::Left;
+                }
+                if (Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D))
+                {
+                    pos += 150.0f * tr->Forward() * Time::DeltaTime();
+                    mTargetDirection = Direction::Right;
+                }
+                if (Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W))
+                {
+                    pos += 150.0f * tr->Forward() * Time::DeltaTime();
+                    mTargetDirection = Direction::Forward;
+
+                }
+                if (Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S))
+                {
+                    mTargetDirection = Direction::Back;
+                    pos += 150.0f * tr->Forward() * Time::DeltaTime();
+                }
+
+            }
+
+  
+         //   directionChange();
+
+        
           
             mbIsMoving = true;
             mState = State::Walk;

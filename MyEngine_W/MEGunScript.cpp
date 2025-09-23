@@ -20,6 +20,8 @@ namespace ME
 	GunScript::GunScript()
 		:mCoolDownTime(0.2f)
 		, mCoolDownTimer(0.0f)
+		, mCoolDownTimeForEnemy(2.0f)
+		, mCoolDownTimerForEnemy(0.0f)
 		, mbCanShoot(false)
 		,mPlayerScript(nullptr)
 		,mEnemyScript(nullptr)
@@ -41,22 +43,48 @@ namespace ME
 			mCurPlayerPos = playerTr->GetPosition();
 		}
 
-		if (mbCanShoot == false)
+		if (mPlayerType == PlayerType::Player)
 		{
-			mCoolDownTimer += Time::DeltaTime();
 
-			if (mCoolDownTimer > mCoolDownTime)
+			if (mbCanShoot == false )
 			{
-				mbCanShoot = true;
-				mCoolDownTimer = 0.0f;
+				mCoolDownTimer += Time::DeltaTime();
+
+				if (mCoolDownTimer > mCoolDownTime)
+				{
+					mbCanShoot = true;
+					mCoolDownTimer = 0.0f;
+				}
+			}
+
+			if (Input::GetKeyDown(eKeyCode::LeftMous))
+			{
+				if (mbCanShoot == true && mPlayerScript->IsUsingGun())
+				{
+					makeBullet();
+					mbCanShoot = false;
+				}
 			}
 		}
-
-		if (mPlayerType == PlayerType::Player && Input::GetKeyDown(eKeyCode::LeftMous))
+		else if (mPlayerType == PlayerType::Enemy)
 		{
-			if(mbCanShoot == true && mPlayerScript->IsUsingGun())
+			if (mbCanShoot == false)
+			{
+				mCoolDownTimerForEnemy += Time::DeltaTime();
+
+				if (mCoolDownTimerForEnemy > mCoolDownTimeForEnemy)
+				{
+					mbCanShoot = true;
+					mCoolDownTimeForEnemy = rand() % 3 + 2;
+					mCoolDownTimerForEnemy = 0.0f;
+				}
+			}
+
+			if (mbCanShoot)
+			{
 				makeBullet();
-			
+				mbCanShoot = false;
+			}
 		}
 	}
 	void GunScript::LateUpdate()
@@ -122,7 +150,58 @@ namespace ME
 		}
 		else if(mPlayerType == PlayerType::Enemy)
 		{
-			
+			if (mEnemyScript->IsUsingGun())
+			{
+				Transform* tr = GetOwner()->GetComponent<Transform>();
+				Transform* playerTr = GetGunOwner()->GetComponent<Transform>();
+
+				Vector3 moveOffset = mCurPlayerPos - mPrevPlayerPos;
+
+
+				Bone* leftHand = mEnemyScript->GetLeftHandBone();
+
+				Matrix handLocal = leftHand->FinalTransform;
+
+				Matrix playerWorldMatrix = playerTr->GetWorldMatrix();
+
+				Matrix handMatrix = handLocal * playerWorldMatrix;
+				// 손 위치 & 회전 추출
+				Vector3 handPos = handMatrix.Translation();
+				Quaternion handRot = Quaternion::CreateFromRotationMatrix(handMatrix);
+
+
+				// 최종 위치 & 회전
+				Vector3 gunPos = handPos;
+				Quaternion gunRot = handRot;
+
+				Vector3 offset = Vector3(96.0f, 152.0f, 22.0f);
+				Vector3 finalPos = gunPos + Vector3::Transform(offset, Matrix::CreateFromQuaternion(gunRot));
+
+				Matrix worldMatrix = Matrix::CreateFromQuaternion(gunRot) * Matrix::CreateTranslation(finalPos);
+
+				Vector3 charForward = mOwner->GetComponent<Transform>()->Forward();
+				charForward.y = 0.0f;
+				charForward.Normalize();
+
+				if (charForward.LengthSquared() > 0.0001f)
+				{
+					float yawRad = atan2f(charForward.x, charForward.z);
+					float yawDeg = XMConvertToDegrees(yawRad);
+
+					Vector3 rt = tr->GetRotation();
+					rt.y = yawDeg;
+					tr->SetRotation(rt);
+				}
+
+				Vector3 pos;
+				Quaternion rot;
+				Vector3 scale;
+				worldMatrix.Decompose(scale, rot, pos);
+				tr->SetPosition(pos);
+				//tr->SetRotation(rot.ToEuler());
+				scale = tr->GetScale();
+				tr->SetScale(scale);
+			}
 		}
 		
 	}
