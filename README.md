@@ -1,4 +1,4 @@
-## Window API를 이용해 구현한 2D 게임 엔진의 틀을 이용하여 만든 DX11를 사용한 3D 게임엔진 
+## Window API를 이용해 구현했던 2D 게임 엔진의 틀을 활용하여 만든 DX11 3D 게임엔진 
 
 renderer, 기본적인 component 종류들 (Transform, Rigidbody, Collider, etc...)를 구현했다.
 
