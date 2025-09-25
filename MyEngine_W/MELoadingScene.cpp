@@ -75,6 +75,7 @@ namespace ME
 			Resources::Load<graphics::Texture>(L"GUN", L"..\\Resources\\M4Tex.png");
 			Resources::Load<graphics::Texture>(L"ALIEN", L"..\\Resources\\AlienTex.png");
 			Resources::Load<graphics::Texture>(L"SOLDIER", L"..\\Resources\\SoldierTex.jpg");
+			Resources::Load<graphics::Texture>(L"HPBAR", L"..\\Resources\\Hpbar.png");
 			renderer::Initialize();
 
 			

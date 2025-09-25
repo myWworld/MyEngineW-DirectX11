@@ -53,6 +53,7 @@ namespace ME
 	private:
 
 		void makeBullet();
+		void adjustGunPos();
 
 	private:
 

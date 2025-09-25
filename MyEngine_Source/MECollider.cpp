@@ -10,7 +10,8 @@ namespace ME
         :Component(enums::eComponentType::Collider)
         ,mType(type)
         ,mID(mCollisionID++)
-        ,mSize(Vector2::One)
+        ,mSize(Vector3::One)
+        ,mOffset(Vector3::Zero)
     {
 
     }

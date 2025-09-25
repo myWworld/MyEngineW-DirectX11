@@ -1,10 +1,13 @@
 #include "MEUIBase.h"
+#include "METransform.h"
+#include "MEGameObject.h"
 
 namespace ME
 {
     UIBase::UIBase(enums::eUIType type)
         :mType(type)
         ,mbMouseOn(false)
+        ,mbFollowingOwner(false)
     {
     }
     UIBase::~UIBase()
@@ -55,6 +58,17 @@ namespace ME
     }
     void UIBase::OnUpdate()
     {
+        if (mbFollowingOwner == true)
+        {
+            if (mOwner != nullptr)
+            {
+                Transform* tr = mOwner->GetComponent<Transform >();
+                Vector3 pos = tr->GetPosition();
+                SetPos(Vector2(pos.x, pos.y));
+
+
+            }
+        }
     }
     void UIBase::OnLateUpdate()
     {

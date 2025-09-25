@@ -17,8 +17,8 @@ namespace ME
 
 	void ME::UIHUD::OnInit()
 	{
-		SetPos(Vector2(5, 5));
-		SetSize(Vector2(0.1f, 0.1f));
+		SetPos(Vector2(10, 10));
+		SetSize(Vector2(3.f, 3.0f));
 
 		
 		mTexture = Resources::Find<graphics::Texture>(L"HPBAR");

@@ -45,7 +45,7 @@ namespace ME
 		
 		void SetGround(bool ground) { mbGround = ground; }
 		void SetVelocity(Vector3 velocity) { mVelocity = velocity; }
-		
+		void SetLimitVelocity(const Vector3& lVelocity) { mLimitVelocity = lVelocity; }
 
 		Vector3 GetVelocity() const{return mVelocity;}
 		Vector3 GetForce() { return mForce; }

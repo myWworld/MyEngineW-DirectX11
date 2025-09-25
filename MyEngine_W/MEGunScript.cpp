@@ -36,7 +36,8 @@ namespace ME
 	}
 	void GunScript::Update()
 	{
-		
+		adjustGunPos();
+
 		if (mOwner != nullptr)
 		{
 			Transform* playerTr = GetGunOwner()->GetComponent<Transform>();
@@ -89,6 +90,16 @@ namespace ME
 		}
 	}
 	void GunScript::LateUpdate()
+	{
+		
+		
+	}
+	void GunScript::Render()
+	{
+	}
+
+
+	void GunScript::adjustGunPos()
 	{
 		if (mPlayerType == PlayerType::Player)
 		{
@@ -149,7 +160,7 @@ namespace ME
 
 			mPrevPlayerPos = mCurPlayerPos;
 		}
-		else if(mPlayerType == PlayerType::Enemy)
+		else if (mPlayerType == PlayerType::Enemy)
 		{
 			if (mEnemyScript->IsUsingGun())
 			{
@@ -204,10 +215,6 @@ namespace ME
 				tr->SetScale(scale);
 			}
 		}
-		
-	}
-	void GunScript::Render()
-	{
 	}
 
 	void GunScript::makeBullet()
@@ -219,7 +226,9 @@ namespace ME
 		Vector3 spawnPos = gunPos;
 		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Bullet, spawnPos);
 		bullet->AddComponent<BulletScript>();
-		bullet->AddComponent<BoxCollider3D>();
+		BoxCollider3D* col = bullet->AddComponent<BoxCollider3D>();
+		col->SetSize(Vector3(3, 2, 2));
+		
 		Rigidbody* rb = bullet->AddComponent<Rigidbody>();
 		rb->SetMass(2.0f);
 
@@ -245,9 +254,10 @@ namespace ME
 
 			Vector3 dir = tr->Forward();
 			dir.Normalize();
-			dir = (dir + tr->Up() * 0.01f);
+			dir = (dir + tr->Up() * 0.0001f);
 			dir.Normalize();
-			rb->AddForce(dir * 5000.0f, Rigidbody::eForceMode::Impulse);
+			rb->SetLimitVelocity(Vector3(5000.0f, 1000.0f, 5000.0f));
+			rb->AddForce(dir * 2000.0f, Rigidbody::eForceMode::Impulse);
 		}
 		else
 		{

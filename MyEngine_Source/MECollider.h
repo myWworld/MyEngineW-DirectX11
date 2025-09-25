@@ -26,7 +26,7 @@ namespace ME
 
 		UINT32 GetID() const{ return mID; }
 		Vector3 GetSize() const { return mSize; }
-
+	
 		void SetSize(Vector3 size) { mSize = size; }
 
 		enums::eColliderType GetColliderType() const{ return mType; }

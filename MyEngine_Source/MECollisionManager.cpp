@@ -161,8 +161,8 @@ namespace ME
 		Vector3 leftPos = leftTr->GetPosition() + left->GetOffset();
 		Vector3 rightPos = rightTr->GetPosition() + right->GetOffset();
 
-		Vector3 leftSize = left->GetSize() * 100.0f;
-		Vector3 rightSize = right->GetSize() * 100.0f;
+		Vector3 leftSize = left->GetSize(); //* 100.0f;
+		Vector3 rightSize = right->GetSize(); //* 100.0f;
 
 		BoxCollider2D* leftBC = (static_cast<BoxCollider2D*>(left));
 		BoxCollider2D* rightBC = (static_cast<BoxCollider2D*>(right));
@@ -271,8 +271,11 @@ namespace ME
 		if (leftType == enums::eColliderType::Box3D
 			&& rightType == enums::eColliderType::Box3D)
 		{
-			Vector3 leftCenterPos = leftPos + (leftSize / 2.0f);
-			Vector3 rightCenterPos = rightPos + (rightSize / 2.0f);
+			Vector3 LHeight = Vector3(0, leftSize.y, 0);
+			Vector3 RHeight = Vector3(0, rightSize.y, 0);
+
+			Vector3 leftCenterPos = leftPos + (LHeight / 2.0f);
+			Vector3 rightCenterPos = rightPos + (RHeight / 2.0f);
 
 
 			if (leftBC3D->IsRotate())
@@ -298,7 +301,8 @@ namespace ME
 
 			//AABB Ãæµ¹ rect-rect
 			if (fabs(leftCenterPos.x - rightCenterPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
-				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f)  && fabs(leftCenterPos.z - rightCenterPos.z) < fabs(leftSize.z / 2.0f + rightSize.z / 2.0f))
+				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f) 
+				&& fabs(leftCenterPos.z - rightCenterPos.z) < fabs(leftSize.z / 2.0f + rightSize.z / 2.0f))
 			{
 				return true;
 			}

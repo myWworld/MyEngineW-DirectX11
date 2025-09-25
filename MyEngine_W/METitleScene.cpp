@@ -15,6 +15,8 @@
 #include "MEPlayer.h"
 #include "MEModel.h"
 
+#include "MEUIManager.h"
+
 #include "MECameraScript.h"
 #include "MEModelRenderer.h"
 #include "MEAnimator3D.h"
@@ -141,12 +143,14 @@ namespace ME
 
 		//	Rigidbody* rb = mPlayer->AddComponent<Rigidbody>();
 			Collider* col = player->AddComponent<BoxCollider3D>();
-			
+			col->SetSize(Vector3(50, 250, 50));
 
 			if (model->GetTextures().size() > 0)
 				animator->SetTextures(model->GetTextures());
 			else
 				animator->SetTexture(Resources::Find<graphics::Texture>(L"ALIEN"));
+
+			UIManager::Push(enums::eUIType::HpBar);
 
 
 			animator->SetSkeleton(&model->GetSkeleton());

@@ -2,8 +2,9 @@
 #include "MEEntity.h"
 
 namespace ME
-
 {
+	
+
 	class UIBase :public Entity
 	{
 	public:
@@ -56,6 +57,9 @@ namespace ME
 		Vector2 GetPos() { return mPosition; }
 		void SetSize(Vector2 size) { mSize = size; }
 		Vector2 GetSize() { return mSize; }
+
+		void SetOwner(class GameObject* owner) { this->mOwner = owner; }
+		void SetFollowOwner(bool follow) { mbFollowingOwner = follow; }
 		
 	protected:
 		Vector2 mPosition;
@@ -66,7 +70,10 @@ namespace ME
 
 		enums::eUIType mType;
 		bool mbFullScreen;
+		bool mbFollowingOwner;
 		bool mbEnabled;
+
+		class GameObject* mOwner;
 
 		UIBase* mParent;
 	};

@@ -17,7 +17,7 @@ namespace ME
 		,mViewMatrix(Matrix::Identity)
 		,mAspectRatio(0.0f)
 		,mNear(1.0f)
-		,mFar(1000.0f)
+		,mFar(20000.0f)
 		,mSize(1.0f)
 		,mCameraPitch(0.0f)
 		, mCameraRoll(0.0f)
