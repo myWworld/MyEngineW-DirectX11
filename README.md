@@ -1,9 +1,9 @@
-MyEngineW-DirectX11
+#MyEngineW-DirectX11
 
 Windows API 기반의 2D 엔진 구조에서 확장하여, DirectX11을 활용해 3D 렌더링 및 컴포넌트 기반 구조를 구현한 개인 게임엔진 프로젝트입니다.
 현재 빛(lighting) 모델은 구현되어 있지 않으며, 향후 확장 기능으로 남겨두었습니다.
 
-🚀 프로젝트 개요
+##🚀 프로젝트 개요
 
 언어 / 기술 스택: C++ (Modern C++ 기준), Windows API, DirectX11, HLSL(Shader)
 
@@ -23,7 +23,7 @@ Windows API 기반의 2D 엔진 구조에서 확장하여, DirectX11을 활용�
 
 기능 범위: Mesh Rendering, Transform/Collider/Rigidbody 등 기본 컴포넌트, 카메라 제어, 스크립터블 씬 관리 등
 
-🏗️ 아키텍처 및 디렉토리 구조
+##🏗️ 아키텍처 및 디렉토리 구조
 /MyEngineW-DirectX11
 │
 ├─ Core/
@@ -57,7 +57,7 @@ Windows API 기반의 2D 엔진 구조에서 확장하여, DirectX11을 활용�
 └─ Entry/
      Main.cpp                         ← WinMain 또는 main 진입점, 엔진 실행 흐름  
 
-🔍 주요 기능 설명
+##🔍 주요 기능 설명
 Device & Renderer 초기화
 
 Direct3D11 Device, DeviceContext, SwapChain, RenderTargetView, DepthStencilView 등 필수 객체를 생성
