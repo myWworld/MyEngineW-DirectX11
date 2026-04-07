@@ -4,6 +4,7 @@
 #include "MECircleCollider2D.h"
 #include "METransform.h"
 #include "MEGameObject.h"
+#include "MEQuadTree.h"
 
 
 namespace ME
@@ -39,6 +40,7 @@ namespace ME
 
 	private:
 
+		static QuadTree* mQuadTree;
 
 		static std::bitset<(UINT)enums::eLayerType::Max> mCollisionLayerMatrix[(UINT)enums::eLayerType::Max];
 		static std::unordered_map<UINT64, bool> mCollisionMap;

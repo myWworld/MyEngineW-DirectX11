@@ -149,7 +149,12 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.cpp">
       <Filter>Component\Collider</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)MEObjectPool.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEObjectPool.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEQuadTree.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -318,7 +323,12 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.h">
       <Filter>Component\Collider</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)MEObjectPool.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEObjectPool.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEQuadTree.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
