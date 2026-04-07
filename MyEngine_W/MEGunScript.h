@@ -6,6 +6,7 @@
 #include "MEPlayer.h"
 #include "MEPlayerScript.h"
 #include "MEEnemyScript.h"
+#include "MEObjectPool.h"
 
 namespace ME
 {
@@ -52,7 +53,8 @@ namespace ME
 
 	private:
 
-		void makeBullet();
+		GameObject* makeBullet();
+		void shootBullet();
 		void adjustGunPos();
 
 	private:
@@ -70,6 +72,7 @@ namespace ME
 		 float mCoolDownTime;
 		 float mCoolDownTimer;
 
+		 ObjectPool<GameObject>* mBulletPool;
 		 bool mbCanShoot;
 
 		 float mCoolDownTimeForEnemy;

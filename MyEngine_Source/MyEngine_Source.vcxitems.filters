@@ -149,6 +149,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.cpp">
       <Filter>Component\Collider</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEObjectPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -317,6 +318,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.h">
       <Filter>Component\Collider</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEObjectPool.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">

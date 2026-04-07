@@ -32,8 +32,8 @@ namespace ME {
 		T* AddComponent()
 		{
 			T* comp = new T();
-			comp->Initialize();
 			comp->SetOwner(this);
+			comp->Initialize();
 
 			mComponents[(UINT)comp->GetType()] = comp;
 			
@@ -45,7 +45,7 @@ namespace ME {
 		{
 			T* component = nullptr;
 			
-				for (Component* comp : mComponents)
+			for (Component* comp : mComponents)
 				{
 					component = dynamic_cast<T*>(comp);
 					if (component)

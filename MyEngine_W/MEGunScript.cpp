@@ -16,6 +16,7 @@
 #include "MERigidbody.h"
 #include "MEBoxCollider3D.h"
 
+
 namespace ME
 {
 	GunScript::GunScript()
@@ -33,6 +34,10 @@ namespace ME
 	}
 	void GunScript::Initialize()
 	{
+		mBulletPool = new ObjectPool<GameObject>(50, [this]()->GameObject*
+		{
+			return this->makeBullet();
+		});
 	}
 	void GunScript::Update()
 	{
@@ -63,7 +68,7 @@ namespace ME
 			{
 				if (mbCanShoot == true && mPlayerScript->IsUsingGun())
 				{
-					makeBullet();
+					shootBullet();
 					mbCanShoot = false;
 				}
 			}
@@ -84,7 +89,7 @@ namespace ME
 
 			if (mbCanShoot)
 			{
-				makeBullet();
+				shootBullet();
 				mbCanShoot = false;
 			}
 		}
@@ -217,7 +222,7 @@ namespace ME
 		}
 	}
 
-	void GunScript::makeBullet()
+	GameObject* GunScript::makeBullet()
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
 		Vector3 gunPos = tr->GetPosition();
@@ -225,7 +230,9 @@ namespace ME
 
 		Vector3 spawnPos = gunPos;
 		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Bullet, spawnPos);
-		bullet->AddComponent<BulletScript>();
+		BulletScript* bulletScript = bullet->AddComponent<BulletScript>();
+		bulletScript->SetPool(mBulletPool);
+
 		BoxCollider3D* col = bullet->AddComponent<BoxCollider3D>();
 		col->SetSize(Vector3(3, 2, 2));
 		
@@ -252,12 +259,6 @@ namespace ME
 
 			bullet->SetModel(bullet_model);
 
-			Vector3 dir = tr->Forward();
-			dir.Normalize();
-			dir = (dir + tr->Up() * 0.0001f);
-			dir.Normalize();
-			rb->SetLimitVelocity(Vector3(5000.0f, 1000.0f, 5000.0f));
-			rb->AddForce(dir * 2000.0f, Rigidbody::eForceMode::Impulse);
 		}
 		else
 		{
@@ -265,5 +266,29 @@ namespace ME
 			bullet_model = nullptr;
 		}
 
+		return reinterpret_cast<GameObject*>(bullet);
+
 	}
+
+	void GunScript::shootBullet()
+	{
+		auto bullet = mBulletPool->Get();
+
+		if (bullet == nullptr) return;
+		
+		Transform* tr = GetOwner()->GetComponent<Transform>();
+		Vector3 gunPos = tr->GetPosition();
+
+		Transform* bulletTr = bullet->GetComponent<Transform>();
+
+		Rigidbody* rb = bullet->GetComponent<Rigidbody>();
+
+		bulletTr->SetPosition(gunPos);
+		Vector3 dir = tr->Forward();
+		dir.Normalize();
+		dir = (dir + tr->Up() * 0.0001f);
+		dir.Normalize();
+		rb->SetLimitVelocity(Vector3(5000.0f, 1000.0f, 5000.0f));
+		rb->AddForce(dir * 2000.0f, Rigidbody::eForceMode::Impulse);
+	}	
 }

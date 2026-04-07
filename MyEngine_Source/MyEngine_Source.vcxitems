@@ -50,6 +50,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEModel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEModelRenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEObject.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEObjectPool.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MERenderer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEResource.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEResources.h" />
@@ -103,6 +104,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEModel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEModelRenderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEObjectPool.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MERenderer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEResource.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEResources.cpp" />

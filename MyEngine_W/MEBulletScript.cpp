@@ -2,6 +2,7 @@
 #include "METime.h"
 #include "MEGameObject.h"
 #include "METransform.h"
+#include "MERigidbody.h"
 
 namespace ME
 {
@@ -20,18 +21,16 @@ namespace ME
 	{
 		mDeadTimer += Time::DeltaTime();
 
-		//Transform* tr = GetOwner()->GetComponent<Transform>();
-		//Vector3 pos = tr->GetPosition();
-		//
-		//pos += tr->Forward() * 4.0f;
-		//
-		//tr->SetPosition(pos);
-
 
 		if (mDeadTime < mDeadTimer)
 		{
 			mDeadTimer = 0.0f;
-			GetOwner()->SetDeath();
+			GetOwner()->SetActive(false);
+			if (mPool)
+			{
+				mPool->Return(this->GetOwner());
+			}
+			resetBulletData();
 		}
 	}
 	void BulletScript::LateUpdate()
@@ -39,5 +38,15 @@ namespace ME
 	}
 	void BulletScript::Render()
 	{
+	}
+
+	void BulletScript::resetBulletData()
+	{
+		mDeadTimer = 0.0f;
+		
+		auto owner = GetOwner();
+		Rigidbody* rb = owner->GetComponent<Rigidbody>();
+
+		rb->ClearForces();
 	}
 }
