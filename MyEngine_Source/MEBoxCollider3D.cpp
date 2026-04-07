@@ -86,4 +86,61 @@ namespace ME
 
 		return centralPoint;
 	}
+
+	bool BoxCollider3D::IntersectWith(BoxCollider3D* other)
+	{
+		Transform* leftTr = this->GetOwner()->GetComponent<Transform>();
+		Transform* rightTr = other->GetOwner()->GetComponent<Transform>();
+
+		Vector3 leftPos = leftTr->GetPosition() + this->GetOffset();
+		Vector3 rightPos = rightTr->GetPosition() + other->GetOffset();
+
+		Vector3 leftSize = this->GetSize(); //* 100.0f;
+		Vector3 rightSize = other->GetSize(); //* 100.0f;
+
+		BoxCollider3D* leftBC3D = this;
+		BoxCollider3D* rightBC3D = other;
+
+		enums::eColliderType leftType = this->GetColliderType();
+		enums::eColliderType rightType = other->GetColliderType();
+
+		if (leftType == enums::eColliderType::Box3D
+			&& rightType == enums::eColliderType::Box3D)
+		{
+			Vector3 LHeight = Vector3(0, leftSize.y, 0);
+			Vector3 RHeight = Vector3(0, rightSize.y, 0);
+
+			Vector3 leftCenterPos = leftPos + (LHeight / 2.0f);
+			Vector3 rightCenterPos = rightPos + (RHeight / 2.0f);
+
+
+			if (leftBC3D->IsRotate())
+			{
+
+				leftCenterPos = leftBC3D->GetCentralPoint();
+
+				leftSize.y = leftBC3D->GetHeight();
+				leftSize.x = leftBC3D->GetWidth();
+
+			}
+
+			if (rightBC3D->IsRotate())
+			{
+				rightCenterPos = rightBC3D->GetCentralPoint();
+
+				rightSize.y = rightBC3D->GetHeight();
+				rightSize.x = rightBC3D->GetWidth();
+
+			}
+
+
+
+			//AABB Ãæµ¹ rect-rect
+			if (fabs(leftCenterPos.x - rightCenterPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
+				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f)
+				&& fabs(leftCenterPos.z - rightCenterPos.z) < fabs(leftSize.z / 2.0f + rightSize.z / 2.0f))
+			{
+				return true;
+			}
+	}
 }

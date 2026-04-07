@@ -155,6 +155,8 @@ namespace ME
 
 	bool CollisionManager::Intersect(Collider* left, Collider* right)
 	{
+		return left->Intersect(right);
+
 		Transform* leftTr = left->GetOwner()->GetComponent<Transform>();
 		Transform* rightTr = right->GetOwner()->GetComponent<Transform>();
 

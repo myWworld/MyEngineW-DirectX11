@@ -86,4 +86,104 @@ namespace ME
 
 		return centralPoint;
 	}
+
+	bool BoxCollider2D::IntersectWith(BoxCollider2D* other)
+	{
+		Transform* leftTr = this->GetOwner()->GetComponent<Transform>();
+		Transform* rightTr = other->GetOwner()->GetComponent<Transform>();
+
+		Vector3 leftPos = leftTr->GetPosition() + this->GetOffset();
+		Vector3 rightPos = rightTr->GetPosition() + other->GetOffset();
+
+		Vector3 leftSize = this->GetSize(); //* 100.0f;
+		Vector3 rightSize = other->GetSize(); //* 100.0f;
+
+
+		BoxCollider2D* leftBC = this;
+		BoxCollider2D* rightBC = other;
+
+
+		enums::eColliderType leftType = this->GetColliderType();
+		enums::eColliderType rightType = other->GetColliderType();
+
+		if (leftType == enums::eColliderType::Rect2D
+			&& rightType == enums::eColliderType::Rect2D)
+		{
+			Vector3 leftCenterPos = leftPos + (leftSize / 2.0f);
+			Vector3 rightCenterPos = rightPos + (rightSize / 2.0f);
+
+
+			if (leftBC->IsRotate())
+			{
+
+				leftCenterPos = leftBC->GetCentralPoint();
+
+				leftSize.y = leftBC->GetHeight();
+				leftSize.x = leftBC->GetWidth();
+
+			}
+
+			if (rightBC->IsRotate())
+			{
+				rightCenterPos = rightBC->GetCentralPoint();
+
+				rightSize.y = rightBC->GetHeight();
+				rightSize.x = rightBC->GetWidth();
+
+			}
+
+
+
+			//AABB Ãæµ¹ rect-rect
+			if (fabs(leftCenterPos.x - rightCenterPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
+				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f))
+			{
+				return true;
+			}
+
+
+
+			return false;
+
+		}
+	}
+	bool BoxCollider2D::IntersectWith(CircleCollider2D* other)
+	{
+		Transform* leftTr = this->GetOwner()->GetComponent<Transform>();
+		Transform* rightTr = other->GetOwner()->GetComponent<Transform>();
+
+		Vector3 leftPos = leftTr->GetPosition() + this->GetOffset();
+		Vector3 rightPos = rightTr->GetPosition() + other->GetOffset();
+
+		Vector3 leftSize = this->GetSize(); //* 100.0f;
+		Vector3 rightSize = other->GetSize(); //* 100.0f;
+
+
+		BoxCollider2D* leftBC = this;
+		CircleCollider2D* rightBC = other;
+
+
+		enums::eColliderType leftType = this->GetColliderType();
+		enums::eColliderType rightType = other->GetColliderType();
+
+		if (leftType == enums::eColliderType::Rect2D && rightType == enums::eColliderType::Circle2D)
+		{
+			//circle - rect
+			Vector3 rightCirclePos = rightPos + (rightSize / 2.0f);
+
+			float r = rightSize.x / 2.0f;
+
+
+			if ((rightCirclePos.x >= leftPos.x - r && rightCirclePos.x <= leftPos.x + r)
+				&& (rightCirclePos.y >= leftPos.y - r && rightCirclePos.y <= leftPos.y + r))
+			{
+				return true;
+			}
+
+		}
+
+
+		return false;
+	}
+
 }

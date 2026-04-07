@@ -16,6 +16,14 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
+		virtual bool Intersect(Collider* other) override { return other->IntersectWith(this); }
+
+		virtual bool  IntersectWith(BoxCollider2D* other)override;
+		virtual bool  IntersectWith(CircleCollider2D* other) override;
+
+
+	public:
+
 	private:
 		float mRadius;
 
