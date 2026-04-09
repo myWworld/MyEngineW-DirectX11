@@ -57,15 +57,27 @@ namespace ME::enums
 
 	enum class eComponentType
 	{
-		Trasnform,
-		Collider,
-		Rigidbody,
-		SpriteRenderer,
-		Animator,
-		ModelRenderer,
-		Animator3D,
+		// 사용자 로직이 가장 먼저 실행되어 위치나 상태를 결정
 		Script,
+
+		// 스크립트가 움직인 위치를 바탕으로 물리 연산(충돌, 중력)을 처리
+		Rigidbody,
+		Collider,
+
+		//  결정된 위치를 바탕으로 애니메이션
+		Animator,
+		Animator3D,
+
+		// 스크립트, 물리, 애니메이션이 모두 끝난 최종 데이터로 월드 행렬을 만들기
+		Transform, 
+
+		//만들어진 월드 행렬을 화면에 그리기
+		SpriteRenderer,
+		ModelRenderer,
+
+		//  모든 물체가 제자리를 찾은 후, 마지막으로 카메라가 쫓아가기
 		Camera,
+
 		AudioListener,
 		AudioSource,
 		End,

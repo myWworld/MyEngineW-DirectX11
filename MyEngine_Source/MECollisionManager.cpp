@@ -13,6 +13,14 @@ namespace ME
 
 	 void ME::CollisionManager::Iniatialize()
 	{
+		 if (mQuadTree == nullptr)
+		 {
+
+			 math::Vector2 worldMin(-10000.0f, -10000.0f); // ¸Ê ÃÖ¼Ò ÁÂÇ¥
+			 math::Vector2 worldMax(10000.0f, 10000.0f);   // ¸Ê ÃÖ´ë ÁÂÇ¥
+
+			 mQuadTree = new QuadTree(0, worldMin, worldMax);
+		 }
 	}
 
 	void ME::CollisionManager::Update()

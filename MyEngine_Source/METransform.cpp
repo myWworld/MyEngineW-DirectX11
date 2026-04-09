@@ -8,7 +8,7 @@ namespace ME
 {
 
 	ME::Transform::Transform()
-		:Component(enums::eComponentType::Trasnform)
+		:Component(enums::eComponentType::Transform)
 		,mWorldMatrix(Matrix::Identity)
 		,mScale(Vector3::One)
 		,mPosition(Vector3::Zero)

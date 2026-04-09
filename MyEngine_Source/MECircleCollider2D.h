@@ -4,6 +4,7 @@
 
 namespace ME
 {
+	class BoxCollider2D;
 	class CircleCollider2D:public Collider
 	{
 	public:

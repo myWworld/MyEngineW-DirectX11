@@ -12,7 +12,7 @@ namespace ME
 		math::Vector2 mBoundsMin;
 		math::Vector2 mBoundsMax;
 
-		std::vector<Collider*> mColliders;
+		std::vector<Collider*> mObjects;
 		QuadTree* mNodes[4];
 
 		const int MAX_OBJECTS = 10;

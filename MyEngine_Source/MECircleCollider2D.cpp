@@ -1,4 +1,5 @@
 #include "MECircleCollider2D.h"
+#include "MEBoxCollider2D.h"
 #include "METransform.h"
 #include "MEGameObject.h"
 #include "MERenderer.h"

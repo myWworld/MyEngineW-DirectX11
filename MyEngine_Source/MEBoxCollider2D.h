@@ -1,8 +1,10 @@
 #pragma once
 #include "MECollider.h"
+#include "CommonInclude.h"
 
 namespace ME
 {
+	class CircleCollider2D;
 
 
 	class BoxCollider2D:public Collider
@@ -37,9 +39,9 @@ namespace ME
 	private:
 	
 		Vector3 RotateCollider(float rot, int x, int y, int width, int height);
-	
-	private:
 		
+	private:
+			
 		float mRot;
 		Vector3 mCentralPoint;
 

@@ -41,7 +41,7 @@ namespace ME
 	}
 	void GunScript::Update()
 	{
-		adjustGunPos();
+	
 
 		if (mOwner != nullptr)
 		{
@@ -97,6 +97,8 @@ namespace ME
 	void GunScript::LateUpdate()
 	{
 		
+		adjustGunPos();
+
 		
 	}
 	void GunScript::Render()
@@ -281,11 +283,15 @@ namespace ME
 
 		Transform* bulletTr = bullet->GetComponent<Transform>();
 
+
 		Rigidbody* rb = bullet->GetComponent<Rigidbody>();
 
 		bulletTr->SetPosition(gunPos);
+		bulletTr->SetRotation(tr->GetRotation());
+		
 		Vector3 dir = tr->Forward();
 		dir.Normalize();
+
 		dir = (dir + tr->Up() * 0.0001f);
 		dir.Normalize();
 		rb->SetLimitVelocity(Vector3(5000.0f, 1000.0f, 5000.0f));

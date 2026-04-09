@@ -1,12 +1,12 @@
 #pragma once
 #include "MEComponent.h"
-#include "MEBoxCollider2D.h"
-#include "MECircleCollider2D.h"
-#include "MEBoxCollider3D.h"
-
 
 namespace ME
 {
+	class BoxCollider2D;
+	class CircleCollider2D;
+	class BoxCollider3D;
+
 	class Collider:public Component
 	{
 

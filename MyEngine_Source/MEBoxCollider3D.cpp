@@ -142,5 +142,8 @@ namespace ME
 			{
 				return true;
 			}
+		}
+
+		return false;
 	}
 }
