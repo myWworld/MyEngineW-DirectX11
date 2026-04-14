@@ -245,9 +245,10 @@ namespace ME
 		bulletTr->SetScale(.1f, .1f, .1f);
 		bulletTr->SetRotation(tr->GetRotation());
 
-		Model* bullet_model = new Model();
 
-		if (bullet_model->LoadModel(L"..\\Resources\\Bullet.fbx"))
+		std::shared_ptr<Model> bullet_model = Resources::Find<Model>(L"BulletModel");
+
+		if (bullet_model !=  nullptr)
 		{
 
 			ModelRenderer* modelRenderer = bullet->AddComponent<ModelRenderer>();
@@ -264,7 +265,6 @@ namespace ME
 		}
 		else
 		{
-			delete bullet_model;
 			bullet_model = nullptr;
 		}
 

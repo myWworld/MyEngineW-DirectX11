@@ -30,7 +30,10 @@ namespace ME
 
         void SetTextures(const std::vector<graphics::Texture*>& textures) { mTextures = textures; }
         void SetTexture(graphics::Texture* texture) { mTextures.push_back(texture); }
+        void SetTexture(std::shared_ptr<graphics::Texture> texture) { mTextures.push_back(texture.get()); }
+
         void SetMaterial(Material* material) { mMaterial = material; }
+		void SetMaterial(std::shared_ptr<Material> material) { mMaterial = material.get(); }
 
     private:
         void render();

@@ -37,7 +37,7 @@ namespace ME
         {
             if (mLeftHandBone == nullptr && mRightHandBone == nullptr)
             {
-                Skeleton* skeleton = mAnimator->GetSkeleton();
+                Skeleton* skeleton = mAnimator->GetSkeletonPtr();
                 mLeftHandBone = skeleton->GetLeftHandTransform();
                 mRightHandBone = skeleton->GetRightHandTransform();
             }

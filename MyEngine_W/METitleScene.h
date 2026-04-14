@@ -22,7 +22,7 @@ namespace ME
 
 	private:
 
-		void MakeCharacter(Model* model, GameObject* player);
+		void MakeCharacter( GameObject* player);
 		void MakeGun(GameObject* player, bool bIsEnemy = false);
 
 	private:

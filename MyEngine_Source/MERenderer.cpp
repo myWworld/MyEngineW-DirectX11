@@ -167,10 +167,7 @@ namespace ME::renderer
 	
 	void LoadTriangleMesh()
 	{
-		Mesh* mesh = new Mesh();
-
-		//xyz
-	//rgba
+		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 
 		std::vector<graphics::Vertex> vertexes = {};
 		std::vector<UINT> indices;
@@ -206,7 +203,7 @@ namespace ME::renderer
 		inputLayoutDesces[1].SemanticName = "COLOR";
 		inputLayoutDesces[1].SemanticIndex = 0;
 
-		graphics::Shader* triangleShader = Resources::Find<graphics::Shader>(L"TriangleShader");
+		graphics::Shader* triangleShader = Resources::Find<graphics::Shader>(L"TriangleShader").get();
 		mesh->SetVertexBufferParams(2, inputLayoutDesces, triangleShader->GetVSBlob()->GetBufferPointer(), triangleShader->GetVSBlob()->GetBufferSize());
 
 		mesh->CreateIB(indices);
@@ -217,7 +214,7 @@ namespace ME::renderer
 
 	void LoadRectMesh()
 	{
-		Mesh* mesh = new Mesh();
+		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
 
 		std::vector<graphics::Vertex> vertexes = {};
 		std::vector<UINT> indices;
@@ -279,9 +276,12 @@ namespace ME::renderer
 		inputLayoutDesces[3].SemanticName = "TEXCOORD";
 		inputLayoutDesces[3].SemanticIndex = 0;
 
-		graphics::Shader* spriteShader = Resources::Find<graphics::Shader>(L"SpriteDefaultShader");
-		mesh->SetVertexBufferParams(4, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
+		graphics::Shader* spriteShader = Resources::Find<graphics::Shader>(L"SpriteDefaultShader").get();
 
+		if (spriteShader != nullptr)
+		{
+			mesh->SetVertexBufferParams(4, inputLayoutDesces, spriteShader->GetVSBlob()->GetBufferPointer(), spriteShader->GetVSBlob()->GetBufferSize());
+		}
 
 		mesh->CreateIB(indices);
 		mesh->CreateVB(vertexes);
@@ -337,11 +337,14 @@ namespace ME::renderer
 		inputLayoutDesces[5].SemanticIndex = 0;
 
 
-		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader");
-		modelShader->SetBlendState(graphics::eBlendState::Opaque);
+		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader").get();
 
-		mesh->SetVertexBufferParams(6, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+		if (modelShader != nullptr)
+		{
+			modelShader->SetBlendState(graphics::eBlendState::Opaque);
 
+			mesh->SetVertexBufferParams(6, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+		}
 	}
 
 	void LoadStaticModels(Mesh* mesh)
@@ -376,10 +379,13 @@ namespace ME::renderer
 		inputLayoutDesces[3].SemanticName = "TEXCOORD";
 		inputLayoutDesces[3].SemanticIndex = 0;
 
-		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"StaticModelShader");
-		modelShader->SetBlendState(graphics::eBlendState::Opaque);
-		mesh->SetVertexBufferParams(4, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"StaticModelShader").get();
 
+		if (modelShader != nullptr)
+		{
+			modelShader->SetBlendState(graphics::eBlendState::Opaque);
+			mesh->SetVertexBufferParams(4, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+		}
 	}
 
 	void LoadMeshes()
@@ -402,16 +408,16 @@ namespace ME::renderer
 
 	void LoadMaterials()
 	{
-		Material* triangleMaterial = new Material();
+		std::shared_ptr<Material> triangleMaterial = std::make_shared<Material>();
 		ME::Resources::Insert(L"TriangleMaterial", triangleMaterial);
 
-		Material* spriteMaterial = new Material();
+		std::shared_ptr<Material> spriteMaterial = std::make_shared<Material>();
 		ME::Resources::Insert(L"SpriteMaterial", spriteMaterial);
 
-		Material* modelMaterial = new Material();
+		std::shared_ptr<Material> modelMaterial = std::make_shared<Material>();
 		ME::Resources::Insert(L"ModelMaterial", modelMaterial);
 
-		Material* staticModelMaterial = new Material();
+		std::shared_ptr<Material> staticModelMaterial = std::make_shared<Material>();	
 		ME::Resources::Insert(L"StaticModelMaterial", staticModelMaterial);
 
 		spriteMaterial->SetShader(ME::Resources::Find <graphics::Shader>(L"SpriteDefaultShader"));

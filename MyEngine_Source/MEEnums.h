@@ -31,6 +31,7 @@ namespace ME::enums
 		Animation,
 		Animation3D,
 		Skeleton,
+		Model,
 		AudioClip,
 		Shader,
 		Prefab,

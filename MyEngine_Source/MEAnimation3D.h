@@ -13,6 +13,9 @@ namespace ME
 {
 	using namespace math;
 
+	class Skeleton;
+	class Animator3D;
+
 	class Animation3D :public Resource
 	{
 	public:
@@ -37,6 +40,8 @@ namespace ME
 			std::vector<VectorKey> scales;
 		};
 
+	public:
+
 		Animation3D();
 		~Animation3D();
 
@@ -46,13 +51,16 @@ namespace ME
 		void Update();
 		void Render();
 
+		void UpdateAnimation(float currentTime, Skeleton* skeleton, Animator3D* animator);
+
 		void CreateAnimation(const std::wstring& name, const std::wstring& path);
 
 		void Reset();
 
-		bool IsComplete() const { return mbComplete; }
 		void SetAnimator(class Animator3D* animator) { mAnimator = animator; }
 
+		float GetDuration() const { return mDuration; }
+		float GetTickersPerSecond() const { return mTickersPerSecond; }
 
 	public:
 
@@ -72,7 +80,7 @@ namespace ME
 
 		std::string extractBoneName(std::string& name);
 		
-		math::Matrix InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime, std::string boneName);
+		math::Matrix InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime, const std::string& boneName, Skeleton* skeleton);
 		math::Vector3 InterpolatePosition(const	std::vector<VectorKey>& pos, float currentTime);
 		math::Quaternion InterpolateRotation(const std::vector<QuatKey>& rotation, float currentTime);
 		math::Vector3 InterpolateScale(const std::vector<VectorKey>& scale, float currentTime);
@@ -83,10 +91,6 @@ namespace ME
 		class Animator3D* mAnimator;
 		class Skeleton* mSkeleton;
 	
-
-		float mTime;
-		bool mbComplete;
-
 
 	};
 

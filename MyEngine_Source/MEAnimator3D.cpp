@@ -7,6 +7,7 @@
 #include "MEGameObject.h"
 #include "MEMesh.h"
 #include "MEMaterial.h"
+#include "METime.h"
 
 
 namespace ME
@@ -18,49 +19,52 @@ namespace ME
 		, mbLoop(false)
 		, mEvents{}
 		, mModelType(enums::eModelType::StaticBone)
-		, mSkeleton(nullptr)
+		, mSkeleton{}
 		, mMaterial(nullptr)
 		, mMeshes{}
 		, mTextures{}
 		, mModelMatrix{}
+		, mStaticMaterial(nullptr)
+		, mCurrentTime(0.0f)
 	{
 	}
 	Animator3D::~Animator3D()
 	{
-		for (auto& iter : mAnimations)
-		{
-			delete iter.second;
-			iter.second = nullptr;
-		}
-
-		for (auto& iter : mEvents)
-		{
-			delete iter.second;
-			iter.second = nullptr;
-		}
+		mAnimations.clear();
+		mEvents.clear();
 	}
 	void Animator3D::Initialize()
 	{
+		mMaterial = Resources::Find<Material>(L"ModelMaterial").get();
+		mStaticMaterial = Resources::Find<Material>(L"StaticModelMaterial").get();
 	}
 	void Animator3D::Update()
 	{
 		if (mActiveAnimation)
 		{
-			mActiveAnimation->Update();
 
-			Events* events = FindEvents(mActiveAnimation->GetName());
+			mCurrentTime += Time::DeltaTime();
 
+			
+			float duration = mActiveAnimation->GetDuration();
+			float ticksPerSec = mActiveAnimation->GetTickersPerSecond();
 
-			if (mActiveAnimation->IsComplete() == true)
+			if (mCurrentTime * ticksPerSec > duration)
 			{
-				if (mbLoop == true)
-					mActiveAnimation->Reset();
-
-				if (events)
-				{
-					events->CompleteEvent();
+				mbComplete = true;
+				if (mbLoop) {
+					mCurrentTime = 0.0f; 
+					mbComplete = false;
 				}
+			}
 
+			mActiveAnimation->UpdateAnimation(mCurrentTime, &mSkeleton, this);
+
+	
+			if (mbComplete)
+			{
+				Events* events = FindEvents(mActiveAnimation->GetName());
+				if (events) events->CompleteEvent();
 			}
 
 		}
@@ -93,14 +97,12 @@ namespace ME
 					continue;
 
 				if (mesh->IsSkinned() == true)
-				{
-					mMaterial = Resources::Find<Material>(L"ModelMaterial");
+				{		
 					mMaterial->BindShader();
 				}
 				else
-				{
-					mMaterial = Resources::Find<Material>(L"StaticModelMaterial");
-					mMaterial->BindShader();
+				{				
+					mStaticMaterial->BindShader();
 				}
 
 				mesh->Bind();
@@ -145,9 +147,9 @@ namespace ME
 		{
 			graphics::AnimationCB cbData = {};
 
-			for (unsigned i = 0; i < mSkeleton->mBones.size(); i++)
+			for (unsigned i = 0; i < mSkeleton.mBones.size(); i++)
 			{
-				cbData.BoneMatrices[i] = mSkeleton->mBones[i].FinalTransform;
+				cbData.BoneMatrices[i] = mSkeleton.mBones[i].FinalTransform;
 		
 			}
 
@@ -172,22 +174,18 @@ namespace ME
 
 	void Animator3D::CreateAnimation(const std::wstring& name, const std::wstring& path)
 	{
-		Animation3D* animation = nullptr;
-
-		animation = FindAnimation(name);
-
-		if (animation != nullptr)
+		if (FindAnimation(name) != nullptr)
 			return;
 
-		animation = new Animation3D();
+		auto animation = std::make_unique<Animation3D>();
 		animation->SetName(name);
 		animation->SetAnimator(this);
 		animation->CreateAnimation(name, path);
 
-		Events* events = new Events();
-		mEvents.insert({ name, events });
+		auto events = std::make_unique<Events>();
 
-		mAnimations.insert({ name, animation });
+		mEvents.insert({ name, std::move(events)});
+		mAnimations.insert({ name, std::move(animation)});
 
 	}
 
@@ -200,7 +198,7 @@ namespace ME
 		if (iter == mAnimations.end())
 			return nullptr;
 
-		return iter->second;
+		return iter->second.get();
 
 
 	}
@@ -244,7 +242,7 @@ namespace ME
 		if (iter == mEvents.end())
 			return nullptr;
 
-		return iter->second;
+		return iter->second.get();
 	}
 
 	std::function<void()>& Animator3D::GetStartEvent(const std::wstring& name)

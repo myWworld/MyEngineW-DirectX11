@@ -8,19 +8,22 @@
 
 #include "METexture.h"
 #include "MESkeleton.h"
+#include "MEResource.h"
 
 namespace ME
 {
 
     class Mesh;
   
-    class Model
+    class Model : public Resource
     {
     public:
         Model();
         ~Model();
 
-        bool LoadModel(const std::wstring& path);
+        HRESULT Save(const std::wstring& path) override;
+        HRESULT Load(const std::wstring& path) override;
+    
         const std::vector<Mesh*>& GetMeshes() { return mMeshes; }
         const std::vector<graphics::Texture*>&GetTextures() { return mTextures; }
         Skeleton& GetSkeleton() { return mSkeleton; }

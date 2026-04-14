@@ -62,25 +62,30 @@ namespace ME
 		std::function<void()>& GetCompleteEvent(const std::wstring& name);
 		std::function<void()>& GetEndEvent(const std::wstring& name);
 
-		bool IsComplete() { return mActiveAnimation->IsComplete(); }
 		void SetSkeleton(Skeleton* skeleton) { 
 			
-			mSkeleton = skeleton; 
-			this->mModelType = mSkeleton->GetModelType();
+			mSkeleton = *skeleton; 
+			this->mModelType = mSkeleton.GetModelType();
 		}
-		Skeleton* GetSkeleton() { return mSkeleton; }
+		Skeleton GetSkeleton() { return mSkeleton; }
+		Skeleton* GetSkeletonPtr() { return &mSkeleton; }
 
 		//void setModelMatrix(const Matrix& model);
 		void SetMesh(const std::vector<Mesh*>& meshes_) { mMeshes = meshes_; }
 
 		void SetTextures(const std::vector<graphics::Texture*>& textures) { mTextures = textures; }
 		void SetTexture(graphics::Texture* texture) { mTextures.push_back(texture); }
+		void SetTexture(std::shared_ptr<graphics::Texture> texture) { mTextures.push_back(texture.get()); }
+
 		void SetMaterial(Material* material) { mMaterial = material; }
 
 		void SetApplyRootMotion(bool apply) { mbApplyRootMotion = apply; }
 		bool GetApplyRootMotion() { return mbApplyRootMotion; }
 
-	
+
+		Vector3 GetPrevRootPos() { return mPrevRootPos; }
+		void SetPrevRootPos(const Vector3& pos) { mPrevRootPos = pos; }
+
 
 	private:
 
@@ -96,19 +101,24 @@ namespace ME
 		std::vector<Mesh*> mMeshes;
 		std::vector<graphics::Texture* >mTextures;
 		Material* mMaterial;
-
-		
-		std::map<std::wstring, Animation3D*> mAnimations;
+		Material* mStaticMaterial;
 
 		bool mbLoop;
 		bool mbApplyRootMotion = false;
 
+		float mCurrentTime;
+		bool mbComplete;
+
+		math::Vector3 mPrevRootPos;
+
 		Animation3D* mActiveAnimation;
-		Skeleton* mSkeleton;
+		Skeleton mSkeleton;
 
 
-		//Event
-		std::map<std::wstring, Events*> mEvents;
+
+		std::unordered_map<std::wstring, std::unique_ptr<Animation3D>> mAnimations;
+		std::unordered_map<std::wstring, std::unique_ptr<Events>> mEvents;
+
 		enums::eModelType mModelType;
 
 	};

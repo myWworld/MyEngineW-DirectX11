@@ -23,7 +23,7 @@ namespace ME
 		SetPos(Vector2(255, 120));
 		SetSize(Vector2(70,20));
 
-		mTexture = Resources::Find<graphics::Texture>(L"STARTBUTTON");
+		mTexture = Resources::Find<graphics::Texture>(L"STARTBUTTON").get();
 
 		mOnClick = std::bind(&UIButton::ButtonClick, this);
 

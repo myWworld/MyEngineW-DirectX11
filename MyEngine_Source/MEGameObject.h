@@ -91,6 +91,11 @@ namespace ME {
 			model = model_;
 		}
 
+		void SetModel(std::shared_ptr<Model> model_)
+		{
+			model = model_.get();
+		}
+
 		Model* GetModel() { return model; }
 
 	

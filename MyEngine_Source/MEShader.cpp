@@ -9,6 +9,9 @@ namespace ME::graphics
 
 	ME::graphics::Shader::Shader()
 		:Resource(enums::eResourceType::Shader)
+		, mRasterizerState(eRasterizerState::SolidBack) 
+		, mBlendState(eBlendState::Opaque)
+		, mDepthStencilState(eDepthStencilState::LessEqual)
 	{
 	}
 
@@ -68,7 +71,7 @@ namespace ME::graphics
 	{
 		if (bWireFrame)
 		{
-			Shader* wireframeShader = Resources::Find<Shader>(L"WireFrameShader");
+			Shader* wireframeShader = Resources::Find<Shader>(L"WireFrameShader").get();
 			Microsoft::WRL::ComPtr<ID3D11VertexShader> wireframeShaderVS = wireframeShader->GetVS();
 			Microsoft::WRL::ComPtr<ID3D11PixelShader>wireframeShaderPS = wireframeShader->GetPS();
 			Microsoft::WRL::ComPtr<ID3D11RasterizerState> wireframeRasterizerState = renderer::rasterizerStates[static_cast<UINT> (eRasterizerState::WireFrame)];
@@ -91,7 +94,16 @@ namespace ME::graphics
 			GetDevice()->BindPS(mPS.Get());
 
 
-		GetDevice()->BindRasterizerState(renderer::rasterizerStates[static_cast<UINT>(mRasterizerState)].Get());
+		UINT idx = static_cast<UINT>(mRasterizerState);
+		if (idx < _countof(renderer::rasterizerStates) && renderer::rasterizerStates[idx])
+		{
+			GetDevice()->BindRasterizerState(renderer::rasterizerStates[idx].Get());
+		}
+		else
+		{
+			// 안전 대체 동작 (예: 기본 상태 바인드 또는 무시)
+			GetDevice()->BindRasterizerState(nullptr);
+		}
 		GetDevice()->BindBlendState(renderer::blendStates[static_cast<UINT>(mBlendState)].Get(), nullptr, 0xffffff);
 		GetDevice()->BindDepthStencilState(renderer::depthStencilStates[static_cast<UINT>(mDepthStencilState)].Get(), 0);
 	}

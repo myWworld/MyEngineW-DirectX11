@@ -4,6 +4,7 @@
 #include "MEResources.h"
 #include "METexture.h"
 #include "MESceneManager.h"
+#include "MEModel.h"
 #include "METitleScene.h"
 
 
@@ -76,6 +77,9 @@ namespace ME
 			Resources::Load<graphics::Texture>(L"ALIEN", L"..\\Resources\\AlienTex.png");
 			Resources::Load<graphics::Texture>(L"SOLDIER", L"..\\Resources\\SoldierTex.jpg");
 			Resources::Load<graphics::Texture>(L"HPBAR", L"..\\Resources\\Hpbar.png");
+
+			Resources::Load<Model>(L"BulletModel", L"..\\Resources\\Bullet.fbx");
+			Resources::Load<Model>(L"AlienModel", L"..\\Resources\\alien.fbx");
 			renderer::Initialize();
 
 			

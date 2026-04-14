@@ -15,9 +15,7 @@ namespace ME
 	Animation3D::Animation3D()
 		:Resource(enums::eResourceType::Animation3D)
 		, mAnimator(nullptr)
-		, mbComplete(false)
 		,mSkeleton(nullptr)
-		,mTime(0.0f)
 		,mPrevRootPos(Vector3::Zero)
 	{
 	}
@@ -37,75 +35,7 @@ namespace ME
 	void Animation3D::Update()
 	{
 
-		if (mSkeleton == nullptr)
-		{
-			if(mAnimator != nullptr)
-				mSkeleton = mAnimator->GetSkeleton();
-		}
 
-		if (mbComplete)
-			return;
-
-
-
-		mTime += Time::DeltaTime();
-
-		float timeInTicks = mTime * mTickersPerSecond;
-
-		if (timeInTicks > mDuration)
-		{
-			mbComplete = true;
-			mTime = mDuration;
-			return;
-		}
-
-		float animationTime = mTime * mTickersPerSecond;
-
-		std::unordered_set<std::string> updatedBones;
-
-		Vector3 currentRootPos = Vector3::Zero;
-
-		for (auto bones : boneAnimations)
-		{
-			if (mSkeleton == nullptr)
-				return;
-
-			int boneindex = mSkeleton->GetBoneIndexToMatchWithAnim(bones.boneName);
-
-			if (boneindex == -1)
-				continue;
-
-			math::Matrix localTransform;
-			
-			localTransform = InterpolateLocalTransform(bones, animationTime, bones.boneName);
-			mSkeleton->mBones[boneindex].mLocalTransform = localTransform;
-
-			updatedBones.insert(bones.boneName);
-			
-			if (bones.boneName == "mixamorig:Hips" || bones.boneName == "Hips")
-				currentRootPos = localTransform.Translation();
-		}
-
-		for (auto& bone : mSkeleton->mBones)
-		{
-			if (updatedBones.find(bone.mName) == updatedBones.end())
-			{
-				bone.mLocalTransform = bone.mDefaultLocalTransform; // 원래 포즈 유지
-			}
-		}
-
-		Transform* tr = mAnimator->GetOwner()->GetComponent<Transform>();
-
-		if (mAnimator->GetApplyRootMotion() && !mbComplete)
-		{
-			Vector3 delta = currentRootPos - mPrevRootPos;
-			mRootMotionTotalOffset += delta;
-			delta.y = 0;
-			tr->SetPosition(mRootMotionBasePosition + mRootMotionTotalOffset);
-		}
-		mPrevRootPos = currentRootPos;
-
-		mSkeleton->CalculateFinalTransform();
 
 	}
 
@@ -115,6 +45,63 @@ namespace ME
 	}
 
 
+	void Animation3D::UpdateAnimation(float currentTime, Skeleton* skeleton, Animator3D* animator)
+	{
+
+
+		if (skeleton == nullptr || animator == nullptr)
+			return;
+
+		float timeInTicks = currentTime * mTickersPerSecond;
+		std::unordered_set<std::string> updatedBones;
+		Vector3 currentRootPos = Vector3::Zero;
+
+
+		for (auto& bones : boneAnimations) 
+		{
+		
+			int boneindex = skeleton->GetBoneIndexToMatchWithAnim(bones.boneName);
+
+			if (boneindex == -1)
+				continue;
+
+			math::Matrix localTransform = InterpolateLocalTransform(bones, timeInTicks, bones.boneName, skeleton);
+			skeleton->mBones[boneindex].mLocalTransform = localTransform;
+
+			updatedBones.insert(bones.boneName);
+
+			if (bones.boneName == "mixamorig:Hips" || bones.boneName == "Hips")
+				currentRootPos = localTransform.Translation();
+		}
+		for (auto& bone : skeleton->mBones)
+		{
+			if (updatedBones.find(bone.mName) == updatedBones.end())
+			{
+				bone.mLocalTransform = bone.mDefaultLocalTransform;
+			}
+		}
+
+		Transform* tr = animator->GetOwner()->GetComponent<Transform>();
+
+		if (animator->GetApplyRootMotion())
+		{
+
+			Vector3 prevRootPos = animator->GetPrevRootPos();
+			Vector3 delta = currentRootPos - prevRootPos;
+
+
+			delta.y = 0;
+
+			Vector3 currentPos = tr->GetPosition();
+			tr->SetPosition(currentPos + delta);
+
+	
+			animator->SetPrevRootPos(currentRootPos);
+		}
+
+
+		skeleton->CalculateFinalTransform();
+	}
 
 	void Animation3D::CreateAnimation(const std::wstring& name, const std::wstring& path)
 	{
@@ -143,7 +130,7 @@ namespace ME
 		{
 			aiAnimation* anim = animScene->mAnimations[0];
 			CreateFromAssimp(anim);
-			mSkeleton = mAnimator->GetSkeleton();
+			
 			this->SetPath(path);
 
 		}
@@ -152,8 +139,7 @@ namespace ME
 	}
 	void Animation3D::Reset()
 	{
-		mTime = -0.0001f;
-		mbComplete = false;
+	
 		mPrevRootPos = Vector3::Zero;
 		mRootMotionTotalOffset = Vector3::Zero;
 		mRootMotionBasePosition = mAnimator->GetOwner()->GetComponent<Transform>()->GetPosition();
@@ -245,7 +231,7 @@ namespace ME
 	}
 
 
-	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime, std::string boneName)
+	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime,const std::string& boneName, Skeleton* skeleton)
 	{
 		Vector3 interpolatedPos = InterpolatePosition(boneAnim.positions, currentTime);
 
@@ -256,7 +242,7 @@ namespace ME
 		}
 
 		Quaternion interpolatedRot = InterpolateRotation(boneAnim.rotations, currentTime);
-		int boneIdx = mSkeleton->GetBoneIndex(boneName);
+		int boneIdx = skeleton->GetBoneIndex(boneName);
 
 
 		//Quaternion finalRot = interpolatedRot;
@@ -266,7 +252,7 @@ namespace ME
 		
 		if (boneIdx != -1)
 		{
-			 baseTransform = mSkeleton->mBonesTransform[boneIdx];
+			 baseTransform = skeleton->mBonesTransform[boneIdx];
 		}
 		//
 		Vector3 interpolatedScale = InterpolateScale(boneAnim.scales, currentTime);

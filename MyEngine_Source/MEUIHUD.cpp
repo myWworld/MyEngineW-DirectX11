@@ -21,7 +21,7 @@ namespace ME
 		SetSize(Vector2(3.f, 3.0f));
 
 		
-		mTexture = Resources::Find<graphics::Texture>(L"HPBAR");
+		mTexture = Resources::Find<graphics::Texture>(L"HPBAR").get();
 	}
 
 	void ME::UIHUD::OnActive()

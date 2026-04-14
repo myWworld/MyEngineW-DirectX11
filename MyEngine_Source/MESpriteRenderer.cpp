@@ -27,7 +27,7 @@ namespace ME {
 
 	void ME::SpriteRenderer::Initialize()
 	{
-		mMesh = Resources::Find<Mesh>(L"RectMesh");
+		mMesh = Resources::Find<Mesh>(L"RectMesh").get();
 	}
 
 	void ME::SpriteRenderer::Update()

@@ -49,6 +49,41 @@ namespace ME
 		Bone* GetLeftHandTransform();
 		Bone* GetRightHandTransform();
 
+	public :
+		Skeleton& operator=(const Skeleton& other)
+		{
+			if (this != &other)
+			{
+				mBones = other.mBones;
+				mBoneNameToIndexMap = other.mBoneNameToIndexMap;
+				mBonesTransform = other.mBonesTransform;
+				mRootBoneName = other.mRootBoneName;
+				mModelType = other.mModelType;
+
+				for (int i = 0; i < mBones.size(); ++i)
+				{
+		
+					if (other.mBones[i].mParent != nullptr)
+					{
+						int parentIdx = other.mBones[i].mParent->mIndex;
+						mBones[i].mParent = &mBones[parentIdx];
+					}
+					else
+					{
+						mBones[i].mParent = nullptr;
+					}
+
+					mBones[i].mChildren.clear(); 
+					for (Bone* child : other.mBones[i].mChildren)
+					{
+						int childIdx = child->mIndex;
+						mBones[i].mChildren.push_back(&mBones[childIdx]);
+					}
+				}
+			}
+			return *this;
+		}
+
 	private:
 		void updateBoneRecursive(int boneIndex, const math::Matrix& parentTransform);
 		

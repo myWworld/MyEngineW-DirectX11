@@ -26,6 +26,8 @@ namespace ME
 		void BindTextures();
 
 		void SetShader(graphics::Shader* shader) { mShader = shader; }
+		void SetShader(std::shared_ptr<graphics::Shader> shader) { mShader = shader.get(); }
+
 		void SetAlbedoTexture(graphics::Texture* texture) { mAlbedoTexture = texture; mData.albedo = texture->GetName(); }
 
 
@@ -44,6 +46,7 @@ namespace ME
 
 		graphics::eRenderingMode mMode;
 		Material::Data mData;
+
 
 	};
 

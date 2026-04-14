@@ -95,8 +95,7 @@ namespace ME
 			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 			//
 			mPlayer->AddComponent<PlayerScript>();
-			Model* model = new Model();
-			MakeCharacter(model, mPlayer);
+			MakeCharacter(mPlayer);
 
 			MakeGun(mPlayer);
 
@@ -105,8 +104,7 @@ namespace ME
 			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
 
 			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
-			Model* enemyModel = new Model();
-			MakeCharacter(enemyModel, enemy);
+			MakeCharacter(enemy);
 
 			MakeGun(enemy, true);
 		}
@@ -127,16 +125,13 @@ namespace ME
 
 	}
 
-	void TitleScene::MakeCharacter(Model* model, GameObject* player)
+	void TitleScene::MakeCharacter(GameObject* player)
 	{
-		if (model->LoadModel(L"..\\Resources\\alien.fbx"))
+		std::shared_ptr<Model> model = Resources::Find<Model>(L"AlienModel");
+
+		if (model)
 		{
 
-			//ModelRenderer* modelRenderer = mPlayer->AddComponent<ModelRenderer>();
-			//modelRenderer->SetMesh(model->GetMeshes());
-			//modelRenderer->SetMaterial(Resources::Find<Material>(L"StaticModelMaterial"));
-			//modelRenderer->SetTextures(model->GetTextures());
-			//modelRenderer->SetTexture(Resources::Find<graphics::Texture>(L"SOLDIER"));
 
 			Animator3D* animator = player->AddComponent<Animator3D>();
 			animator->SetMesh(model->GetMeshes());
@@ -165,14 +160,13 @@ namespace ME
 		}
 		else
 		{
-			delete model;
 			model = nullptr;
 		}
 	}
 
 	void TitleScene::MakeGun(GameObject* player, bool bIsEnemy )
 	{
-		Model* gun = new Model();
+		
 
 		Gun* m4 = object::Instantiate<Gun>(enums::eLayerType::Items, Vector3(0, 10, 35));
 		Transform* tr = m4->GetComponent<Transform>();
@@ -181,8 +175,9 @@ namespace ME
 		GunScript* gunScript = m4->AddComponent<GunScript>();
 		gunScript->SetGunOnwer(static_cast<Player*>(player), bIsEnemy);
 	
+		std::shared_ptr<Model> gun = Resources::Load<Model>(L"PistolModel", L"..\\Resources\\Pistol.fbx");
 
-		if (gun->LoadModel(L"..\\Resources\\Pistol.fbx"))
+		if (gun)
 		{
 
 			ModelRenderer* modelRenderer = m4->AddComponent<ModelRenderer>();
@@ -198,7 +193,7 @@ namespace ME
 		}
 		else
 		{
-			delete gun;
+	
 			gun = nullptr;
 		}
 	}

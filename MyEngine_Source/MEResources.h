@@ -1,5 +1,6 @@
 #pragma once
 #include "MEResource.h"
+#include <memory>
 
 namespace ME
 {
@@ -11,26 +12,26 @@ namespace ME
 
 		
 		template <typename T>
-		static T* Find(const std::wstring& key)
+		static std::shared_ptr<T> Find(const std::wstring& key)
 		{
 			auto iter = mResources.find(key);
 		
 			if (iter == mResources.end())
 				return nullptr;
 
-			return dynamic_cast<T*>(iter->second);
+			return std::dynamic_pointer_cast<T>(iter->second);
 		}
 	
 
 
 		template <typename T>
-		static T* Load(const std::wstring& key, const std::wstring &path)
+		static std::shared_ptr<T> Load(const std::wstring& key, const std::wstring &path)
 		{
-			T* resource = Resources::Find<T>(key);
+			std::shared_ptr<T> resource = Resources::Find<T>(key);
 			if (resource != nullptr)
 				return resource;
 
-			resource = new T();
+			resource = std::make_shared<T>();
 
 			if (FAILED(resource->Load(path)))
 			{
@@ -39,12 +40,12 @@ namespace ME
 
 			resource->SetName(key);
 			resource->SetPath(path);
-			mResources.insert({ key,resource });
+			mResources.emplace(key,resource );
 			
 			return resource;
 		}
 
-		static void Insert(const std::wstring& key, Resource* resource)
+		static void Insert(const std::wstring& key, std::shared_ptr<Resource> resource)
 		{
 			if (key == L"")
 				return;
@@ -56,18 +57,11 @@ namespace ME
 
 		static void Release()
 		{
-			for (auto& iter : mResources)
-			{
-				if(iter.second == nullptr)
-					continue;
-				
-				delete iter.second;
-				iter.second = nullptr;
-			}
+			mResources.clear();
 		}
 		
 	private:
 
-		static std::map<std::wstring, Resource*> mResources;
+		static std::unordered_map<std::wstring, std::shared_ptr<Resource>> mResources;
 	};
 }

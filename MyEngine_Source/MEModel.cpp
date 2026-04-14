@@ -11,7 +11,7 @@ namespace ME
     using namespace math;
 
     Model::Model()
-        :mModelType(enums::eModelType::Static)
+        :Resource(enums::eResourceType::Model),mModelType(enums::eModelType::Static)
     {}
 
     Model::~Model()
@@ -32,7 +32,7 @@ namespace ME
 	        texture = nullptr;
 		}
     }
-    bool Model::LoadModel(const std::wstring& path)
+    HRESULT Model::Load(const std::wstring& path)
     {
         Assimp::Importer importer;
         std::string path_str = std::string(path.begin(), path.end());
@@ -57,7 +57,7 @@ namespace ME
         {
             std::string str = importer.GetErrorString();
     
-            return false;
+            return E_FAIL;
         }
 
        
@@ -73,7 +73,12 @@ namespace ME
             mSkeleton.RegisterSkinData(scene);
         }
 
-        return true;
+        return S_OK;
+    }
+
+    HRESULT Model::Save(const std::wstring& path)
+    {
+		return E_NOTIMPL;
     }
 
     void Model::ProcessNode(aiNode* node, const aiScene* scene)
