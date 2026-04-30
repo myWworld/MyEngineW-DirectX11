@@ -19,10 +19,24 @@ namespace ME
 		virtual void Render();
 		virtual void Destroy();
 
-		void AddGameObject(GameObject* gameObject);
-		void EraseGameObject(GameObject* eraseGameObj);
+		void AddGameObject(std::unique_ptr<GameObject> gameObject);
+		void EraseGameObject(GameObject* obj);
+		std::unique_ptr<GameObject> ExtractGameObject(GameObject* gameObj);
 
-		const std::vector<GameObject*> GetGameObject() { return mGameObjects;  }
+		const std::vector<GameObject*> GetGameObject() 
+		{
+			std::vector<GameObject*> mGameObjPtrs;
+
+			for (auto& gameOBj : mGameObjects)
+				{
+					if (gameOBj == nullptr)
+						continue;
+
+					mGameObjPtrs.push_back(gameOBj.get());
+				}
+
+			return mGameObjPtrs;
+		}
 
 	private:
 
@@ -33,7 +47,7 @@ namespace ME
 	
 	private:
 
-		std::vector<GameObject*> mGameObjects;
+		std::vector<std::unique_ptr<GameObject>> mGameObjects;
 		
 
 	};

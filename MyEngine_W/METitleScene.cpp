@@ -49,15 +49,6 @@ namespace ME
 
 		Scene::Initialize();
 
-		GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, Vector3(0, 0, 0));
-
-		Camera* cameraComp = camera->AddComponent<Camera>();
-		cameraComp->SetProjectionMatrix(Camera::eProjectionType::Perspective);
-		cameraComp->SetSize(1000.0f);
-
-		CameraScript* cameraScript = camera->AddComponent<CameraScript>();
-		renderer::mainCamera = cameraComp;
-
 		CollisionManager::CollisionLayerCheck(enums::eLayerType::Player, enums::eLayerType::Bullet, true);
 		CollisionManager::CollisionLayerCheck(enums::eLayerType::Bullet, enums::eLayerType::Player, true);
 
@@ -82,6 +73,17 @@ namespace ME
 
 	void TitleScene::OnEnter()
 	{
+
+		
+			GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, Vector3(0, 0, 0));
+
+			Camera* cameraComp = camera->AddComponent<Camera>();
+			cameraComp->SetProjectionMatrix(Camera::eProjectionType::Perspective);
+			cameraComp->SetSize(1000.0f);
+
+			CameraScript* cameraScript = camera->AddComponent<CameraScript>();
+			renderer::mainCamera = cameraComp;
+		
 		if (!mPlayer)
 		{
 
@@ -119,6 +121,20 @@ namespace ME
 
 	void TitleScene::OnExit()
 	{
+		if (mPlayer)
+		{
+			object::Destroy(mPlayer);
+			mPlayer = nullptr;
+		}
+
+
+		if (renderer::mainCamera != nullptr)
+		{
+			GameObject* obj = renderer::mainCamera->GetOwner();
+			object::Destroy(obj);
+			renderer::mainCamera = nullptr;
+		}
+
 		UIManager::Pop(enums::eUIType::Button);
 
 		Scene::OnExit();
@@ -135,6 +151,7 @@ namespace ME
 
 			Animator3D* animator = player->AddComponent<Animator3D>();
 			animator->SetMesh(model->GetMeshes());
+			player->SetModel(model);
 
 		//	Rigidbody* rb = mPlayer->AddComponent<Rigidbody>();
 			Collider* col = player->AddComponent<BoxCollider3D>();
@@ -173,6 +190,8 @@ namespace ME
 		//tr->SetScale(Vector3(7.0f, 7.0f, 7.0f));
 	//	tr->SetRotation(Vector3(0.0f, 180.0f, 0.0f));
 		GunScript* gunScript = m4->AddComponent<GunScript>();
+
+		
 		gunScript->SetGunOnwer(static_cast<Player*>(player), bIsEnemy);
 	
 		std::shared_ptr<Model> gun = Resources::Load<Model>(L"PistolModel", L"..\\Resources\\Pistol.fbx");

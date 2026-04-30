@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
+    <ClInclude Include="MEActorScript.h" />
     <ClInclude Include="MEBulletScript.h" />
     <ClInclude Include="MECameraScript.h" />
     <ClInclude Include="MEEnemyScript.h" />
@@ -33,9 +34,11 @@
     <ClInclude Include="METile.h" />
     <ClInclude Include="METitleScene.h" />
     <ClInclude Include="METoolScene.h" />
+    <ClInclude Include="MEWeaponScript.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bullet.cpp" />
+    <ClCompile Include="MEActorScript.cpp" />
     <ClCompile Include="MEBulletScript.cpp" />
     <ClCompile Include="MECameraScript.cpp" />
     <ClCompile Include="MEEnemyScript.cpp" />
@@ -48,6 +51,7 @@
     <ClCompile Include="METile.cpp" />
     <ClCompile Include="METitleScene.cpp" />
     <ClCompile Include="METoolScene.cpp" />
+    <ClCompile Include="MEWeaponScript.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

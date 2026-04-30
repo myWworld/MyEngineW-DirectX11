@@ -4,19 +4,19 @@
 namespace ME
 {
 
-	std::map<std::wstring, Scene*> SceneManager::mScene = {};
+	std::map<std::wstring, std::unique_ptr<Scene>> SceneManager::mScene = {};
 	Scene* SceneManager::mActiveScene = nullptr;
 	Scene* SceneManager::mDontDestroyOnLoad = nullptr;
 
 
 	bool SceneManager::SetActiveScene(const std::wstring& name)
 	{
-		std::map<std::wstring, Scene*>::iterator iter = mScene.find(name);
+		std::map<std::wstring, std::unique_ptr<Scene>>::iterator iter = mScene.find(name);
 
 		if (iter == mScene.end())
 			return false;
 
-		mActiveScene = iter->second;
+		mActiveScene = iter->second.get();
 		return true;
 	}
 
@@ -44,14 +44,22 @@ namespace ME
 
 	std::vector<GameObject*> SceneManager::GetGameObject(enums::eLayerType layer)
 	{
-		
-		std::vector<GameObject*>  gameObjects = mActiveScene->GetLayer(layer)->GetGameObject();
+		std::vector<GameObject*> outList;
 
-		std::vector<GameObject*>  dontDestroyOnLoad = mActiveScene->GetLayer(layer)->GetGameObject();
 
-		gameObjects.insert(gameObjects.end(),dontDestroyOnLoad.begin(), dontDestroyOnLoad.end());
+		const auto& activeObjs = mActiveScene->GetLayer(layer)->GetGameObject();
+		for (auto& uPtr : activeObjs)
+		{
+			outList.push_back(uPtr); 
+		}
 
-		return gameObjects;
+		const auto& dontDestroyObjs = mDontDestroyOnLoad->GetLayer(layer)->GetGameObject();
+		for (auto& uPtr : dontDestroyObjs)
+		{
+			outList.push_back(uPtr);
+		}
+
+		return outList;
 
 	}
 
@@ -82,7 +90,7 @@ namespace ME
 	{
 		for (auto& iter : mScene)
 		{
-			delete iter.second;
+			iter.second.release();
 			iter.second = nullptr;
 		}
 	}

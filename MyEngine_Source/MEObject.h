@@ -12,51 +12,56 @@ namespace ME::object
 	template <typename T>
 	static T* Instantiate(ME::enums::eLayerType type)
 	{
-		T* gameObject = new T();
+		std::unique_ptr<T> gameObject = std::make_unique<T>();
 		gameObject->SetLayerType(type);
+		T* gameObjectPtr = gameObject.get();
+
 		Scene* activeScene = SceneManager::GetActiveScene();
 		Layer* layer = activeScene->GetLayer(type);
 		
-		layer->AddGameObject(gameObject);
+		layer->AddGameObject(std::move(gameObject));
 
-		return gameObject;
+		return gameObjectPtr;
 		
 	}
 
 	template <typename T>
 	static T* Instantiate(ME::enums::eLayerType type, math::Vector3 position)
 	{
-		T* gameObject = new T();
+		T* gameObjectPtr = Instantiate<T>(type);
 
-		gameObject->SetLayerType(type);
-
-		Scene* activeScene = SceneManager::GetActiveScene();
-		Layer* layer = activeScene->GetLayer(type);
-
-		layer->AddGameObject(gameObject);
-
-		Transform* tr = gameObject->GetComponent<Transform>();
+		Transform* tr = gameObjectPtr->GetComponent<Transform>();
 		tr->SetPosition(position);
 
 
 		 
-		return gameObject;
+		return gameObjectPtr;
 
 	}
 
 	static void Destroy(GameObject* obj)
 	{
-		obj->SetDeath();
+		if (obj != nullptr)
+		{
+			obj->SetDeath();
+		}
 	}
 
 	static void DontDestroyOnLoad(GameObject* gameObject)
 	{
 		Scene* activeScene = SceneManager::GetActiveScene();
 
-		activeScene->EraseGameObject(gameObject);
+		enums::eLayerType layerType = gameObject->GetLayerType();
 
-		Scene* dontDestroyOnLoad = SceneManager::GetDontDestroyOnLoad();
-		dontDestroyOnLoad->AddGameObject(gameObject, gameObject->GetLayerType());
+		//현재 씬의 레이어에서 해당 객체의 소유권을 찾아옴
+		std::unique_ptr<GameObject> movedObj = activeScene->GetLayer(layerType)->ExtractGameObject(gameObject);
+		
+		if (movedObj)
+		{
+			// DontDestroyOnLoad 씬으로 소유권을 완전히 이전
+			Scene* dontDestroyOnLoad = SceneManager::GetDontDestroyOnLoad();
+			dontDestroyOnLoad->AddGameObject(std::move(movedObj), layerType);
+		}
 	}
 
 

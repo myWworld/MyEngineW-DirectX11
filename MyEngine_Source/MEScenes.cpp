@@ -12,26 +12,23 @@ namespace ME
 	}
 	Scene::~Scene()
 	{
-		for (Layer* layer : mLayers)
-		{
-			if (layer == nullptr)
-				continue;
-
-			delete layer;
-			layer = nullptr;
-		}
+	
 	}
 
 	void Scene::Initialize()
 	{
-		const std::wstring& sceneName = GetName();
-		SceneManager::SetActiveScene(sceneName);
+		for (auto& layer : mLayers)
+		{
+			if (layer == nullptr) continue;
+			layer->Initialize();
+		}
+	
 	}
 
 	void Scene::Update()
 	{
 
-		for (Layer* layer : mLayers)
+		for (auto& layer : mLayers)
 		{
 			if (layer == nullptr)
 				continue;
@@ -42,7 +39,7 @@ namespace ME
 	void Scene::LateUpdate()
 	{
 
-		for (Layer* layer : mLayers)
+		for (auto& layer : mLayers)
 		{
 			if (layer == nullptr)
 				continue;
@@ -53,7 +50,7 @@ namespace ME
 	void Scene::Render()
 	{
 		
-			for (Layer* layer : mLayers)
+			for (auto& layer : mLayers)
 			{
 				if (layer == nullptr)
 					continue;
@@ -63,8 +60,7 @@ namespace ME
 	}
 	void Scene::Destroy()
 	{
-
-		for (Layer* layer : mLayers)
+		for (auto& layer : mLayers)
 		{
 			if (layer == nullptr)
 				continue;
@@ -82,9 +78,11 @@ namespace ME
 		CollisionManager::Clear();
 	}
 
-	void Scene::AddGameObject(GameObject* gameObject, const enums::eLayerType type)
+	void Scene::AddGameObject(std::unique_ptr<GameObject> gameObject, const enums::eLayerType type)
 	{
-		mLayers[(UINT)type]->AddGameObject(gameObject);
+		if (gameObject == nullptr) return;
+
+		mLayers[(UINT)type]->AddGameObject(std::move(gameObject));
 	}
 
 	void Scene::EraseGameObject(GameObject* gameObj)
@@ -99,7 +97,7 @@ namespace ME
 
 		for (size_t i = 0; i < (UINT)enums::eLayerType::Max; i++)
 		{
-			mLayers[i] = new Layer();
+			mLayers[i] = std::make_unique<Layer>();
 		}
 	}
 }

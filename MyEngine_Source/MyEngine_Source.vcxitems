@@ -30,6 +30,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MECircleCollider2D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECollider.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MECollisionManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MECommand.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEComponent.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEConstantBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEDontDestroyOnLoad.h" />
@@ -42,6 +43,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphics.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEIndexBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInput.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEInputHandler.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInputLayout.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MELayer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMaterial.h" />
@@ -98,6 +100,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEIndexBuffer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEInput.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEInputHandler.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEInputLayout.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MELayer.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMaterial.cpp" />

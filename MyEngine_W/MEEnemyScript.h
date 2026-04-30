@@ -1,5 +1,5 @@
 #pragma once
-#include "../MyEngine_Source/MEScript.h"
+#include "MEActorScript.h"	
 #include "MEMath.h"
 #include "MECamera.h"
 #include "MEBone.h"
@@ -8,7 +8,7 @@ namespace ME
 {
 
 
-	class EnemyScript :public Script
+	class EnemyScript :public ActorScript
 	{
 	public:
 
@@ -50,6 +50,9 @@ namespace ME
 		void OnCollisionStay(Collider* other) override ;
 		void OnCollisionExit(Collider* other) override ;
 
+		void OnPrimaryAction() override;
+		void OnToggleWeapon() override;
+
 		bool IsMoving() { return mbIsMoving; }
 		bool IsUsingGun() { return mbHoldingGun; }
 
@@ -80,7 +83,6 @@ namespace ME
 		bool mbIsMoving;
 
 		bool mbUseHands = true;
-		bool mbHoldingGun = true;
 
 		State mState = State::Idle;
 		Direction mDirection = Direction::Forward;

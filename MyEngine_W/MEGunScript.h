@@ -31,6 +31,8 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
+		void Fire();
+
 		void SetGunOnwer(Player* player, bool bIsEnemy = false)
 		{
 			mOwner = player;
@@ -61,6 +63,9 @@ namespace ME
 
 
 		 Player* mOwner;
+		 Transform* mPlayerTransform;
+		 Transform* mGunTransform;
+
 		 PlayerScript * mPlayerScript;
 		 EnemyScript* mEnemyScript;
 

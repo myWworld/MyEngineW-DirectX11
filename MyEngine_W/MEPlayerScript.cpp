@@ -5,6 +5,7 @@
 #include "METime.h"
 #include "MEAnimator3D.h"
 #include "MERenderer.h"
+#include "MEInputHandler.h"
 
 namespace ME
 {
@@ -13,6 +14,9 @@ namespace ME
         , mMouseSpeed(0.5f)
         , mbIsMoving(false)
         , mPlayerType(PlayerType::Player)
+		, mPlayerTransform(nullptr)
+		, mAnimator(nullptr)
+		, mInputHandler()
     {
     }
     PlayerScript::~PlayerScript()
@@ -28,6 +32,11 @@ namespace ME
             mAnimator = GetOwner()->GetComponent< Animator3D>();
         }
 
+        if (mPlayerTransform == nullptr)
+        {
+            mPlayerTransform = GetOwner()->GetComponent<Transform>();
+        }
+
         if (mbUseHands)
         {
             if (mLeftHandBone == nullptr && mRightHandBone == nullptr)
@@ -38,7 +47,15 @@ namespace ME
             }
         }
 
-        Translate();
+		ICommand* command = mInputHandler.HandleActionInput();
+        if(command)
+        {
+            command->Execute(GetOwner());
+		}
+
+        Vector2 moveInput = mInputHandler.GetMovementAxis();
+
+        Translate(moveInput);
 
    
         switch (mState)
@@ -88,6 +105,19 @@ namespace ME
     {
     }
 
+    void PlayerScript::OnPrimaryAction()
+    {
+        if (mbHoldingGun)
+        {
+
+        }
+    }
+
+    void PlayerScript::OnToggleWeapon()
+    {
+		ActorScript::OnToggleWeapon();
+    }
+
     void  PlayerScript::Idle()
     {
         mAnimator->PlayAnimation(L"PISTOLIDLE");
@@ -113,71 +143,34 @@ namespace ME
 
     }
 
-    void PlayerScript::Translate()
+    void PlayerScript::Translate(math::Vector2 moveAxis)
     {
-        directionChange();
-
-        Transform* tr = GetOwner()->GetComponent<Transform>();
-        Vector3 pos = tr->GetPosition();
-
-
-            bool forward = Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W);
-            bool back = Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S);
-            bool left = Input::GetKey(eKeyCode::Left) || Input::GetKey(eKeyCode::A);
-            bool right = Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D);
-
-            if (Input::GetKeyDown(eKeyCode::T))
-            {
-                if (mbHoldingGun == false)
-                    mbHoldingGun = true;
-                else
-                    mbHoldingGun = false;
-            }
-
-            if (!forward && !back && !left && !right)
-            {
-                mState = State::Idle;
-                mbIsMoving = false;
-                return;
-            }
-            else
-            {
-
-                if (left)
-                {
-                    pos += 150.0f* tr->Forward() * Time::DeltaTime();
-                    mTargetDirection = Direction::Left;
-                }
-                if (Input::GetKey(eKeyCode::Right) || Input::GetKey(eKeyCode::D))
-                {
-                    pos += 150.0f * tr->Forward() * Time::DeltaTime();
-                    mTargetDirection = Direction::Right;
-                }
-                if (Input::GetKey(eKeyCode::Up) || Input::GetKey(eKeyCode::W))
-                {
-                    pos += 150.0f * tr->Forward() * Time::DeltaTime();
-                    mTargetDirection = Direction::Forward;
-
-                }
-                if (Input::GetKey(eKeyCode::Down) || Input::GetKey(eKeyCode::S))
-                {
-                    mTargetDirection = Direction::Back;
-                    pos += 150.0f * tr->Forward() * Time::DeltaTime();
-                }
-
-            }
-
-  
-         //   directionChange();
-
-        
-          
-            mbIsMoving = true;
-            mState = State::Walk;
        
-            mDirection = mTargetDirection;
-      
-            tr->SetPosition(pos);
+ 
+        if (moveAxis.x == 0 && moveAxis.y == 0)
+        {
+            mState = State::Idle;
+            mbIsMoving = false;
+            return;
+        }
+
+        if (mPlayerTransform == nullptr) return;
+
+        if (moveAxis.y > 0) mTargetDirection = Direction::Forward;
+        else if (moveAxis.y < 0) mTargetDirection = Direction::Back;
+        else if (moveAxis.x > 0) mTargetDirection = Direction::Right;
+        else if (moveAxis.x < 0) mTargetDirection = Direction::Left;
+
+            
+        Vector3 pos = mPlayerTransform->GetPosition();
+        pos += 150.0f * mPlayerTransform->Forward() * Time::DeltaTime();
+        mPlayerTransform->SetPosition(pos);
+
+        mbIsMoving = true;
+        mState = State::Walk;
+        mDirection = mTargetDirection;
+
+        directionChange();
         
 
 
@@ -205,9 +198,12 @@ namespace ME
 
     void PlayerScript::directionChange()
     {
+		if (mPlayerTransform == nullptr)
+        {
+            mPlayerTransform = GetOwner()->GetComponent<Transform>();
+        }
         
-        
-        Transform* tr = GetOwner()->GetComponent<Transform>();
+       
 
         Vector3 camForward = renderer::mainCamera->GetForward();
         camForward.y = 0.0f;
@@ -218,38 +214,13 @@ namespace ME
             float yawRad = atan2f(camForward.x, camForward.z);
             float yawDeg = XMConvertToDegrees(yawRad);
 
-            Vector3 rt = tr->GetRotation();
+            Vector3 rt = mPlayerTransform->GetRotation();
             rt.y = yawDeg;
-            tr->SetRotation(rt);
+            mPlayerTransform->SetRotation(rt);
         }
 
 
-        //if (mDirection == Direction::Forward && mTargetDirection == Direction::Back
-        //    || mDirection == Direction::Back && mTargetDirection == Direction::Forward
-        //    || mDirection == Direction::Left && mTargetDirection == Direction::Right
-        //    || mDirection == Direction::Right && mTargetDirection == Direction::Left)
-        //{
-        //    curRotation.y += 180.0f;
-        //    tr->SetRotation(curRotation);
-        //}
-        //else if (mDirection == Direction::Forward && mTargetDirection == Direction::Left
-        //    || mDirection == Direction::Left && mTargetDirection == Direction::Back
-        //    || mDirection == Direction::Back && mTargetDirection == Direction::Right
-        //    || mDirection == Direction::Right && mTargetDirection == Direction::Forward)
-        //{
-        //    curRotation.y -= 90.0f;
-        //    tr->SetRotation(curRotation);
-        //}
-        //else if (mDirection == Direction::Forward && mTargetDirection == Direction::Right
-        //    || mDirection == Direction::Right && mTargetDirection == Direction::Back
-        //    || mDirection == Direction::Back && mTargetDirection == Direction::Left
-        //    || mDirection == Direction::Left && mTargetDirection == Direction::Forward)
-        //{
-        //    curRotation.y += 90.0f;
-        //    tr->SetRotation(curRotation);
-        //}
-        //else if (mDirection == mTargetDirection)
-        //    return;
+    
         
     }
 

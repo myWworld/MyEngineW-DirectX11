@@ -1,14 +1,18 @@
 #pragma once
-#include "../MyEngine_Source/MEScript.h"
+#include "MEActorScript.h"
 #include "MEMath.h"
 #include "MECamera.h"
 #include "MEBone.h"
+#include "MEInputHandler.h"
 
 namespace ME
 {
 
+	class Transform;
+	class InputHandler;
+	class GunScript;
 
-	class PlayerScript :public Script
+	class PlayerScript :public ActorScript
 	{
 	public:
 		
@@ -56,6 +60,9 @@ namespace ME
 		void OnCollisionStay(Collider* other) override;
 		void OnCollisionExit(Collider* other) override;
 		
+		void OnPrimaryAction() override;
+		void OnToggleWeapon() override;
+
 		bool IsMoving() { return mbIsMoving; }
 		bool IsUsingGun() { return mbHoldingGun; }
 
@@ -67,6 +74,13 @@ namespace ME
 			mPlayerType = type;
 		}
 
+		void SetWeaponEquipment(GunScript* gun)
+		{
+			mEquippedGun = gun;
+		}
+
+
+
 	private:
 
 		void Idle();
@@ -74,7 +88,7 @@ namespace ME
 		void Attack();
 		void Die();
 
-		void Translate();
+		void Translate(math::Vector2 moveAxis);
 		void randomAction();
 
 		void directionChange();
@@ -90,18 +104,20 @@ namespace ME
 		bool mbIsMoving;
 
 		bool mbUseHands = true;
-		bool mbHoldingGun = false;
 
 		State mState = State::Idle;
 		Direction mDirection = Direction::Forward;
 		Direction mTargetDirection = Direction::Forward;
 
+		Transform* mPlayerTransform;
 	
 
 		Bone* mLeftHandBone;
 		Bone* mRightHandBone;
 
+		GunScript* mEquippedGun = nullptr;
 		PlayerType mPlayerType;
+		InputHandler mInputHandler;
 	};
 
 }

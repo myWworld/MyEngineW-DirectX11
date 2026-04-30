@@ -39,6 +39,10 @@
       <Filter>Script\Others</Filter>
     </ClInclude>
     <ClInclude Include="MEEnemyScript.h" />
+    <ClInclude Include="MEActorScript.h">
+      <Filter>Script\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="MEWeaponScript.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -96,5 +100,9 @@
       <Filter>Script\Others</Filter>
     </ClCompile>
     <ClCompile Include="MEEnemyScript.cpp" />
+    <ClCompile Include="MEActorScript.cpp">
+      <Filter>Script\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="MEWeaponScript.cpp" />
   </ItemGroup>
 </Project>

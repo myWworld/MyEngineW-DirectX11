@@ -13,7 +13,9 @@ namespace ME
         , mMouseSpeed(0.5f)
         , mbIsMoving(false)
         ,translateTimer(2.5f)
+		
     {
+		mbHoldingGun = true;
     }
     EnemyScript::~EnemyScript()
     {
@@ -27,11 +29,10 @@ namespace ME
         {
             mAnimator = GetOwner()->GetComponent< Animator3D>();
         }
-
-        if (mbHoldingGun == false)
-            mbHoldingGun = true;
         
         translateTime += Time::DeltaTime();
+
+        OnToggleWeapon();
 
         if (mbUseHands)
         {
@@ -80,6 +81,18 @@ namespace ME
     {
     }
 
+    void EnemyScript::OnPrimaryAction()
+    {
+
+    }
+
+    void EnemyScript::OnToggleWeapon()
+    {
+        if(!mbHoldingGun)
+            ActorScript::OnToggleWeapon();
+
+
+    }
   
     void  EnemyScript::Idle()
     {

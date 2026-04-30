@@ -10,12 +10,14 @@ namespace ME
 		template<typename T>
 		static Scene* CreateScene(const std::wstring& name)
 		{
-			T* scene = new T();
-			mScene.insert({ name, scene });
+			std::unique_ptr<T> scene = std::make_unique<T>();
 			scene->SetName(name);
 			scene->Initialize();
+			T* scenePtr = scene.get();
 
-			return scene;
+			mScene.insert({ name,std::move(scene)});
+
+			return scenePtr;
 		}
 
 
@@ -37,7 +39,7 @@ namespace ME
 
 	private:
 		
-		static std::map<std::wstring, Scene*> mScene;
+		static std::map<std::wstring, std::unique_ptr<Scene>> mScene;
 		static Scene* mActiveScene;
 		static Scene* mDontDestroyOnLoad;
 	};

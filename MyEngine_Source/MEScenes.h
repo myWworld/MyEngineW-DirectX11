@@ -26,15 +26,15 @@ namespace ME
 		virtual void OnEnter();
 		virtual void OnExit();
 
-		void AddGameObject(GameObject* gameObject, const enums::eLayerType type);
+		void AddGameObject(std::unique_ptr<GameObject> gameObject, const enums::eLayerType type);
 		void EraseGameObject(GameObject* gameObj);
 
-		Layer* GetLayer(const enums::eLayerType type) { return mLayers[(UINT)type]; }
+		Layer* GetLayer(const enums::eLayerType type) { return mLayers[(UINT)type].get(); }
 
 	private: 
 		void createLayers();
 	private:
-		std::vector<Layer*> mLayers;
+		std::vector<std::unique_ptr<Layer>> mLayers;
 	};
 
 }
