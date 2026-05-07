@@ -10,7 +10,7 @@ namespace ME
 
 	class Transform;
 	class InputHandler;
-	class GunScript;
+	class WeaponScript;
 
 	class PlayerScript :public ActorScript
 	{
@@ -64,19 +64,16 @@ namespace ME
 		void OnToggleWeapon() override;
 
 		bool IsMoving() { return mbIsMoving; }
-		bool IsUsingGun() { return mbHoldingGun; }
 
 		Bone* GetLeftHandBone() { return mLeftHandBone; }
 		Bone* GetRightHandBone() { return mRightHandBone; }
 
-		void SetPlayerType(PlayerType type)
-		{
-			mPlayerType = type;
-		}
+		Bone* GetWeaponSocketBone() override;
+		Vector3 GetAimDirection() override;
 
-		void SetWeaponEquipment(GunScript* gun)
+		void SetWeaponEquipment(WeaponScript* weapon)
 		{
-			mEquippedGun = gun;
+			mEquippedWeapon = weapon;
 		}
 
 
@@ -115,7 +112,6 @@ namespace ME
 		Bone* mLeftHandBone;
 		Bone* mRightHandBone;
 
-		GunScript* mEquippedGun = nullptr;
 		PlayerType mPlayerType;
 		InputHandler mInputHandler;
 	};

@@ -3,6 +3,8 @@
 
 namespace ME
 {
+	class Bone;
+	class WeaponScript;
 	class ActorScript: public Script
 	{
 
@@ -10,13 +12,23 @@ namespace ME
 		
 
 		virtual void OnPrimaryAction() = 0;
+		virtual Bone* GetWeaponSocketBone() = 0;
+		virtual Vector3 GetAimDirection() = 0;
+		bool IsUsingWeapon() { return mbHoldingWeapon; }
+
 		virtual void OnToggleWeapon()
 		{
-			mbHoldingGun = !mbHoldingGun;
+			mbHoldingWeapon = !mbHoldingWeapon;
+		}
+
+		virtual void SetWeaponEquipment(WeaponScript* weapon)
+		{
+			mEquippedWeapon = weapon;
 		}
 
 	protected:
-		bool mbHoldingGun = false;
+		bool mbHoldingWeapon = false;
+		WeaponScript* mEquippedWeapon;
 
 	};
 }

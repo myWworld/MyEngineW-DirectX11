@@ -108,7 +108,7 @@ namespace ME
 			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
 			MakeCharacter(enemy);
 
-			MakeGun(enemy, true);
+			MakeGun(enemy);
 		}
 
 
@@ -181,7 +181,7 @@ namespace ME
 		}
 	}
 
-	void TitleScene::MakeGun(GameObject* player, bool bIsEnemy )
+	void TitleScene::MakeGun(GameObject* player  )
 	{
 		
 
@@ -192,7 +192,7 @@ namespace ME
 		GunScript* gunScript = m4->AddComponent<GunScript>();
 
 		
-		gunScript->SetGunOnwer(static_cast<Player*>(player), bIsEnemy);
+		gunScript->SetOnwer(player);
 	
 		std::shared_ptr<Model> gun = Resources::Load<Model>(L"PistolModel", L"..\\Resources\\Pistol.fbx");
 

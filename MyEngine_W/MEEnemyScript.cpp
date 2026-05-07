@@ -5,6 +5,7 @@
 #include "METime.h"
 #include "MEAnimator3D.h"
 #include "MERenderer.h"
+#include "MEWeaponScript.h"
 
 namespace ME
 {
@@ -15,7 +16,6 @@ namespace ME
         ,translateTimer(2.5f)
 		
     {
-		mbHoldingGun = true;
     }
     EnemyScript::~EnemyScript()
     {
@@ -83,12 +83,15 @@ namespace ME
 
     void EnemyScript::OnPrimaryAction()
     {
-
+        if (mbHoldingWeapon)
+        {
+            mEquippedWeapon->Use();
+        }
     }
 
     void EnemyScript::OnToggleWeapon()
     {
-        if(!mbHoldingGun)
+        if(!mbHoldingWeapon)
             ActorScript::OnToggleWeapon();
 
 
@@ -158,9 +161,10 @@ namespace ME
         default:
             break;
         }
-
-        dir.Normalize();
-        pos += dir * 150.0f * Time::DeltaTime();
+        if (dir.LengthSquared() > 0.0f)
+        {
+            dir.Normalize();
+            pos += dir * 150.0f * Time::DeltaTime();
 
             mbIsMoving = true;
             mState = State::Patrol;
@@ -168,12 +172,13 @@ namespace ME
             mDirection = mTargetDirection;
 
             tr->SetPosition(pos);
-        
+
             if (mbTurn == false)
             {
                 directionChange(dir);
                 mbTurn = true;
             }
+        }
 
     }
 
@@ -186,6 +191,10 @@ namespace ME
         Transform* tr = GetOwner()->GetComponent<Transform>();
 
         Vector3 curDir = tr->Forward();
+
+        float dotProduct = curDir.Dot(newDir);
+        if (dotProduct > 1.0f) dotProduct = 1.0f;
+        if (dotProduct < -1.0f) dotProduct = -1.0f;
 
         float angle = Degree((acos(curDir.Dot(newDir))));
 
@@ -212,48 +221,7 @@ namespace ME
             tr->SetRotation(rt);
         }
 
-        //Vector3 camForward = renderer::mainCamera->GetForward();
-        //camForward.y = 0.0f;
-        //camForward.Normalize();
-        //
-        //if (camForward.LengthSquared() > 0.0001f)
-        //{
-        //    float yawRad = atan2f(camForward.x, camForward.z);
-        //    float yawDeg = XMConvertToDegrees(yawRad);
-        //
-        //    Vector3 rt = tr->GetRotation();
-        //    rt.y = yawDeg;
-        //    tr->SetRotation(rt);
-        //}
-
-
-        //if (mDirection == Direction::Forward && mTargetDirection == Direction::Back
-        //    || mDirection == Direction::Back && mTargetDirection == Direction::Forward
-        //    || mDirection == Direction::Left && mTargetDirection == Direction::Right
-        //    || mDirection == Direction::Right && mTargetDirection == Direction::Left)
-        //{
-        //    curRotation.y += 180.0f;
-        //    tr->SetRotation(curRotation);
-        //}
-        //else if (mDirection == Direction::Forward && mTargetDirection == Direction::Left
-        //    || mDirection == Direction::Left && mTargetDirection == Direction::Back
-        //    || mDirection == Direction::Back && mTargetDirection == Direction::Right
-        //    || mDirection == Direction::Right && mTargetDirection == Direction::Forward)
-        //{
-        //    curRotation.y -= 90.0f;
-        //    tr->SetRotation(curRotation);
-        //}
-        //else if (mDirection == Direction::Forward && mTargetDirection == Direction::Right
-        //    || mDirection == Direction::Right && mTargetDirection == Direction::Back
-        //    || mDirection == Direction::Back && mTargetDirection == Direction::Left
-        //    || mDirection == Direction::Left && mTargetDirection == Direction::Forward)
-        //{
-        //    curRotation.y += 90.0f;
-        //    tr->SetRotation(curRotation);
-        //}
-        //else if (mDirection == mTargetDirection)
-        //    return;
-
+     
     }
     void EnemyScript::randomState()
     {
@@ -277,6 +245,12 @@ namespace ME
                 mState = State::Attack;
             }
         
+    }
+
+
+    Vector3 EnemyScript::GetAimDirection()
+    {
+        return GetOwner()->GetComponent<Transform>()->Forward();
     }
 
     void EnemyScript::OnCollisionEnter(Collider* other)

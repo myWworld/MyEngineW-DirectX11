@@ -3,25 +3,17 @@
 #include "MEMath.h"
 #include "MECamera.h"
 
-#include "MEPlayer.h"
-#include "MEPlayerScript.h"
-#include "MEEnemyScript.h"
+#include "MEWeaponScript.h"
 #include "MEObjectPool.h"
 
 namespace ME
 {
 
 
-	class GunScript :public Script
+	class GunScript :public WeaponScript
 	{
 	public:
 
-		enum class PlayerType
-		{
-			Player,
-			Enemy,
-			End,
-		};
 
 		GunScript();
 		~GunScript();
@@ -31,29 +23,11 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
+		void Use() override { Fire(); }
 		void Fire();
 
-		void SetGunOnwer(Player* player, bool bIsEnemy = false)
-		{
-			mOwner = player;
-
-			if (bIsEnemy == false)
-			{
-				mPlayerType = PlayerType::Player;
-				mPlayerScript = mOwner->GetComponent<PlayerScript>();
-			}
-			else
-			{
-				mPlayerType = PlayerType::Enemy;
-				mEnemyScript = mOwner->GetComponent<EnemyScript>();
-			}
-		
-		}
-
-
-		Player* GetGunOwner() { return mOwner; }
-
 	private:
+
 
 		GameObject* makeBullet();
 		void shootBullet();
@@ -62,26 +36,15 @@ namespace ME
 	private:
 
 
-		 Player* mOwner;
-		 Transform* mPlayerTransform;
-		 Transform* mGunTransform;
-
-		 PlayerScript * mPlayerScript;
-		 EnemyScript* mEnemyScript;
-
-		 PlayerType mPlayerType;
-
-		 Vector3 mPrevPlayerPos = Vector3::Zero;
-		 Vector3 mCurPlayerPos = Vector3::Zero;
+	
+		Transform* mGunTransform = nullptr;
+	
 
 		 float mCoolDownTime;
 		 float mCoolDownTimer;
-
-		 ObjectPool<GameObject>* mBulletPool;
 		 bool mbCanShoot;
 
-		 float mCoolDownTimeForEnemy;
-		 float mCoolDownTimerForEnemy;
+		 std::unique_ptr<ObjectPool<GameObject>> mBulletPool;
 
 	};
 

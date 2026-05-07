@@ -6,6 +6,7 @@
 #include "MEAnimator3D.h"
 #include "MERenderer.h"
 #include "MEInputHandler.h"
+#include "MEWeaponScript.h"
 
 namespace ME
 {
@@ -107,15 +108,20 @@ namespace ME
 
     void PlayerScript::OnPrimaryAction()
     {
-        if (mbHoldingGun)
+        if (mbHoldingWeapon)
         {
-
+            mEquippedWeapon->Use();
         }
     }
 
     void PlayerScript::OnToggleWeapon()
     {
 		ActorScript::OnToggleWeapon();
+    }
+
+    Bone* PlayerScript::GetWeaponSocketBone()
+    {
+        return mLeftHandBone;
     }
 
     void  PlayerScript::Idle()
@@ -145,7 +151,7 @@ namespace ME
 
     void PlayerScript::Translate(math::Vector2 moveAxis)
     {
-       
+        directionChange();
  
         if (moveAxis.x == 0 && moveAxis.y == 0)
         {
@@ -156,21 +162,21 @@ namespace ME
 
         if (mPlayerTransform == nullptr) return;
 
-        if (moveAxis.y > 0) mTargetDirection = Direction::Forward;
-        else if (moveAxis.y < 0) mTargetDirection = Direction::Back;
-        else if (moveAxis.x > 0) mTargetDirection = Direction::Right;
-        else if (moveAxis.x < 0) mTargetDirection = Direction::Left;
+        Vector3 forwardDir = mPlayerTransform->Forward();
+        Vector3 rightDir = mPlayerTransform->Right();
+        Vector3 moveDir = (forwardDir * moveAxis.y) + (rightDir * moveAxis.x);
 
-            
+        if (moveDir.LengthSquared() > 0.0f)
+        {
+            moveDir.Normalize();
+        }
+
         Vector3 pos = mPlayerTransform->GetPosition();
-        pos += 150.0f * mPlayerTransform->Forward() * Time::DeltaTime();
+        pos += moveDir * 150.0f * Time::DeltaTime();
         mPlayerTransform->SetPosition(pos);
 
         mbIsMoving = true;
         mState = State::Walk;
-        mDirection = mTargetDirection;
-
-        directionChange();
         
 
 
@@ -222,6 +228,11 @@ namespace ME
 
     
         
+    }
+
+    Vector3 PlayerScript::GetAimDirection()
+    {
+        return renderer::mainCamera->GetForward();
     }
 
     

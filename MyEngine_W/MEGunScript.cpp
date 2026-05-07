@@ -15,6 +15,7 @@
 #include "METexture.h"
 #include "MERigidbody.h"
 #include "MEBoxCollider3D.h"
+#include "MEActorScript.h"
 
 
 namespace ME
@@ -22,19 +23,17 @@ namespace ME
 	GunScript::GunScript()
 		:mCoolDownTime(0.2f)
 		, mCoolDownTimer(0.0f)
-		, mCoolDownTimeForEnemy(2.0f)
-		, mCoolDownTimerForEnemy(0.0f)
 		, mbCanShoot(false)
-		,mPlayerScript(nullptr)
-		,mEnemyScript(nullptr)
+
 	{
 	}
 	GunScript::~GunScript()
 	{
+		
 	}
 	void GunScript::Initialize()
 	{
-		mBulletPool = new ObjectPool<GameObject>(50, [this]()->GameObject*
+		mBulletPool = std::make_unique<ObjectPool<GameObject>>(50, [this]()->GameObject*
 		{
 			return this->makeBullet();
 		});
@@ -42,59 +41,24 @@ namespace ME
 	void GunScript::Update()
 	{
 	
-
-		if (mOwner != nullptr)
-		{
-			if(mPlayerTransform == nullptr)
-				mPlayerTransform = mOwner->GetComponent<Transform>();
-		}
-
 		if (mGunTransform == nullptr)
 		{
 			mGunTransform = GetOwner()->GetComponent<Transform>();
 		}
+	
 
-
-		if (mPlayerTransform)
-		{
-			mCurPlayerPos = mPlayerTransform->GetPosition();
+		if (!mbCanShoot) {
+			mCoolDownTimer += Time::DeltaTime();
+			if (mCoolDownTimer > mCoolDownTime) {
+				mbCanShoot = true;
+				mCoolDownTimer = 0.0f;
+			}
 		}
-		
 
-		if (mPlayerType == PlayerType::Player)
-		{
-
-			if (mbCanShoot == false )
-			{
-				mCoolDownTimer += Time::DeltaTime();
-
-				if (mCoolDownTimer > mCoolDownTime)
-				{
-					mbCanShoot = true;
-					mCoolDownTimer = 0.0f;
-				}
-			}
-
-		}
-		else if (mPlayerType == PlayerType::Enemy)
-		{
-			if (mbCanShoot == false)
-			{
-				mCoolDownTimerForEnemy += Time::DeltaTime();
-
-				if (mCoolDownTimerForEnemy > mCoolDownTimeForEnemy)
-				{
-					mbCanShoot = true;
-					mCoolDownTimeForEnemy = rand() % 3 + 2;
-					mCoolDownTimerForEnemy = 0.0f;
-				}
-			}
-
-			if (mbCanShoot)
-			{
-				shootBullet();
-				mbCanShoot = false;
-			}
+		if (mOwnerType == OwnerType::Enemy && mbCanShoot) {
+			Fire();
+	
+			mCoolDownTime = (float)(rand() % 3 + 2);
 		}
 	}
 	void GunScript::LateUpdate()
@@ -110,58 +74,34 @@ namespace ME
 
 	void GunScript::Fire()
 	{
-		if (mbCanShoot == false) return;
-
-		shootBullet();
-		mbCanShoot = false;
+		if (mbCanShoot)
+		{
+			shootBullet();
+			mbCanShoot = false;
+			mCoolDownTimer = 0.0f;
+		}
 	}
 
 	void GunScript::adjustGunPos()
 	{
-		if (mPlayerTransform == nullptr || mGunTransform == nullptr) return;
+		if (mOwner == nullptr || mGunTransform == nullptr) return;
 
-		Bone* leftHand = nullptr;
-		Vector3 forwardDir;
+		Bone* socket = mActorScript->GetWeaponSocketBone();
+		if (socket == nullptr || !mActorScript->IsUsingWeapon()) return;
 
-		if (mPlayerType == PlayerType::Player && mPlayerScript->IsUsingGun())
-		{
-			leftHand = mPlayerScript->GetLeftHandBone();
-			forwardDir = renderer::mainCamera->GetForward();
-			mPrevPlayerPos = mCurPlayerPos;
+		Vector3 forwardDir = mActorScript->GetAimDirection();
 
-		}
-		else if (mPlayerType == PlayerType::Enemy && mEnemyScript->IsUsingGun())
-		{
-			leftHand = mEnemyScript->GetLeftHandBone();
-			forwardDir = mPlayerTransform->Forward();
-		}
-		else
-		{
-			return;
-		}
-
-
-		if (leftHand == nullptr) return;
-
-
-		Matrix handLocal = leftHand->FinalTransform;
-
-		Matrix playerWorldMatrix = mPlayerTransform->GetWorldMatrix();
-
+		Matrix handLocal = socket->FinalTransform;
+		Matrix playerWorldMatrix = mOwnerTransform->GetWorldMatrix();
 		Matrix handMatrix = handLocal * playerWorldMatrix;
 		// 손 위치 & 회전 추출
 		Vector3 handPos = handMatrix.Translation();
 		Quaternion handRot = Quaternion::CreateFromRotationMatrix(handMatrix);
 
-
-		// 최종 위치 & 회전
-		Vector3 gunPos = handPos;
-		Quaternion gunRot = handRot;
-
 		Vector3 offset = Vector3(96.0f, 152.0f, 22.0f);
-		Vector3 finalPos = gunPos + Vector3::Transform(offset, Matrix::CreateFromQuaternion(gunRot));
+		Vector3 finalPos = handPos + Vector3::Transform(offset, Matrix::CreateFromQuaternion(handRot));
 
-		Matrix worldMatrix = Matrix::CreateFromQuaternion(gunRot) * Matrix::CreateTranslation(finalPos);
+		Matrix worldMatrix = Matrix::CreateFromQuaternion(handRot) * Matrix::CreateTranslation(finalPos);
 
 	
 		forwardDir.y = 0.0f;
@@ -176,6 +116,7 @@ namespace ME
 			rt.y = yawDeg;
 			mGunTransform->SetRotation(rt);
 		}
+
 
 		Vector3 pos;
 		Quaternion rot;
@@ -201,7 +142,7 @@ namespace ME
 		Vector3 spawnPos = gunPos;
 		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Bullet, spawnPos);
 		BulletScript* bulletScript = bullet->AddComponent<BulletScript>();
-		bulletScript->SetPool(mBulletPool);
+		bulletScript->SetPool(mBulletPool.get());
 
 		BoxCollider3D* col = bullet->AddComponent<BoxCollider3D>();
 		col->SetSize(Vector3(3, 2, 2));
@@ -236,7 +177,7 @@ namespace ME
 			bullet_model = nullptr;
 		}
 
-		return dynamic_cast<GameObject*>(bullet);
+		return static_cast<GameObject*>(bullet);
 
 	}
 

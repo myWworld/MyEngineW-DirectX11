@@ -7,7 +7,7 @@
 namespace ME
 {
 
-
+	
 	class EnemyScript :public ActorScript
 	{
 	public:
@@ -54,10 +54,16 @@ namespace ME
 		void OnToggleWeapon() override;
 
 		bool IsMoving() { return mbIsMoving; }
-		bool IsUsingGun() { return mbHoldingGun; }
 
 		Bone* GetLeftHandBone() { return mLeftHandBone; }
 		Bone* GetRightHandBone() { return mRightHandBone; }
+
+		Bone* GetWeaponSocketBone() override
+		{
+			return 	mLeftHandBone;
+		}
+
+		Vector3 GetAimDirection() override;
 
 	private:
 
