@@ -34,7 +34,7 @@ namespace ME
 
         void ProcessNode(aiNode* node, const aiScene* scene);
         Mesh* ProcessMesh(aiMesh* mesh, const aiScene* scene);
-        std::vector<graphics::Texture*> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::wstring& typeName);
+        std::vector<std::shared_ptr<graphics::Texture>> LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::wstring& typeName);
 
         std::unordered_map<std::string, math::Matrix> LoadPreRotationsWithFBXSDK(const std::wstring& wpath);
 

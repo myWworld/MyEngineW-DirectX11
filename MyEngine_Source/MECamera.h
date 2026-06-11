@@ -6,6 +6,7 @@ namespace ME
 {
 	using namespace ME::math;
 
+	class FrustumCulling;
 	class Camera :public Component
 	{
 	public:
@@ -51,6 +52,8 @@ namespace ME
 		float GetPitch() { return mCameraPitch; }
 		float GetRoll() { return mCameraRoll; }
 
+		FrustumCulling* GetFrustumCulling() { return mFrustumCulling.get(); }
+
 	private:
 
 		//std::vector<GameObject*> mGameObjects;
@@ -80,7 +83,8 @@ namespace ME
 		Vector3 mForward;
 
 		CameraScript* mCamScript;
-	
+		std::unique_ptr<FrustumCulling> mFrustumCulling;
+
 	};
 
 }

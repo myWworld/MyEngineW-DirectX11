@@ -5,6 +5,8 @@
 #include "MERenderer.h"
 #include "METransform.h"
 #include "MEMaterial.h"
+#include "MEFrustumCulling.h"
+#include "MEResources.h"
 
 namespace ME
 {
@@ -20,7 +22,6 @@ ModelRenderer::~ModelRenderer()
 
 void ModelRenderer::Initialize()
 {
-
 }
 void ModelRenderer::Update()
 {
@@ -47,67 +48,47 @@ void ModelRenderer::render()
 {
  
     Transform* tr = GetOwner()->GetComponent<Transform>();
-
     if (tr)
         tr->Bind();
 
-
-   if (mMaterial)
-   {
-       mMaterial->BindShader();
-   }
-   if (!mMeshes.empty())
-   {
-       for (auto mesh : mMeshes)
-       {
-           if (mesh == nullptr)
-               continue;
-
-           mesh->Bind();
-
-           if(mesh->GetDiffuseTexture() != nullptr)
-		   {
-			   mesh->GetDiffuseTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
-               mbHasEmbeddedTextures = true;
-           }
-
-           if (mesh->GetSpecularTexture() != nullptr)
-           {
-               mesh->GetSpecularTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Specular);
-               mbHasEmbeddedTextures = true;
-           }
+    if (mMeshes.empty())
+        return;
 
 
-           if (mesh->GetNormalTexture() != nullptr)
-           {
-               mesh->GetNormalTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Normal);
-               mbHasEmbeddedTextures = true;
-           }
-       }
-   }
+    math::Matrix worldMatrix = tr->GetWorldMatrix();
+    FrustumCulling* frustumCulling = renderer::mainCamera->GetFrustumCulling();
 
-    //if (!mbHasEmbeddedTextures)
-    //{
-    //    for (auto texture : mTextures)
-    //    {
-    //        if (texture == nullptr)
-    //            continue;
-    //
-    //        texture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
-    //    }
-    //}
-
-    if (!mMeshes.empty())
+    // 하나의 루프로 통합
+    for (auto mesh : mMeshes)
     {
-        for (auto mesh : mMeshes)
+        if (mesh == nullptr)
+            continue;
+
+
+        math::Vector3 localMinBounds = mesh->GetMinBounds();
+        math::Vector3 localMaxBounds = mesh->GetMaxBounds();
+
+        DirectX::BoundingBox localBox;
+        DirectX::BoundingBox::CreateFromPoints(localBox, localMinBounds, localMaxBounds);
+
+        DirectX::BoundingBox worldBox;
+        localBox.Transform(worldBox, worldMatrix);
+
+       //if (!frustumCulling->CheckAABB(worldBox))
+       //{
+       //    continue;
+       //}
+
+        std::shared_ptr<Material> mat = mesh->GetMaterial();
+        
+        if (mat != nullptr)
         {
-            if (mesh == nullptr)
-                continue;
-  
-            graphics::GetDevice()->DrawIndexed(mesh->GetIndexCount(), 0, 0);
+            mat->Bind(); // 이 안에서 셰이더(Skinned/Static)와 텍스처 통합
         }
+
+        mesh->Bind();        
+        graphics::GetDevice()->DrawIndexed(mesh->GetIndexCount(), 0, 0);
     }
-       
 
 
 }

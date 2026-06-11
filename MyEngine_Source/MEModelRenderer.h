@@ -10,7 +10,6 @@ namespace ME
 
     class Mesh;
     class Material;
-  
 
     class ModelRenderer : public Component
     {
@@ -28,12 +27,7 @@ namespace ME
         void setModelMatrix(const Matrix& model);
         void SetMesh(const std::vector<Mesh*>& meshes_);
 
-        void SetTextures(const std::vector<graphics::Texture*>& textures) { mTextures = textures; }
-        void SetTexture(graphics::Texture* texture) { mTextures.push_back(texture); }
-        void SetTexture(std::shared_ptr<graphics::Texture> texture) { mTextures.push_back(texture.get()); }
-
-        void SetMaterial(Material* material) { mMaterial = material; }
-		void SetMaterial(std::shared_ptr<Material> material) { mMaterial = material.get(); }
+  
 
     private:
         void render();
@@ -44,11 +38,9 @@ namespace ME
         Matrix mModelMatrix;
 
         std::vector<Mesh*> mMeshes;
-        std::vector<graphics::Texture* >mTextures;
-        Material* mMaterial;
-
+        
         bool mbHasEmbeddedTextures = false; // Flag to check if textures are embedded in the model
-
+  
        
     };
 

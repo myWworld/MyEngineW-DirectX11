@@ -18,9 +18,10 @@ namespace ME
 		~Skeleton();
 
 		std::vector<Bone> mBones;
-		std::unordered_map<std::string, int> mBoneNameToIndexMap;
+		std::unordered_map<size_t, int> mBoneNameToIndexMap;
 		std::vector<Matrix> mBonesTransform;
-		std::string mRootBoneName;
+	
+		size_t mRootBoneHash;
 
 		enums::eModelType mModelType;
 
@@ -35,6 +36,7 @@ namespace ME
 		void BuildSkeleton(aiNode* node);
 
 		int GetBoneIndex(const std::string& name) const;
+		int GetBoneIndex(const size_t& hash) const;
 		int GetBoneIndexToMatchWithAnim(const std::string& name) const;
 
 		void CalculateFinalTransform();
@@ -57,7 +59,7 @@ namespace ME
 				mBones = other.mBones;
 				mBoneNameToIndexMap = other.mBoneNameToIndexMap;
 				mBonesTransform = other.mBonesTransform;
-				mRootBoneName = other.mRootBoneName;
+				mRootBoneHash = other.mRootBoneHash;
 				mModelType = other.mModelType;
 
 				for (int i = 0; i < mBones.size(); ++i)

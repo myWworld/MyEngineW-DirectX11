@@ -1,8 +1,11 @@
 #include "MEModel.h"
 #include "MEGraphics.h"
 #include "MEMesh.h"
+#include "MEMaterial.h"
 #include "MERenderer.h"
 #include "MEBone.h"
+#include "MEResources.h"
+#include <float.h>
 
 
 namespace ME
@@ -42,6 +45,8 @@ namespace ME
 
         const aiScene* scene = importer.ReadFile(path_str,
             aiProcess_Triangulate |
+            aiProcess_ConvertToLeftHanded |
+            aiProcess_CalcTangentSpace |
             aiProcess_FlipUVs |
             aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
                     //  잘못된 데이터 자동 제거
@@ -134,14 +139,37 @@ namespace ME
         std::unordered_map<std::string, int> boneNameToIndex;
         std::vector<Bone> bones; 
 
+        Vector3 minBounds(FLT_MAX, FLT_MAX, FLT_MAX);
+        Vector3 maxBounds(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
         for (unsigned int i = 0; i < mesh->mNumVertices; i++)
         {
             Vertex vertex;
             vertex.pos = Vector3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
 
+
+            if (vertex.pos.x < minBounds.x) minBounds.x = vertex.pos.x;
+            if (vertex.pos.y < minBounds.y) minBounds.y = vertex.pos.y;
+            if (vertex.pos.z < minBounds.z) minBounds.z = vertex.pos.z;
+
+            if (vertex.pos.x > maxBounds.x) maxBounds.x = vertex.pos.x;
+            if (vertex.pos.y > maxBounds.y) maxBounds.y = vertex.pos.y;
+            if (vertex.pos.z > maxBounds.z) maxBounds.z = vertex.pos.z;
+
+
             if (mesh->HasNormals())
             {
                 vertex.normal = Vector3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+            }
+
+            if (mesh->HasTangentsAndBitangents())
+            {
+				vertex.tangent = Vector3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
+            }
+            else //임시용
+            {
+                
+                vertex.tangent = Vector3(1.0f, 0.0f, 0.0f);
             }
 
             if (mesh->HasTextureCoords(0))
@@ -204,64 +232,67 @@ namespace ME
         }
 
         Mesh* newMesh = new Mesh(vertices, indices,bones);
+        newMesh->SetBoundingBox(minBounds, maxBounds);
 
         if (mesh->mMaterialIndex >= 0)
         {
            aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-           std::vector<ME::Texture*> diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, L"texture_diffuse");
 
-           if(!diffuseMaps.empty())
-               newMesh->SetDiffuseTexture(diffuseMaps[0]);
-          
-           mTextures.insert(mTextures.end(), diffuseMaps.begin(), diffuseMaps.end());
-          
-           std::vector<ME::Texture*> specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, L"texture_specular");
-           mTextures.insert(mTextures.end(), specularMaps.begin(), specularMaps.end());
-           if (!specularMaps.empty())
-               newMesh->SetSpecularTexture(specularMaps[0]);
+		   std::shared_ptr<Material> newMaterial = std::make_shared<Material>();
 
-           std::vector<ME::Texture*> normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, L"texture_normal");
-          
-           mTextures.insert(mTextures.end(), normalMaps.begin(), normalMaps.end());
+           if (mesh->mNumBones > 0)
+           {
+               newMaterial->SetShader(Resources::Find<graphics::Shader>(L"ModelShader"));
+           }
+           else
+           {
+               newMaterial->SetShader(Resources::Find<graphics::Shader>(L"StaticModelShader"));
+           }
+
+           auto diffuseMaps = LoadMaterialTextures(material, aiTextureType_DIFFUSE, L"texture_diffuse");
+           if (!diffuseMaps.empty())
+               newMaterial->SetAlbedoTexture(diffuseMaps[0]);
+
+           auto normalMaps = LoadMaterialTextures(material, aiTextureType_NORMALS, L"texture_normal");
            if (!normalMaps.empty())
-               newMesh->SetNormalTexture(normalMaps[0]);
+               newMaterial->SetNormalTexture(normalMaps[0]);
+
+  
+           auto specularMaps = LoadMaterialTextures(material, aiTextureType_SPECULAR, L"texture_specular");
+           if (!specularMaps.empty())
+               newMaterial->SetSpecularTexture(specularMaps[0]);
+
+           auto smoothMaps = LoadMaterialTextures(material, aiTextureType_SHININESS, L"texture_smoothness");
+           if (!smoothMaps.empty())
+               newMaterial->SetRoughnessTexture(smoothMaps[0]);
+
+		   newMesh->SetMaterial(newMaterial);
         }
 
      
         return newMesh;
     }
 
-     std::vector<ME::Texture*> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::wstring& typeName)
+     std::vector<std::shared_ptr<graphics::Texture>> Model::LoadMaterialTextures(aiMaterial* mat, aiTextureType type, const std::wstring& typeName)
      {
-         std::vector<ME::Texture*> textures;
+         std::vector<std::shared_ptr<graphics::Texture>> textures;
          for (unsigned int i = 0; i < mat->GetTextureCount(type); i++)
          {
              aiString str;
              mat->GetTexture(type, i, &str);
-             Texture* texture = new Texture();
-             const char* cstr = str.C_Str();
-         	 
-             std::string new_str(cstr);
-             
-             std::string texStr = new_str;
-             
-             if (texStr.find("..") == 0)
-                 texStr = texStr.substr(3);
 
-             std::filesystem::path base = std::filesystem::absolute(L"..\\Resources\\");
-             std::filesystem::path fullPath = base / texStr;
-        // OK!
+             std::filesystem::path fullPathFromFBX(str.C_Str()); // FBX에 적힌 경로
+             std::wstring fileName = fullPathFromFBX.filename().wstring(); // 경로 다 떼고 "M9_BaseColor.png"만 추출
+           
+             std::filesystem::path myEnginePath = L"..\\Resources\\Textures\\";
+             myEnginePath.append(fileName);
 
-          
-             if (texture->Load(fullPath.wstring()) == S_OK)
+             auto texture = Resources::Load<graphics::Texture>(fileName, myEnginePath.wstring());
+
+             if (texture)
              {
                  textures.push_back(texture);
-             }
-             else
-             {
-                 delete texture;
-                 texture = nullptr;
-             }
+			 }
              
          }
          return textures;

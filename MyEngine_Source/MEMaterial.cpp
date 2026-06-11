@@ -21,11 +21,9 @@ namespace ME
 	}
 	void Material::Bind()
 	{
-		if(mShader)
-			mShader->Bind();
+		BindShader();
+		BindTextures();
 
-		if (mAlbedoTexture)
-			mAlbedoTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
 	}
 	void Material::BindShader()
 	{
@@ -36,5 +34,17 @@ namespace ME
 	{
 		if (mAlbedoTexture)
 			mAlbedoTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
+
+		if(mNormalTexture)
+			mNormalTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Normal);
+
+		if (mSpecularTexture)
+			mSpecularTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Specular);
+
+		if(mRoughnessTexture)
+			mRoughnessTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Smoothness);
+
+		if(mMetallicTexture)
+			mMetallicTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Metalic);
 	}
 }

@@ -37,6 +37,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEEntity.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEEnums.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEFmod.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFrustumCulling.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGameObject.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEApplication.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.h" />
@@ -95,6 +96,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEDontDestroyOnLoad.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEEntity.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEFmod.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFrustumCulling.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGameObject.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEApplication.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp" />

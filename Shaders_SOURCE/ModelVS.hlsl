@@ -5,9 +5,12 @@ struct VSInput
     float3 pos : POSITION;
     float4 color : COLOR;
     float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    float2 uv : TEXCOORD;
+    
+      
     int4 boneIndices : BONEINDICES;
     float4 boneWeight : BONEWEIGHTS;
-    float2 uv : TEXCOORD;
 };
 
 struct VSOutput
@@ -16,6 +19,8 @@ struct VSOutput
     float4 pos : SV_Position;
     float4 color : COLOR;
     float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    
     float2 uv : TEXCOORD;
 };
 
@@ -25,6 +30,7 @@ VSOutput main(VSInput input)
     
     float4 skinPos = float4(0.0f, 0.0f, 0.0f, 0.0f);
     float3 skinnedNormal = float3(0, 0, 0);
+    float3 skinnedTangent = float3(0, 0, 0);
 
     for (int i = 0; i < 4; i++)
     {
@@ -36,6 +42,7 @@ VSOutput main(VSInput input)
         {
             skinPos += boneWeight * mul(float4(input.pos, 1.0f), BoneMatrices[boneIndex]);
             skinnedNormal += boneWeight * mul((float3x3) BoneMatrices[boneIndex], input.normal);
+            skinnedTangent += boneWeight * mul((float3x3) BoneMatrices[boneIndex], input.tangent);
         }
     }
     
@@ -47,7 +54,11 @@ VSOutput main(VSInput input)
     
     output.pos = projPos;
     output.color = input.color;
+    
+    
     output.normal = normalize(mul((float3x3) WorldMatrix, skinnedNormal));
+    output.tangent = normalize(mul((float3x3) WorldMatrix, skinnedTangent));
     output.uv = input.uv;
+    
     return output;
 }

@@ -20,12 +20,11 @@ namespace ME
 		, mEvents{}
 		, mModelType(enums::eModelType::StaticBone)
 		, mSkeleton{}
-		, mMaterial(nullptr)
-		, mMeshes{}
-		, mTextures{}
 		, mModelMatrix{}
-		, mStaticMaterial(nullptr)
 		, mCurrentTime(0.0f)
+		, mPrevRootPos(Vector3::Zero)
+		, mRootMotionTotalOffset(Vector3::Zero)
+		, mRootMotionBasePosition(Vector3::Zero)
 	{
 	}
 	Animator3D::~Animator3D()
@@ -35,8 +34,6 @@ namespace ME
 	}
 	void Animator3D::Initialize()
 	{
-		mMaterial = Resources::Find<Material>(L"ModelMaterial").get();
-		mStaticMaterial = Resources::Find<Material>(L"StaticModelMaterial").get();
 	}
 	void Animator3D::Update()
 	{
@@ -80,61 +77,15 @@ namespace ME
 		//{
 		//	mActiveAnimation->Render(hdc);
 		//}
-		render();
+		Bind();
+
 
 	}
 
 	void Animator3D::render()
 	{
-		Bind();
-
-
-		if (!mMeshes.empty())
-		{
-			for (auto mesh : mMeshes)
-			{
-				if (mesh == nullptr)
-					continue;
-
-				if (mesh->IsSkinned() == true)
-				{		
-					mMaterial->BindShader();
-				}
-				else
-				{				
-					mStaticMaterial->BindShader();
-				}
-
-				mesh->Bind();
-
-				if (mesh->GetDiffuseTexture() != nullptr)
-				{
-					mesh->GetDiffuseTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
-				}
-
-				if (mesh->GetSpecularTexture() != nullptr)
-				{
-					mesh->GetSpecularTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Specular);
-				}
-
-				if (mesh->GetNormalTexture() != nullptr)
-				{
-					mesh->GetNormalTexture()->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Normal);
-				}
-
-				if (!mesh->GetSpecularTexture() && !mesh->GetDiffuseTexture() && !mTextures.empty())
-				{
-					for (auto texture : mTextures)
-					{
-						if (texture)
-							texture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Albedo);
-					}
-				}
-
-				graphics::GetDevice()->DrawIndexed(mesh->GetIndexCount(), 0, 0);
-			
-			}
-		}
+	
+	
 
 	}
 
@@ -177,15 +128,12 @@ namespace ME
 		if (FindAnimation(name) != nullptr)
 			return;
 
-		auto animation = std::make_unique<Animation3D>();
-		animation->SetName(name);
-		animation->SetAnimator(this);
-		animation->CreateAnimation(name, path);
+		std::shared_ptr<Animation3D> animation = Resources::Load<Animation3D>(name, path);
 
 		auto events = std::make_unique<Events>();
 
 		mEvents.insert({ name, std::move(events)});
-		mAnimations.insert({ name, std::move(animation)});
+		mAnimations.insert({ name, animation.get()});
 
 	}
 
@@ -198,17 +146,18 @@ namespace ME
 		if (iter == mAnimations.end())
 			return nullptr;
 
-		return iter->second.get();
+		return iter->second;
 
 
 	}
 	void Animator3D::PlayAnimation(const std::wstring& name, bool loop)
  	{
-		Animation3D* animation = FindAnimation(name);
+		std::shared_ptr<Animation3D> animation = Resources::Find<Animation3D>(name);
+
 		if (animation == nullptr)
 			return;
 
-		if (mActiveAnimation && mActiveAnimation == animation)
+		if (mActiveAnimation && mActiveAnimation == animation.get())
 			return;
 
 		if (mActiveAnimation)
@@ -230,8 +179,8 @@ namespace ME
 			nextEvents->StartEvent();
 		}
 
-		mActiveAnimation = animation;
-		mActiveAnimation->Reset();
+		mActiveAnimation = animation.get();
+		this->mPrevRootPos = Vector3::Zero;
 		mbLoop = loop;
 
 	}

@@ -14,7 +14,6 @@ namespace ME
 
 	Animation3D::Animation3D()
 		:Resource(enums::eResourceType::Animation3D)
-		, mAnimator(nullptr)
 		,mSkeleton(nullptr)
 		,mPrevRootPos(Vector3::Zero)
 	{
@@ -30,7 +29,30 @@ namespace ME
 	HRESULT Animation3D::Load(const std::wstring& path)
 	{
 	
-		return E_NOTIMPL;
+		Assimp::Importer importer;
+		std::string path_str = std::string(path.begin(), path.end());
+
+		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+
+		const aiScene* animScene = importer.ReadFile(path_str,
+			aiProcess_Triangulate |
+			aiProcess_FlipUVs |
+			aiProcess_ImproveCacheLocality |
+			aiProcess_JoinIdenticalVertices |
+			aiProcessPreset_TargetRealtime_Quality
+		);
+
+		if (!animScene || animScene->mNumAnimations == 0)
+		{
+			return E_FAIL;
+		}
+
+		aiAnimation* anim = animScene->mAnimations[0];
+		CreateFromAssimp(anim);
+
+		this->SetPath(path);
+
+		return S_OK;
 	}
 	void Animation3D::Update()
 	{
@@ -65,7 +87,7 @@ namespace ME
 			if (boneindex == -1)
 				continue;
 
-			math::Matrix localTransform = InterpolateLocalTransform(bones, timeInTicks, bones.boneName, skeleton);
+			math::Matrix localTransform = InterpolateLocalTransform(bones, timeInTicks, bones.boneName, skeleton, animator);
 			skeleton->mBones[boneindex].mLocalTransform = localTransform;
 
 			updatedBones.insert(bones.boneName);
@@ -115,6 +137,7 @@ namespace ME
 
 		const aiScene* animScene = importer.ReadFile(path_str,
 			aiProcess_Triangulate |
+			aiProcess_CalcTangentSpace |   //  접선 공간 계산
 			aiProcess_FlipUVs |
 			aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
 			//  잘못된 데이터 자동 제거
@@ -136,13 +159,6 @@ namespace ME
 		}
 
 
-	}
-	void Animation3D::Reset()
-	{
-	
-		mPrevRootPos = Vector3::Zero;
-		mRootMotionTotalOffset = Vector3::Zero;
-		mRootMotionBasePosition = mAnimator->GetOwner()->GetComponent<Transform>()->GetPosition();
 	}
 
 	void Animation3D::CreateFromAssimp(aiAnimation* anim)
@@ -231,13 +247,13 @@ namespace ME
 	}
 
 
-	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime,const std::string& boneName, Skeleton* skeleton)
+	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime,const std::string& boneName, Skeleton* skeleton, Animator3D* animator)
 	{
 		Vector3 interpolatedPos = InterpolatePosition(boneAnim.positions, currentTime);
 
 		if (boneName == "Hips" || boneName == "mixamorig:Hips")
 		{
-			if (!mAnimator->GetApplyRootMotion())
+			if (!animator->GetApplyRootMotion())
 				interpolatedPos = Vector3::Zero;
 		}
 

@@ -2,6 +2,7 @@
 #include "MEGameObject.h"
 #include "METransform.h"
 #include "MEApplication.h"
+#include "MEFrustumCulling.h"
 
 extern ME::Application application;
 
@@ -23,6 +24,7 @@ namespace ME
 		, mCameraRoll(0.0f)
 		, mCameraYaw(0.0f)
 		, mForward(Vector3::Forward)
+		, mFrustumCulling(std::make_unique<FrustumCulling>())
 	{
 	}
 	Camera::~Camera()

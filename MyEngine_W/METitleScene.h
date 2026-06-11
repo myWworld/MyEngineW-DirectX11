@@ -22,7 +22,7 @@ namespace ME
 
 	private:
 
-		void MakeCharacter( GameObject* player);
+		void MakeCharacter(GameObject* player, std::wstring_view modelName);
 		void MakeGun(GameObject* player );
 
 	private:

@@ -60,13 +60,11 @@ namespace ME
 	
 			mCoolDownTime = (float)(rand() % 3 + 2);
 		}
+
 	}
 	void GunScript::LateUpdate()
 	{
-		
 		adjustGunPos();
-
-		
 	}
 	void GunScript::Render()
 	{
@@ -162,12 +160,6 @@ namespace ME
 
 			ModelRenderer* modelRenderer = bullet->AddComponent<ModelRenderer>();
 			modelRenderer->SetMesh(bullet_model->GetMeshes());
-			modelRenderer->SetMaterial(Resources::Find<Material>(L"StaticModelMaterial"));
-
-			if (bullet_model->GetTextures().size() > 0)
-				modelRenderer->SetTextures(bullet_model->GetTextures());
-			else
-				modelRenderer->SetTexture(Resources::Find<graphics::Texture>(L"PISTOL"));
 
 			bullet->SetModel(bullet_model);
 

@@ -5,6 +5,8 @@ struct VSInput
     float3 pos : POSITION;
     float4 color : COLOR;
     float3 normal : NORMAL;
+    float3 tangent : TANGENT;
+    
     float2 uv : TEXCOORD;
 };
 
@@ -14,6 +16,7 @@ struct VSOutput
     float4 pos : SV_Position;
     float4 color : COLOR;
     float3 normal : NORMAL;
+    float3 tangent : TANGENT;
     float2 uv : TEXCOORD;
 };
 
@@ -28,7 +31,8 @@ VSOutput main(VSInput input)
     
     output.pos = projPos;
     output.color = input.color;
-    output.normal = input.normal;
+    output.normal = normalize(mul((float3x3) WorldMatrix, input.normal));
+    output.tangent = normalize(mul((float3x3) WorldMatrix, input.tangent));
     output.uv = input.uv;
     return output;
 }

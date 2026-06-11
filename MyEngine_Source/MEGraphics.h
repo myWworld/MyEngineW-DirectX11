@@ -20,9 +20,10 @@ namespace ME::graphics
 		math::Vector3 pos;
 		math::Vector4 color;
 		math::Vector3 normal;
+		math::Vector3 tangent;
+		math::Vector2 uv;
 		int boneIndices[4] = { 0 };
 		float boneWeight[4] = { 0.0f };
-		math::Vector2 uv;
 
 		void AddBoneData(int boneIndex, float weight)
 		{
@@ -98,12 +99,12 @@ namespace ME::graphics
 
 	enum class eTextureType
 	{
-		Albedo,
-		Normal,
-		Specular,
-		Smoothness,
-		Metalic,
-		Sprite,
+		Albedo = 0,
+		Normal = 1,
+		Specular = 2,
+		Smoothness = 3,
+		Metalic = 4,
+		Sprite = 5,
 		End,
 	};
 

@@ -291,7 +291,7 @@ namespace ME::renderer
 
 	void LoadModels(Mesh* mesh)
 	{
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[6] = {};
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[7] = {};
 		inputLayoutDesces[0].AlignedByteOffset = 0;
 		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[0].InputSlot = 0;
@@ -313,28 +313,38 @@ namespace ME::renderer
 		inputLayoutDesces[2].SemanticName = "NORMAL";
 		inputLayoutDesces[2].SemanticIndex = 0;
 
-
-		inputLayoutDesces[3].AlignedByteOffset = 40; 
-		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32A32_UINT;
+		
+		inputLayoutDesces[3].AlignedByteOffset = 40;
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[3].InputSlot = 0;
 		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[3].SemanticName = "BONEINDICES";
+		inputLayoutDesces[3].SemanticName = "TANGENT";
 		inputLayoutDesces[3].SemanticIndex = 0;
 
 
-		inputLayoutDesces[4].AlignedByteOffset = 56; 
-		inputLayoutDesces[4].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutDesces[4].AlignedByteOffset = 52;
+		inputLayoutDesces[4].Format = DXGI_FORMAT_R32G32_FLOAT;
 		inputLayoutDesces[4].InputSlot = 0;
 		inputLayoutDesces[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[4].SemanticName = "BONEWEIGHTS";
+		inputLayoutDesces[4].SemanticName = "TEXCOORD";
 		inputLayoutDesces[4].SemanticIndex = 0;
 
-		inputLayoutDesces[5].AlignedByteOffset = 72; 
-		inputLayoutDesces[5].Format = DXGI_FORMAT_R32G32_FLOAT;
+
+		inputLayoutDesces[5].AlignedByteOffset = 60; 
+		inputLayoutDesces[5].Format = DXGI_FORMAT_R32G32B32A32_UINT;
 		inputLayoutDesces[5].InputSlot = 0;
 		inputLayoutDesces[5].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[5].SemanticName = "TEXCOORD";
+		inputLayoutDesces[5].SemanticName = "BONEINDICES";
 		inputLayoutDesces[5].SemanticIndex = 0;
+
+
+		inputLayoutDesces[6].AlignedByteOffset = 76; 
+		inputLayoutDesces[6].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutDesces[6].InputSlot = 0;
+		inputLayoutDesces[6].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[6].SemanticName = "BONEWEIGHTS";
+		inputLayoutDesces[6].SemanticIndex = 0;
+
 
 
 		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"ModelShader").get();
@@ -343,13 +353,13 @@ namespace ME::renderer
 		{
 			modelShader->SetBlendState(graphics::eBlendState::Opaque);
 
-			mesh->SetVertexBufferParams(6, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+			mesh->SetVertexBufferParams(7, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
 		}
 	}
 
 	void LoadStaticModels(Mesh* mesh)
 	{
-		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[4] = {};
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[5] = {};
 		inputLayoutDesces[0].AlignedByteOffset = 0;
 		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[0].InputSlot = 0;
@@ -371,20 +381,27 @@ namespace ME::renderer
 		inputLayoutDesces[2].SemanticName = "NORMAL";
 		inputLayoutDesces[2].SemanticIndex = 0;
 
-
-		inputLayoutDesces[3].AlignedByteOffset = 40; //12 + 16
-		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutDesces[3].AlignedByteOffset = 40; //28 + 12
+		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[3].InputSlot = 0;
 		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		inputLayoutDesces[3].SemanticName = "TEXCOORD";
+		inputLayoutDesces[3].SemanticName = "TANGENT";
 		inputLayoutDesces[3].SemanticIndex = 0;
+
+
+		inputLayoutDesces[4].AlignedByteOffset = 52; //40 + 12
+		inputLayoutDesces[4].Format = DXGI_FORMAT_R32G32_FLOAT;
+		inputLayoutDesces[4].InputSlot = 0;
+		inputLayoutDesces[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[4].SemanticName = "TEXCOORD";
+		inputLayoutDesces[4].SemanticIndex = 0;
 
 		graphics::Shader* modelShader = Resources::Find<graphics::Shader>(L"StaticModelShader").get();
 
 		if (modelShader != nullptr)
 		{
 			modelShader->SetBlendState(graphics::eBlendState::Opaque);
-			mesh->SetVertexBufferParams(4, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
+			mesh->SetVertexBufferParams(5, inputLayoutDesces, modelShader->GetVSBlob()->GetBufferPointer(), modelShader->GetVSBlob()->GetBufferSize());
 		}
 	}
 
@@ -401,8 +418,6 @@ namespace ME::renderer
 		ME::Resources::Load<graphics::Shader>(L"WireFrameShader", L"..\\Shaders_SOURCE\\WireFrame");
 		ME::Resources::Load<graphics::Shader>(L"ModelShader", L"..\\Shaders_SOURCE\\Model");
 		ME::Resources::Load<graphics::Shader>(L"StaticModelShader", L"..\\Shaders_SOURCE\\StaticModel");
-
-
 
 	}
 

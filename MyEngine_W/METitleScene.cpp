@@ -97,7 +97,7 @@ namespace ME
 			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 			//
 			mPlayer->AddComponent<PlayerScript>();
-			MakeCharacter(mPlayer);
+			MakeCharacter(mPlayer, L"AlienModel");
 
 			MakeGun(mPlayer);
 
@@ -106,7 +106,7 @@ namespace ME
 			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
 
 			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
-			MakeCharacter(enemy);
+			MakeCharacter(enemy, L"AlienModel");
 
 			MakeGun(enemy);
 		}
@@ -141,38 +141,32 @@ namespace ME
 
 	}
 
-	void TitleScene::MakeCharacter(GameObject* player)
+	void TitleScene::MakeCharacter(GameObject* player, std::wstring_view modelName)
 	{
-		std::shared_ptr<Model> model = Resources::Find<Model>(L"AlienModel");
+		std::shared_ptr<Model> model = Resources::Find<Model>(std::wstring(modelName));
 
 		if (model)
 		{
 
 
-			Animator3D* animator = player->AddComponent<Animator3D>();
-			animator->SetMesh(model->GetMeshes());
+			auto* animator = player->AddComponent<Animator3D>();
+
+			auto* modelRenderer = player->AddComponent<ModelRenderer>();
+			modelRenderer->SetMesh(model->GetMeshes());
+		
+			
 			player->SetModel(model);
 
 		//	Rigidbody* rb = mPlayer->AddComponent<Rigidbody>();
 			Collider* col = player->AddComponent<BoxCollider3D>();
 			col->SetSize(Vector3(50, 250, 50));
 
-			if (model->GetTextures().size() > 0)
-				animator->SetTextures(model->GetTextures());
-			else
-				animator->SetTexture(Resources::Find<graphics::Texture>(L"ALIEN"));
 
 			UIManager::Push(enums::eUIType::HpBar);
 
 
 			animator->SetSkeleton(&model->GetSkeleton());
-			animator->CreateAnimation(L"Idle", L"..\\Resources\\Animation\\Idle2.fbx");
-			animator->CreateAnimation(L"FORWARDWALK", L"..\\Resources\\Animation\\ForwardWalk.fbx");
-			animator->CreateAnimation(L"PISTOLWALK", L"..\\Resources\\Animation\\PistolWalk.fbx");
-			animator->CreateAnimation(L"PISTOLIDLE", L"..\\Resources\\Animation\\PistolIdle.fbx");
-			animator->CreateAnimation(L"PISTOLIDLE2", L"..\\Resources\\Animation\\PistolIdle2.fbx");
-			animator->CreateAnimation(L"HIT", L"..\\Resources\\Animation\\HitReaction.fbx");
-			animator->CreateAnimation(L"DANCE", L"..\\Resources\\Animation\\SillyDancing.fbx");
+	
 			animator->PlayAnimation(L"PISTOLIDLE", true);
 		}
 		else
@@ -194,19 +188,13 @@ namespace ME
 		
 		gunScript->SetOnwer(player);
 	
-		std::shared_ptr<Model> gun = Resources::Load<Model>(L"PistolModel", L"..\\Resources\\Pistol.fbx");
+		std::shared_ptr<Model> gun = Resources::Find<Model>(L"PistolModel");
 
 		if (gun)
 		{
 
 			ModelRenderer* modelRenderer = m4->AddComponent<ModelRenderer>();
 			modelRenderer->SetMesh(gun->GetMeshes());
-			modelRenderer->SetMaterial(Resources::Find<Material>(L"StaticModelMaterial"));
-			
-			if (gun->GetTextures().size() > 0)
-				modelRenderer->SetTextures(gun->GetTextures());
-			else
-				modelRenderer->SetTexture(Resources::Find<graphics::Texture>(L"PISTOL"));
 
 			
 		}

@@ -70,15 +70,6 @@ namespace ME
 		Skeleton GetSkeleton() { return mSkeleton; }
 		Skeleton* GetSkeletonPtr() { return &mSkeleton; }
 
-		//void setModelMatrix(const Matrix& model);
-		void SetMesh(const std::vector<Mesh*>& meshes_) { mMeshes = meshes_; }
-
-		void SetTextures(const std::vector<graphics::Texture*>& textures) { mTextures = textures; }
-		void SetTexture(graphics::Texture* texture) { mTextures.push_back(texture); }
-		void SetTexture(std::shared_ptr<graphics::Texture> texture) { mTextures.push_back(texture.get()); }
-
-		void SetMaterial(Material* material) { mMaterial = material; }
-
 		void SetApplyRootMotion(bool apply) { mbApplyRootMotion = apply; }
 		bool GetApplyRootMotion() { return mbApplyRootMotion; }
 
@@ -98,25 +89,20 @@ namespace ME
 
 		Matrix mModelMatrix;
 
-		std::vector<Mesh*> mMeshes;
-		std::vector<graphics::Texture* >mTextures;
-		Material* mMaterial;
-		Material* mStaticMaterial;
-
 		bool mbLoop;
 		bool mbApplyRootMotion = false;
 
 		float mCurrentTime;
 		bool mbComplete;
 
-		math::Vector3 mPrevRootPos;
-
 		Animation3D* mActiveAnimation;
 		Skeleton mSkeleton;
 
+		math::Vector3 mPrevRootPos = Vector3::Zero;
+		math::Vector3 mRootMotionTotalOffset = Vector3::Zero;
+		math::Vector3 mRootMotionBasePosition = Vector3::Zero;
 
-
-		std::unordered_map<std::wstring, std::unique_ptr<Animation3D>> mAnimations;
+		std::unordered_map<std::wstring, Animation3D*> mAnimations;
 		std::unordered_map<std::wstring, std::unique_ptr<Events>> mEvents;
 
 		enums::eModelType mModelType;

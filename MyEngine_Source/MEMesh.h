@@ -4,13 +4,12 @@
 #include "MEVertexBuffer.h"
 #include "MEIndexBuffer.h"
 #include "MEInputLayout.h"
-#include "METexture.h"
 #include "MEBone.h"
 
 
 namespace ME
 {
-
+	class Material;
 	class Mesh: public Resource
 	{
 	public:
@@ -43,17 +42,21 @@ namespace ME
 
 		UINT GetIndexCount() const { return mIB.GetIndexCount(); }
 
-		void SetDiffuseTexture(graphics::Texture* texture) { diffuseTexture = texture; }
-		void SetSpecularTexture(graphics::Texture* texture) { specularTexture = texture; }
-		void SetNormalTexture(graphics::Texture* texture) { normalTexture = texture; }
 
-		graphics::Texture* GetDiffuseTexture() { return diffuseTexture; }
-		graphics::Texture* GetSpecularTexture() { return specularTexture; }
-		graphics::Texture* GetNormalTexture() { return normalTexture; }
+		void SetMaterial(std::shared_ptr<Material> material) { mMaterial = material; }
+		std::shared_ptr<Material> GetMaterial() { return mMaterial; }
 
 		void SetSkinned(bool skinned) { mbIsSkinned = skinned; }
 		bool IsSkinned() { return mbIsSkinned; }
 
+		void SetBoundingBox(math::Vector3 min, math::Vector3 max)
+		{
+			mMinBounds = min;
+			mMaxBounds = max;
+		}
+
+		math::Vector3 GetMinBounds() { return mMinBounds; }
+		math::Vector3 GetMaxBounds() { return mMaxBounds; }
 
 	private:
 
@@ -61,13 +64,14 @@ namespace ME
 		graphics::VertexBuffer mVB;
 		graphics::IndexBuffer mIB;
 
-		graphics::Texture* diffuseTexture;
-		graphics::Texture* specularTexture;
-		graphics::Texture* normalTexture;
+		std::shared_ptr<Material> mMaterial;
 
 		bool mbIsSkinned;
 
 		MeshData mData;
+
+		math::Vector3 mMaxBounds;
+		math::Vector3 mMinBounds;
 
 	};
 

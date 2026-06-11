@@ -1,0 +1,24 @@
+{
+  "Texture": [
+    { "key": "PISTOL",  "path": "..\\Resources\\PistolTex.jpg" },
+    { "key": "GUN",     "path": "..\\Resources\\M4Tex.png" },
+    { "key": "ALIEN",   "path": "..\\Resources\\AlienTex.png" },
+    { "key": "SOLDIER", "path": "..\\Resources\\SoldierTex.jpg" },
+    { "key": "HPBAR",   "path": "..\\Resources\\Hpbar.png" }
+  ],
+  "Model": [
+    { "key": "BulletModel",  "path": "..\\Resources\\Bullet.fbx" },
+    { "key": "AlienModel",   "path": "..\\Resources\\alien.fbx" },
+    { "key": "PistolModel",  "path": "..\\Resources\\Pistol.fbx" },
+    { "key": "SoldierModel", "path": "..\\Resources\\Soldier.fbx" }
+  ],
+  "Animation": [
+    { "key": "Idle",        "path": "..\\Resources\\Animation\\Idle2.fbx" },
+    { "key": "FORWARDWALK", "path": "..\\Resources\\Animation\\ForwardWalk.fbx" },
+    { "key": "PISTOLWALK",  "path": "..\\Resources\\Animation\\PistolWalk.fbx" },
+    { "key": "PISTOLIDLE",  "path": "..\\Resources\\Animation\\PistolIdle.fbx" },
+    { "key": "PISTOLIDLE2", "path": "..\\Resources\\Animation\\PistolIdle2.fbx" },
+    { "key": "HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
+    { "key": "DANCE",       "path": "..\\Resources\\Animation\\SillyDancing.fbx" }
+  ]
+}

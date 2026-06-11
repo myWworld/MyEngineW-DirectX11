@@ -28,16 +28,20 @@ namespace ME
 		void SetShader(graphics::Shader* shader) { mShader = shader; }
 		void SetShader(std::shared_ptr<graphics::Shader> shader) { mShader = shader.get(); }
 
-		void SetAlbedoTexture(graphics::Texture* texture) { mAlbedoTexture = texture; mData.albedo = texture->GetName(); }
-
+		void SetAlbedoTexture(std::shared_ptr<graphics::Texture> texture) { mAlbedoTexture = texture; }
+		void SetNormalTexture(std::shared_ptr<graphics::Texture> texture) { mNormalTexture = texture; }
+		void SetSpecularTexture(std::shared_ptr<graphics::Texture> texture) { mSpecularTexture = texture; }
+		void SetRoughnessTexture(std::shared_ptr<graphics::Texture> texture) { mRoughnessTexture = texture; }
+		void SetMetallicTexture(std::shared_ptr<graphics::Texture> texture) { mMetallicTexture = texture; }
 
 	private:
-
-		graphics::Texture* mAlbedoTexture;
-		std::vector<graphics::Texture*> mAlbedoTextures;
-		graphics::Texture* mNormalTexture;
-		graphics::Texture* mSpecularTexture;
-
+		
+		std::shared_ptr<graphics::Texture> mAlbedoTexture;
+		std::shared_ptr<graphics::Texture> mNormalTexture;
+		std::shared_ptr<graphics::Texture> mSpecularTexture;
+		std::shared_ptr<graphics::Texture> mRoughnessTexture;
+		std::shared_ptr<graphics::Texture> mMetallicTexture;
+	
 		XMFLOAT3 AmbientColor;
 		XMFLOAT3 DiffuseColor;
 		XMFLOAT3 SpecularColor;
