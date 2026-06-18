@@ -6,6 +6,7 @@
 #include "MEBone.h"
 #include "MEResources.h"
 #include <float.h>
+#include <fstream>
 
 
 namespace ME
@@ -76,7 +77,22 @@ namespace ME
         if (mModelType == enums::eModelType::SkinnedMesh)
         {
             mSkeleton.RegisterSkinData(scene);
+
+			//std::ofstream modelFile("SkeletonData.txt", std::ios::out);
+
+   //         if (modelFile.is_open())
+   //         {
+			//	modelFile << "--- ¸ðµ¨ »À ¸®½ºÆ® ---" << std::endl;
+   //             for (const auto& bone : mSkeleton.mBones)
+   //             {
+
+   //                 modelFile << bone.mName << std::endl;
+
+   //             }
+   //         }
+
         }
+
 
         return S_OK;
     }
@@ -136,7 +152,7 @@ namespace ME
     {
         std::vector<Vertex> vertices;
         std::vector<unsigned int> indices;
-        std::unordered_map<std::string, int> boneNameToIndex;
+      
         std::vector<Bone> bones; 
 
         Vector3 minBounds(FLT_MAX, FLT_MAX, FLT_MAX);
@@ -196,11 +212,15 @@ namespace ME
         {
             aiBone* bone = mesh->mBones[i];
             std::string boneName = bone->mName.C_Str();
-           // boneName = mSkeleton.ExtractBoneName(boneName);
+           boneName = mSkeleton.ExtractBoneName(boneName);
 
             int boneIndex = mSkeleton.GetBoneIndex(boneName);
-            boneNameToIndex[boneName] = boneIndex;
-
+            if (boneIndex == -1)
+            {
+                assert(false && "»À ÀÎµ¦½º ¸ÅÄª ½ÇÆÐ, ¸Þ½¬ÀÇ »À°¡ ½ºÄÌ·¹Åæ Æ®¸®¿¡ ¾ø´Ù ");
+                continue;
+            }
+            
             Bone newBone(boneName,boneIndex, math::Matrix::Identity);
             newBone.mOffsetMatrix = ConvertAIMatrixToMatrix(bone->mOffsetMatrix);
             bones.push_back(newBone);

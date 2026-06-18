@@ -1,11 +1,14 @@
 #include "MESkeleton.h"
 #include "MEAnimator3D.h"
+#include "StringUtility.h"
 
 namespace ME
 {
 
 	Skeleton::Skeleton()
 		:Resource(enums::eResourceType::Skeleton)
+		, mRootBoneHash(0)
+		, mModelType(enums::eModelType::Static)
 	{
 
 	}
@@ -28,39 +31,27 @@ namespace ME
 		std::string nodeName = node->mName.C_Str();
 		size_t nodeHash = 0;
 
-		if (nodeName == "RootNode")
-		{
-			nodeHash = std::hash<std::string>{}(nodeName);
-			mRootBoneHash = nodeHash;
-		}
-		else
-		{
+
 			nodeName = ExtractBoneName(nodeName);
 			nodeHash = std::hash<std::string>{}(nodeName);
-		}
+		
 
-		if (mBoneNameToIndexMap.contains(nodeHash))
+		if (mBoneHashToIndexMap.contains(nodeHash))
 		{
-			int boneIndex = mBoneNameToIndexMap[nodeHash];
+			int boneIndex = mBoneHashToIndexMap[nodeHash];
 
 			if (node->mParent)
 			{
 				std::string parentName = node->mParent->mName.C_Str();
 				size_t parentHash = 0;
 
-				if (parentName == "RootNode")
-				{
-					parentHash = std::hash<std::string>{}(parentName);
-				}
-				else
-				{
 					parentName = ExtractBoneName(parentName);
 					parentHash = std::hash<std::string>{}(parentName);
-				}
+				
 
-				if (mBoneNameToIndexMap.contains(parentHash))
+				if (mBoneHashToIndexMap.contains(parentHash))
 				{
-					int parentIndex = mBoneNameToIndexMap[parentHash];
+					int parentIndex = mBoneHashToIndexMap[parentHash];
 
 					auto& children = mBones[parentIndex].mChildren;
 					if (std::find(children.begin(), children.end(), &mBones[boneIndex]) == children.end())
@@ -88,22 +79,24 @@ namespace ME
 		size_t nodeHash = 0;
 
 		bool bSkiped = false;
+		std::string pureName = ExtractBoneName(nodeName);
 
-		if (nodeName == "RootNode")
+		if (pureName == "RootNode")
 		{
-			nodeHash = std::hash<std::string>{}(nodeName);
+			nodeHash = std::hash<std::string>{}(pureName);
+			mRootBoneHash = nodeHash;
 		}
 		else
 		{
-			std::string pureName = ExtractBoneName(nodeName); // 네임스페이스 제거
+													// 네임스페이스 제거
 			nodeHash = std::hash<std::string>{}(pureName);    // 순수 이름 해싱
 		}
 
-		if (mBoneNameToIndexMap.find(nodeHash) == mBoneNameToIndexMap.end() && bSkiped == false)
+		if (mBoneHashToIndexMap.find(nodeHash) == mBoneHashToIndexMap.end() && bSkiped == false)
 		{
 			int idx = static_cast<int>(mBones.size());
 			Bone newBone;
-			newBone.mName = nodeName;
+			newBone.mName = pureName;
 		
 			auto it = preRot.find(nodeName);
 			Matrix pureRotation = Matrix::Identity;
@@ -123,7 +116,7 @@ namespace ME
 			newBone.mLocalTransform = local;
 			newBone.mDefaultLocalTransform = local;
 
-			mBoneNameToIndexMap[nodeHash] = idx;
+			mBoneHashToIndexMap[nodeHash] = idx;
 			newBone.mIndex = idx;
 			mBones.push_back(newBone);
 		}
@@ -151,10 +144,10 @@ namespace ME
 				boneName = ExtractBoneName(boneName);
 				size_t boneHash = std::hash<std::string>{}(boneName);
 
-				auto iter = mBoneNameToIndexMap.find(boneHash);
+				auto iter = mBoneHashToIndexMap.find(boneHash);
 
 	
-				if (iter != mBoneNameToIndexMap.end())
+				if (iter != mBoneHashToIndexMap.end())
 				{
 					int boneIndex = iter->second;				
 					mBones[boneIndex].mOffsetMatrix = ConvertAIMatrixToMatrix(bone->mOffsetMatrix);
@@ -171,10 +164,10 @@ namespace ME
 	{
 		size_t nameHash = std::hash<std::string>{}(name);
 
-		auto it = mBoneNameToIndexMap.find(nameHash);
+		auto it = mBoneHashToIndexMap.find(nameHash);
 
 
-		if (it != mBoneNameToIndexMap.end())
+		if (it != mBoneHashToIndexMap.end())
 		{
 			return it->second;
 		}
@@ -187,9 +180,9 @@ namespace ME
 				std::string newName = iter->second;
 				size_t newNameHash = std::hash<std::string>{}(newName);
 
-				auto it2 = mBoneNameToIndexMap.find(newNameHash);
+				auto it2 = mBoneHashToIndexMap.find(newNameHash);
 
-				if (it2 != mBoneNameToIndexMap.end())
+				if (it2 != mBoneHashToIndexMap.end())
 				{
 					return it2->second;
 				}
@@ -200,10 +193,10 @@ namespace ME
 
 	int Skeleton::GetBoneIndex(const size_t& hash) const
 	{
-		auto it = mBoneNameToIndexMap.find(hash);
+		auto it = mBoneHashToIndexMap.find(hash);
 
 
-		if (it != mBoneNameToIndexMap.end())
+		if (it != mBoneHashToIndexMap.end())
 		{
 			return it->second;
 		}
@@ -231,9 +224,9 @@ namespace ME
 				std::string newName = iter->second;
 				size_t newNameHash = std::hash<std::string>{}(newName);
 
-				auto it2 = mBoneNameToIndexMap.find(newNameHash);
+				auto it2 = mBoneHashToIndexMap.find(newNameHash);
 
-				if (it2 != mBoneNameToIndexMap.end())
+				if (it2 != mBoneHashToIndexMap.end())
 				{
 					return it2->second;
 				}
@@ -246,9 +239,9 @@ namespace ME
 	Bone* Skeleton::GetLeftHandTransform()
 	{
 		static const size_t leftHandHash = std::hash<std::string>{}("LeftHand");
-		auto it = mBoneNameToIndexMap.find(leftHandHash);
+		auto it = mBoneHashToIndexMap.find(leftHandHash);
 
-		if (it == mBoneNameToIndexMap.end())
+		if (it == mBoneHashToIndexMap.end())
 			return nullptr;
 
 		return &mBones[it->second];
@@ -258,9 +251,9 @@ namespace ME
 	Bone* Skeleton::GetRightHandTransform()
 	{
 		static const size_t rightHandHash = std::hash<std::string>{}("RightHand");
-		auto it = mBoneNameToIndexMap.find(rightHandHash);
+		auto it = mBoneHashToIndexMap.find(rightHandHash);
 
-		if (it == mBoneNameToIndexMap.end())
+		if (it == mBoneHashToIndexMap.end())
 			return nullptr;
 
 		return &mBones[it->second];
@@ -302,29 +295,7 @@ namespace ME
 
 	std::string Skeleton::ExtractBoneName(const std::string& name) const
 	{
-		std::string newName = name;
-
-		size_t pos = newName.find_last_of("/|:");
-
-
-		if (pos != std::string::npos)
-		{
-			newName = newName.substr(pos + 1);
-		}
-
-		size_t assimpFbxPos = newName.find("$AssimpFbx$");
-
-		if (assimpFbxPos != std::string::npos)
-		{
-			newName = newName.substr(0, assimpFbxPos - 1);
-		}
-
-		//transform(newName.begin(), newName.end(), newName.begin(),
-		//	[](unsigned char c) {
-		//		return std::tolower(static_cast<unsigned char>(c));
-		//	});
-	   
-		return newName;
+		return ME::StringUtility::extractBoneName(name);
 	}
 
 

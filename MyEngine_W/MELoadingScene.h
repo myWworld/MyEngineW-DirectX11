@@ -24,6 +24,7 @@ namespace ME
 
 		void resourcesLoad(std::mutex& m);
 
+
 	private:
 
 		bool mbLoadCompleted;

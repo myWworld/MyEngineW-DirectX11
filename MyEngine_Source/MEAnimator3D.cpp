@@ -96,7 +96,8 @@ namespace ME
 
 		if (mModelType == enums::eModelType::SkinnedMesh)
 		{
-			graphics::AnimationCB cbData = {};
+			graphics::AnimationCB cbData; // {} -> to none Zero-초기화를 매번하는 작업 스택에 할당되므로 오버헤드가 적음. 하지만 매번 초기화하는 작업이 필요함.
+			// -> 지역캐시성을 높이기 위해 지역변수로 선언하는 것이 좋음.
 
 			for (unsigned i = 0; i < mSkeleton.mBones.size(); i++)
 			{

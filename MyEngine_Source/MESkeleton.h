@@ -18,7 +18,7 @@ namespace ME
 		~Skeleton();
 
 		std::vector<Bone> mBones;
-		std::unordered_map<size_t, int> mBoneNameToIndexMap;
+		std::unordered_map<size_t, int> mBoneHashToIndexMap;
 		std::vector<Matrix> mBonesTransform;
 	
 		size_t mRootBoneHash;
@@ -57,7 +57,7 @@ namespace ME
 			if (this != &other)
 			{
 				mBones = other.mBones;
-				mBoneNameToIndexMap = other.mBoneNameToIndexMap;
+				mBoneHashToIndexMap = other.mBoneHashToIndexMap;
 				mBonesTransform = other.mBonesTransform;
 				mRootBoneHash = other.mRootBoneHash;
 				mModelType = other.mModelType;

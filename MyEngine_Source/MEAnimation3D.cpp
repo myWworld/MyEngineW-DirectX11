@@ -8,6 +8,7 @@
 #include "MECamera.h"
 #include "MESceneManager.h"
 #include "MESkeleton.h"
+#include "StringUtility.h"
 
 namespace ME
 {
@@ -214,38 +215,26 @@ namespace ME
 			this->boneAnimations.push_back(boneAnim);
 		}
 
+		//std::ofstream modelFile("AnimationSkeletonData.txt", std::ios::out);
+
+		//if (modelFile.is_open())
+		//{
+		//	modelFile << "--- 애니메이션 뼈 리스트 ---" << std::endl;
+		//	for (const auto& bone : boneAnimations)
+		//	{
+
+		//		modelFile << bone.boneName << std::endl;
+
+		//	}
+		//}
+
+
 	}
 
 	std::string Animation3D::extractBoneName(std::string& name)
 	{
-		//size_t lastSlash = name.find_last_of("/|:");
-		//std::string newName;
-		//
-		//if (lastSlash != std::string::npos)
-		//{
-		//	newName = name.substr(lastSlash + 1);
-		//}
-		//else
-		//{
-		//	newName = name;
-		//}
-
-		size_t assimpFbxPos = name.find("$AssimpFbx$");
-		if(assimpFbxPos != std::string::npos)
-		{
-			name = name.substr(0, assimpFbxPos -1);
-		}
-
-		//std::string finalName = "";
-		//
-		//for (char c : newName)
-		//{
-		//	finalName += std::tolower(static_cast<unsigned char>(c));
-		//}
-		//
-		return name;
+		return ME::StringUtility::extractBoneName(name);
 	}
-
 
 	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime,const std::string& boneName, Skeleton* skeleton, Animator3D* animator)
 	{
@@ -274,10 +263,11 @@ namespace ME
 		Vector3 interpolatedScale = InterpolateScale(boneAnim.scales, currentTime);
 
 		Matrix transform =
+			Matrix::CreateScale(interpolatedScale) *
 			Matrix::CreateFromQuaternion(interpolatedRot) *
 			Matrix::CreateTranslation(interpolatedPos);
 
-		//Matrix::CreateScale(interpolatedScale) *
+		//
 
 		transform = transform * baseTransform;
 

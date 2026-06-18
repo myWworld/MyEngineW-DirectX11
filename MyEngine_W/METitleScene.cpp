@@ -97,7 +97,7 @@ namespace ME
 			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 			//
 			mPlayer->AddComponent<PlayerScript>();
-			MakeCharacter(mPlayer, L"AlienModel");
+			MakeCharacter(mPlayer, L"SoldierModel");
 
 			MakeGun(mPlayer);
 

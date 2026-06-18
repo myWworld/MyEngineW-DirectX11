@@ -158,7 +158,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEInputHandler.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
-    <ClCompile Include="$(MSBuildThisFileDirectory)MEFrustumCulling.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFrustumCulling.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -339,7 +341,15 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEInputHandler.h">
       <Filter>Helpers</Filter>
     </ClInclude>
-    <ClInclude Include="$(MSBuildThisFileDirectory)MEFrustumCulling.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)StringUtility.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFrustumCulling.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)BoneMapManager.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">

@@ -3,6 +3,7 @@
 
 #include "framework.h"
 #include "myEngineforStudy.h"
+#include "windows.h"
 #include "..//MyEngine_Source/MEApplication.h"
 #include "..//MyEngine_W/MELoadScene.h"
 #include "..//MyEngine_Source//MEResources.h"
@@ -64,7 +65,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     MSG msg;
 
-  
+    //AllocConsole();
 
     while (true)
     {

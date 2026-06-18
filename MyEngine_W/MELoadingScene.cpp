@@ -6,6 +6,7 @@
 #include "json.hpp"
 #include "MEModel.h"
 #include "METitleScene.h"
+#include "../MyEngine_Source/StringUtility.h"
 #include "../MyEngine_Source/MEAnimation3D.h"
 
 
@@ -79,36 +80,11 @@ namespace ME
 			renderer::Initialize();
 
 			std::ifstream file("..\\Resources\\ResourceList.json");
-
-			if (!file.is_open()) {
-				json datas = json::parse(file);
-			}
 			json datas = json::parse(file);
 
-			for (auto& el : datas.items()) {
-				std::cout << "Key: " << el.key() << std::endl;
-			}
-
-			for (const auto& texture : datas["Texture"])
-			{
-				std::wstring key = std::wstring(texture["key"].get<std::string>().begin(), texture["key"].get<std::string>().end());
-				std::wstring path = std::wstring(texture["path"].get<std::string>().begin(), texture["path"].get<std::string>().end());
-				Resources::Load<graphics::Texture>(key, path);
-			}
-
-			for (const auto& model : datas["Model"])
-			{
-				std::wstring key = std::wstring(model["key"].get<std::string>().begin(), model["key"].get<std::string>().end());
-				std::wstring path = std::wstring(model["path"].get<std::string>().begin(), model["path"].get<std::string>().end());
-				Resources::Load<Model>(key, path);
-			}
-
-			for (const auto& animation : datas["Animation"])
-			{
-				std::wstring key = std::wstring(animation["key"].get<std::string>().begin(), animation["key"].get<std::string>().end());
-				std::wstring path = std::wstring(animation["path"].get<std::string>().begin(), animation["path"].get<std::string>().end());
-				Resources::Load<Animation3D>(key, path);
-			}
+			Resources::LoadFromJSON<graphics::Texture>(datas, "Texture");
+			Resources::LoadFromJSON<Model>(datas, "Model");
+			Resources::LoadFromJSON<Animation3D>(datas, "Animation");
 
 			//Resources::Load<graphics::Texture>(L"PISTOL", L"..\\Resources\\PistolTex.jpg");
 			//Resources::Load<graphics::Texture>(L"GUN", L"..\\Resources\\M4Tex.png");
@@ -140,4 +116,6 @@ namespace ME
 		mbLoadCompleted = true;
 
 	}
+
+
 }

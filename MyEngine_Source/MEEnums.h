@@ -83,4 +83,12 @@ namespace ME::enums
 		AudioSource,
 		End,
 	};
+
+	enum class eBoneProfile : int
+	{
+		None = 0,
+		Humanoid,      // 주인공, 인간형 적
+		Quadruped,     // 4족 보행 몬스터
+		End,          // 배열 크기 측정을 위한 더미값
+	};
 }

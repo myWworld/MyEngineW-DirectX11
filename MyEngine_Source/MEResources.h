@@ -1,6 +1,10 @@
 #pragma once
 #include "MEResource.h"
+#include "json.hpp"
+#include "StringUtility.h"
 #include <memory>
+
+using json = nlohmann::json;
 
 namespace ME
 {
@@ -58,6 +62,27 @@ namespace ME
 		static void Release()
 		{
 			mResources.clear();
+		}
+
+		template<typename T>
+		static void LoadFromJSON(const json& data, const std::string& category)
+		{
+			if (!data.contains(category)) return;
+
+			for (const auto& item : data[category])
+			{
+
+				if (!item.contains("key") || !item.contains("path"))
+				{
+					assert(false && "Invalid JSON format for resource loading.");
+					continue;
+				}
+
+				Load<T>(
+					StringUtility::s2ws(item["key"].get<std::string>()),
+					StringUtility::s2ws(item["path"].get<std::string>())
+				);
+			}
 		}
 		
 	private:
