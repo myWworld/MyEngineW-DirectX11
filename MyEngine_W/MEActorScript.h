@@ -1,5 +1,6 @@
 #pragma once
 #include "MEScript.h"
+#include <vector>
 
 namespace ME
 {
@@ -16,9 +17,14 @@ namespace ME
 		virtual Vector3 GetAimDirection() = 0;
 		bool IsUsingWeapon() { return mbHoldingWeapon; }
 
+		virtual void AddWeapon(WeaponScript* weapon);
+		virtual void EquipWeapon(int index);
 		virtual void OnToggleWeapon()
 		{
-			mbHoldingWeapon = !mbHoldingWeapon;
+			if (mWeapons.size() <= 1) return;
+
+			int nextIdx = (mCurrentWeaponIndex + 1) % mWeapons.size();
+			EquipWeapon(nextIdx);
 		}
 
 		virtual void SetWeaponEquipment(WeaponScript* weapon)
@@ -28,7 +34,10 @@ namespace ME
 
 	protected:
 		bool mbHoldingWeapon = false;
-		WeaponScript* mEquippedWeapon;
+
+		std::vector<WeaponScript*> mWeapons; // 무기 인벤토리
+		int mCurrentWeaponIndex = -1;        // 현재 들고 있는 무기의 배열 번호
+		WeaponScript* mEquippedWeapon;       // 현재 들고 있는 무기에 빠르게 접근하기 위한 캐싱 포인터
 
 	};
 }

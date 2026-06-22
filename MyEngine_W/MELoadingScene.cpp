@@ -6,6 +6,7 @@
 #include "json.hpp"
 #include "MEModel.h"
 #include "METitleScene.h"
+#include "BoneMapManager.h"
 #include "../MyEngine_Source/StringUtility.h"
 #include "../MyEngine_Source/MEAnimation3D.h"
 
@@ -86,6 +87,7 @@ namespace ME
 			Resources::LoadFromJSON<Model>(datas, "Model");
 			Resources::LoadFromJSON<Animation3D>(datas, "Animation");
 
+			BoneMapManager::LoadJsonBoneMap("..\\Resources\\BoneMap.json", enums::eBoneProfile::Humanoid);
 			//Resources::Load<graphics::Texture>(L"PISTOL", L"..\\Resources\\PistolTex.jpg");
 			//Resources::Load<graphics::Texture>(L"GUN", L"..\\Resources\\M4Tex.png");
 			//Resources::Load<graphics::Texture>(L"ALIEN", L"..\\Resources\\AlienTex.png");

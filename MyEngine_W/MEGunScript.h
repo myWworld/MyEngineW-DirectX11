@@ -29,6 +29,7 @@ namespace ME
 	private:
 
 
+
 		GameObject* makeBullet();
 		void shootBullet();
 		void adjustGunPos();

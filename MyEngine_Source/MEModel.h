@@ -22,7 +22,8 @@ namespace ME
         ~Model();
 
         HRESULT Save(const std::wstring& path) override;
-        HRESULT Load(const std::wstring& path) override;
+        HRESULT Load(const std::wstring& path) override; //추상함수의 함수를 상속받아야 하지만 모델에선 쓰이지 않음 -> ...Args를 사용한 대신 딜레마..
+		HRESULT Load(const std::wstring& path, enums::eBoneProfile profile); //resource -> Load를 한 시점에서 이미 shared_ptr<Model>의 형태이므로 오버로딩을 사용 
     
         const std::vector<Mesh*>& GetMeshes() { return mMeshes; }
         const std::vector<graphics::Texture*>&GetTextures() { return mTextures; }

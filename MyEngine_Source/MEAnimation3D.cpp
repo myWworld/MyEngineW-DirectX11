@@ -33,11 +33,15 @@ namespace ME
 		Assimp::Importer importer;
 		std::string path_str = std::string(path.begin(), path.end());
 
+	
 		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 
 		const aiScene* animScene = importer.ReadFile(path_str,
 			aiProcess_Triangulate |
+			aiProcess_ConvertToLeftHanded |    
+			aiProcess_CalcTangentSpace |
 			aiProcess_FlipUVs |
+			aiProcess_RemoveRedundantMaterials |
 			aiProcess_ImproveCacheLocality |
 			aiProcess_JoinIdenticalVertices |
 			aiProcessPreset_TargetRealtime_Quality
@@ -48,9 +52,11 @@ namespace ME
 			return E_FAIL;
 		}
 
+		// Assimp에서 애니메이션 파싱
 		aiAnimation* anim = animScene->mAnimations[0];
 		CreateFromAssimp(anim);
 
+		// 경로 저장
 		this->SetPath(path);
 
 		return S_OK;
@@ -76,7 +82,7 @@ namespace ME
 			return;
 
 		float timeInTicks = currentTime * mTickersPerSecond;
-		std::unordered_set<std::string> updatedBones;
+		std::unordered_set<int> updatedBoneIndices;
 		Vector3 currentRootPos = Vector3::Zero;
 
 
@@ -88,17 +94,17 @@ namespace ME
 			if (boneindex == -1)
 				continue;
 
-			math::Matrix localTransform = InterpolateLocalTransform(bones, timeInTicks, bones.boneName, skeleton, animator);
+			math::Matrix localTransform = InterpolateLocalTransform(bones, timeInTicks, boneindex, skeleton, animator);
 			skeleton->mBones[boneindex].mLocalTransform = localTransform;
 
-			updatedBones.insert(bones.boneName);
+			updatedBoneIndices.insert(boneindex);
 
 			if (bones.boneName == "mixamorig:Hips" || bones.boneName == "Hips")
 				currentRootPos = localTransform.Translation();
 		}
 		for (auto& bone : skeleton->mBones)
 		{
-			if (updatedBones.find(bone.mName) == updatedBones.end())
+			if (updatedBoneIndices.find(skeleton->GetBoneIndex(bone.mName)) == updatedBoneIndices.end())
 			{
 				bone.mLocalTransform = bone.mDefaultLocalTransform;
 			}
@@ -126,41 +132,6 @@ namespace ME
 		skeleton->CalculateFinalTransform();
 	}
 
-	void Animation3D::CreateAnimation(const std::wstring& name, const std::wstring& path)
-	{
-		mName = name;
-		SetName(name);
-
-		Assimp::Importer importer;
-		std::string path_str = std::string(path.begin(), path.end());
-
-		importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
-
-		const aiScene* animScene = importer.ReadFile(path_str,
-			aiProcess_Triangulate |
-			aiProcess_CalcTangentSpace |   //  접선 공간 계산
-			aiProcess_FlipUVs |
-			aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
-			//  잘못된 데이터 자동 제거
-			//aiProcess_OptimizeMeshes |           //  메쉬 최적화
-			aiProcess_ImproveCacheLocality |   //  GPU 캐시 최적화
-			//aiProcess_MakeLeftHanded |
-			aiProcess_JoinIdenticalVertices |
-			//aiProcess_FlipWindingOrder | //  좌표계 변환  
-			aiProcessPreset_TargetRealtime_Quality
-		);
-
-		if (animScene && animScene->mNumAnimations > 0)
-		{
-			aiAnimation* anim = animScene->mAnimations[0];
-			CreateFromAssimp(anim);
-			
-			this->SetPath(path);
-
-		}
-
-
-	}
 
 	void Animation3D::CreateFromAssimp(aiAnimation* anim)
 	{
@@ -215,7 +186,7 @@ namespace ME
 			this->boneAnimations.push_back(boneAnim);
 		}
 
-		//std::ofstream modelFile("AnimationSkeletonData.txt", std::ios::out);
+		//std::ofstream modelFile("AnimationSkeletonData2.txt", std::ios::out);
 
 		//if (modelFile.is_open())
 		//{
@@ -236,47 +207,92 @@ namespace ME
 		return ME::StringUtility::extractBoneName(name);
 	}
 
-	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime,const std::string& boneName, Skeleton* skeleton, Animator3D* animator)
+	math::Matrix Animation3D::InterpolateLocalTransform(const BoneAnimation& boneAnim, float currentTime,int boneIdx, Skeleton* skeleton, Animator3D* animator)
 	{
+		// 위치(Position) 방어: 남의 뼈 길이 무시하고 내 뼈 길이 유지
 		Vector3 interpolatedPos = InterpolatePosition(boneAnim.positions, currentTime);
 
-		if (boneName == "Hips" || boneName == "mixamorig:Hips")
+		if (boneAnim.boneName != "Hips" && boneAnim.boneName != "mixamorig:Hips")
+		{
+			if (boneIdx != -1)
+			{
+				interpolatedPos = skeleton->mBones[boneIdx].mDefaultLocalTransform.Translation();
+			}
+		}
+		else
 		{
 			if (!animator->GetApplyRootMotion())
 				interpolatedPos = Vector3::Zero;
 		}
 
+		//크기(Scale) 방어: 무조건 1.0으로 고정해서 늘어나는 현상 차단
+		Vector3 interpolatedScale = Vector3(1.0f, 1.0f, 1.0f);
+
+		//  회전(Rotation) 계산
 		Quaternion interpolatedRot = InterpolateRotation(boneAnim.rotations, currentTime);
-		int boneIdx = skeleton->GetBoneIndex(boneName);
 
-
-		//Quaternion finalRot = interpolatedRot;
-		//
-		//
 		Matrix baseTransform = Matrix::Identity;
-		
 		if (boneIdx != -1)
 		{
-			 baseTransform = skeleton->mBonesTransform[boneIdx];
+			baseTransform = skeleton->mBonesTransform[boneIdx];
 		}
-		//
-		Vector3 interpolatedScale = InterpolateScale(boneAnim.scales, currentTime);
 
-		Matrix transform =
-			Matrix::CreateScale(interpolatedScale) *
-			Matrix::CreateFromQuaternion(interpolatedRot) *
-			Matrix::CreateTranslation(interpolatedPos);
-
-		//
-
+	
+		Matrix transform = Matrix::CreateScale(interpolatedScale) * Matrix::CreateFromQuaternion(interpolatedRot);
 		transform = transform * baseTransform;
 
+		//회전이 다 끝난 행렬에, 마지막으로 위치값을 직접 꽂아 넣습니다
+		transform._41 = interpolatedPos.x;
+		transform._42 = interpolatedPos.y;
+		transform._43 = interpolatedPos.z;
+
 		return transform;
+		//Vector3 interpolatedPos = InterpolatePosition(boneAnim.positions, currentTime);
+
+		//if (boneAnim.boneName != "Hips" && boneAnim.boneName != "mixamorig:Hips")
+		//{
+		//	if (boneIdx != -1)
+		//	{
+		//		// 애니메이션 위치값 덮어쓰기 -> 내 뼈의 원래 위치(길이)
+		//		interpolatedPos = skeleton->mBones[boneIdx].mDefaultLocalTransform.Translation();
+		//	}
+		//}
+		//else
+		//{
+		//	// 골반(Hips) 루트모션 처리 
+		//	if (!animator->GetApplyRootMotion())
+		//		interpolatedPos = Vector3::Zero;
+		//}
+
+		//Quaternion interpolatedRot = InterpolateRotation(boneAnim.rotations, currentTime);
+
+		////Quaternion finalRot = interpolatedRot;
+		////
+		////
+		//Matrix baseTransform = Matrix::Identity;
+		//
+		//if (boneIdx != -1)
+		//{
+		//	 baseTransform = skeleton->mBonesTransform[boneIdx];
+		//}
+		////
+		//Vector3 interpolatedScale = InterpolateScale(boneAnim.scales, currentTime);
+
+		//Matrix transform =
+		//	Matrix::CreateScale(interpolatedScale) *
+		//	Matrix::CreateFromQuaternion(interpolatedRot) *
+		//	Matrix::CreateTranslation(interpolatedPos);
+
+		////
+
+		//transform = transform * baseTransform;
+
+		//return transform;
 	}
 
 
 
-	math::Vector3 Animation3D::InterpolatePosition(const	std::vector<VectorKey>& pos, float currentTime)
+	math::Vector3 Animation3D::InterpolatePosition(const std::vector<VectorKey>& pos, float currentTime)
 	{
 		if (pos.size() == 1)
 			return pos[0].value;

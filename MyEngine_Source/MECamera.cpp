@@ -76,7 +76,7 @@ namespace ME
 			
 			if (mCamScript->GetPerspective() == CameraScript::perspective::ThirdPerson)
 			{
-				offset = Vector3(0.0f, 270, -75);
+				offset = Vector3(0.0f, 150, -100);
 				mFovY = 75.0f;
 			}
 			else
@@ -91,6 +91,8 @@ namespace ME
 			Matrix fullRot = Matrix::CreateRotationX(mCameraPitch) * Matrix::CreateRotationY(mCameraYaw);
 			Vector3 camForward = Vector3::Transform(Vector3::Forward, fullRot);
 			mForward = camForward;
+			mRight = Vector3::Transform(Vector3::Right, fullRot);
+
 			Vector3 camTarget = camPos + camForward;
 			
 			Quaternion rot = Quaternion::CreateFromRotationMatrix(fullRot);

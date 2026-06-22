@@ -34,8 +34,22 @@ namespace ME
 			mbSetWorldMatrix = false; // Reset world matrix flag when position changes
 		}
 		void SetPosition(float x, float y, float z) { mPosition = Vector3(x, y, z); }
-		void SetRotation(Vector3 rotation) { mRotation = rotation; }
-		void SetRotation(float x, float y, float z) { mRotation = Vector3(x, y, z); }
+		void SetRotation(Vector3 eulerDegrees)
+		{
+			// 사람이 입력한 각도(Degree)를 라디안으로 바꾸고, 그걸 쿼터니언으로 변환해서 저장
+			float pitch = math::Radian(eulerDegrees.x);
+			float yaw = math::Radian(eulerDegrees.y);
+			float roll = math::Radian(eulerDegrees.z);
+
+			mRotationQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
+			mbSetWorldMatrix = false;
+		}
+		void SetRotation(float x, float y, float z) {  SetRotation(Vector3(x, y, z)); }
+		void SetRotation(Quaternion quat)
+		{
+			mRotationQuat = quat;
+			mbSetWorldMatrix = false;
+		}
 		void SetScale(Vector3 scale) { mScale = scale; }
 		void SetScale(float x, float y, float z) { mScale = Vector3(x, y, z); }
 
@@ -59,6 +73,7 @@ namespace ME
 
 		Vector3 mPosition;
 		Vector3 mRotation;
+		Quaternion mRotationQuat;
 		Vector3 mScale;
 
 		Vector3 mForward;

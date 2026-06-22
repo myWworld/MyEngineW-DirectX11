@@ -36,7 +36,8 @@ namespace ME
 	        texture = nullptr;
 		}
     }
-    HRESULT Model::Load(const std::wstring& path)
+
+    HRESULT Model::Load(const std::wstring& path, enums::eBoneProfile profile)
     {
         Assimp::Importer importer;
         std::string path_str = std::string(path.begin(), path.end());
@@ -50,10 +51,10 @@ namespace ME
             aiProcess_CalcTangentSpace |
             aiProcess_FlipUVs |
             aiProcess_RemoveRedundantMaterials | //  쓰레기 재질 제거
-                    //  잘못된 데이터 자동 제거
-          //  aiProcess_OptimizeMeshes |           //  메쉬 최적화
-            aiProcess_ImproveCacheLocality   |   //  GPU 캐시 최적화
-           // aiProcess_MakeLeftHanded |
+            //  잘못된 데이터 자동 제거
+  //  aiProcess_OptimizeMeshes |           //  메쉬 최적화
+            aiProcess_ImproveCacheLocality |   //  GPU 캐시 최적화
+            // aiProcess_MakeLeftHanded |
             aiProcess_JoinIdenticalVertices |
             //aiProcess_FlipWindingOrder | //  좌표계 변환  
             aiProcessPreset_TargetRealtime_Quality
@@ -62,39 +63,45 @@ namespace ME
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
             std::string str = importer.GetErrorString();
-    
+
             return E_FAIL;
         }
 
-       
+
         std::wstring directory = path.substr(0, path.find_last_of('/') + 1);
-        
+
         mSkeleton.RegisterBone(scene->mRootNode, preRot);
         mSkeleton.BuildSkeleton(scene->mRootNode);
-        
+        mSkeleton.SetBoneProfile(profile);
         ProcessNode(scene->mRootNode, scene);
-    
+
+
         if (mModelType == enums::eModelType::SkinnedMesh)
         {
             mSkeleton.RegisterSkinData(scene);
 
-			//std::ofstream modelFile("SkeletonData.txt", std::ios::out);
+            //std::ofstream modelFile("SkeletonData2.txt", std::ios::out);
 
-   //         if (modelFile.is_open())
-   //         {
-			//	modelFile << "--- 모델 뼈 리스트 ---" << std::endl;
-   //             for (const auto& bone : mSkeleton.mBones)
-   //             {
+            //if (modelFile.is_open())
+            //{
+            //	modelFile << "--- 모델 뼈 리스트 ---" << std::endl;
+            //    for (const auto& bone : mSkeleton.mBones)
+            //    {
 
-   //                 modelFile << bone.mName << std::endl;
+            //        modelFile << bone.mName << std::endl;
 
-   //             }
-   //         }
+            //    }
+            //}
 
         }
 
 
         return S_OK;
+
+    }
+    HRESULT Model::Load(const std::wstring& path)
+    {
+		return Load(path, enums::eBoneProfile::None);
     }
 
     HRESULT Model::Save(const std::wstring& path)
@@ -351,6 +358,13 @@ namespace ME
              for (int row = 0; row < 4; ++row)
                  for (int col = 0; col < 4; ++col)
                      (&local._11)[row * 4 + col] = static_cast<float>(localMat.Get(row, col));
+
+             local._13 = -local._13;
+             local._23 = -local._23;
+             local._31 = -local._31;
+             local._32 = -local._32;
+             local._34 = -local._34;
+             local._43 = -local._43;
 
              bonePreRotations[nodeName] = local;
 

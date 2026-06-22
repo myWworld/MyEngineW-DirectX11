@@ -29,6 +29,7 @@ namespace ME
 			if (mOwner)
 			{
 				mOwnerTransform = mOwner->GetComponent<Transform>();
+				mWeaponTransform = GetOwner()->GetComponent<Transform>();
 				mActorScript = mOwner->GetComponent<ActorScript>();
 				mActorScript->SetWeaponEquipment(this);
 			}
@@ -39,12 +40,24 @@ namespace ME
 
 		GameObject* GetOwnerActor() { return mOwner; }
 
+	protected:
+
+		virtual void UpdateWeaponTransform();
+
+	private:		
+		void AttachToSocket();
+
 	protected :
 
 		GameObject* mOwner;
+		Transform* mWeaponTransform;
 		Transform* mOwnerTransform;
 		ActorScript* mActorScript;
 		OwnerType mOwnerType;
+
+	public :
+		math::Vector3 mOffsetRot;
+		math::Vector3 mOffsetPos;
 	};
 
 }

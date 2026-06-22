@@ -9,7 +9,7 @@ struct VSInput
     float2 uv : TEXCOORD;
     
       
-    int4 boneIndices : BONEINDICES;
+    uint4 boneIndices : BONEINDICES;
     float4 boneWeight : BONEWEIGHTS;
 };
 
@@ -34,7 +34,7 @@ VSOutput main(VSInput input)
 
     for (int i = 0; i < 4; i++)
     {
-        int boneIndex = input.boneIndices[i];
+        uint boneIndex = input.boneIndices[i];
         float boneWeight = input.boneWeight[i];
         
         

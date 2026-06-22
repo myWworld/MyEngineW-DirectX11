@@ -35,10 +35,7 @@ namespace ME
 		{
 		
 		Matrix scale = Matrix::CreateScale(mScale.x, mScale.y, mScale.z);
-
-		Matrix rotation = Matrix::CreateRotationX(math::Radian(mRotation.x));
-		rotation *= Matrix::CreateRotationY(math::Radian(mRotation.y));
-		rotation *= Matrix::CreateRotationZ(math::Radian(mRotation.z));
+		Matrix rotation = Matrix::CreateFromQuaternion(mRotationQuat);
 
 		Matrix translation = Matrix::CreateTranslation(mPosition);
 
@@ -47,7 +44,7 @@ namespace ME
 		mForward = Vector3::TransformNormal(Vector3::Forward, rotation);
 		mRight = Vector3::TransformNormal(Vector3::Right, rotation);
 		mUp = Vector3::TransformNormal(Vector3::Up, rotation);
-	}
+		}
 
 	}
 

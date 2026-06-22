@@ -25,6 +25,8 @@
 
 #include "MEPlayerScript.h"
 #include "MEEnemyScript.h"
+#include "MEWeaponScript.h"
+#include "MESwordScript.h"
 #include "MEGunScript.h"
 #include "MEGun.h"
 #include "MECollisionManager.h"
@@ -97,18 +99,18 @@ namespace ME
 			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 			//
 			mPlayer->AddComponent<PlayerScript>();
-			MakeCharacter(mPlayer, L"SoldierModel");
+			MakeCharacter(mPlayer, L"CharacterModel");
 
-			MakeGun(mPlayer);
+			MakeWeapon(mPlayer, L"PistolModel");
+			MakeWeapon(mPlayer, L"SwordModel");
 
 			GameObject* enemy = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(10, 0, 0));
 			Transform* transform = enemy->GetComponent<Transform>();
 			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
 
 			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
-			MakeCharacter(enemy, L"AlienModel");
+			MakeCharacter(enemy, L"MutantModel");
 
-			MakeGun(enemy);
 		}
 
 
@@ -175,33 +177,40 @@ namespace ME
 		}
 	}
 
-	void TitleScene::MakeGun(GameObject* player  )
+	void TitleScene::MakeWeapon(GameObject* player, std::wstring_view modelName)
 	{
 		
+		GameObject* obj = object::Instantiate<GameObject>(enums::eLayerType::Items, Vector3(0, 10, 35));
+		Transform* tr = obj->GetComponent<Transform>();
 
-		Gun* m4 = object::Instantiate<Gun>(enums::eLayerType::Items, Vector3(0, 10, 35));
-		Transform* tr = m4->GetComponent<Transform>();
-		//tr->SetScale(Vector3(7.0f, 7.0f, 7.0f));
-	//	tr->SetRotation(Vector3(0.0f, 180.0f, 0.0f));
-		GunScript* gunScript = m4->AddComponent<GunScript>();
+		WeaponScript* weaponScript = nullptr;
+
+		if (modelName == L"PistolModel")
+		{
+			weaponScript = obj->AddComponent<GunScript>();
+		}
+		else if (modelName == L"SwordModel")
+		{
+			weaponScript = obj->AddComponent<SwordScript>();
+		}
 
 		
-		gunScript->SetOnwer(player);
+		weaponScript->SetOnwer(player);
+		
 	
-		std::shared_ptr<Model> gun = Resources::Find<Model>(L"PistolModel");
+		std::shared_ptr<Model> model = Resources::Find<Model>(std::wstring(modelName));
 
-		if (gun)
+		if (model)
 		{
 
-			ModelRenderer* modelRenderer = m4->AddComponent<ModelRenderer>();
-			modelRenderer->SetMesh(gun->GetMeshes());
-
-			
+			ModelRenderer* modelRenderer = obj->AddComponent<ModelRenderer>();
+			modelRenderer->SetMesh(model->GetMeshes());
+			player->GetComponent<ActorScript>()->AddWeapon(weaponScript);
 		}
 		else
 		{
 	
-			gun = nullptr;
+			model = nullptr;
 		}
 	}
 }

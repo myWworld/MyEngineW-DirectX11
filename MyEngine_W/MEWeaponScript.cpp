@@ -10,4 +10,35 @@ namespace ME
 
 		return mActorScript->GetWeaponSocketBone();
 	}
+
+	void WeaponScript::UpdateWeaponTransform()
+	{
+		AttachToSocket();
+	}
+
+	void WeaponScript::AttachToSocket()
+	{
+		if (mOwner == nullptr || mWeaponTransform == nullptr) return;
+		Bone* socket = mActorScript->GetWeaponSocketBone();
+
+		if (socket == nullptr || !mActorScript->IsUsingWeapon()) return;
+	
+		Matrix handLocal = socket->FinalTransform;
+		Matrix playerWorldMatrix = mOwnerTransform->GetWorldMatrix();
+		Matrix handMatrix = handLocal * playerWorldMatrix;
+
+		Matrix offsetMatrix = Matrix::CreateFromYawPitchRoll(mOffsetRot.y, mOffsetRot.x, mOffsetRot.z)
+			* Matrix::CreateTranslation(mOffsetPos);
+
+		Matrix finalMatrix = offsetMatrix * handMatrix;
+
+		Vector3 pos, scale;
+		Quaternion rot;
+		finalMatrix.Decompose(scale, rot, pos);
+
+		mWeaponTransform->SetPosition(pos);
+		mWeaponTransform->SetRotation(rot);
+
+
+	}
 }

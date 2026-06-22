@@ -107,11 +107,11 @@ namespace ME
 
 			Matrix local = ConvertAIMatrixToMatrix(node->mTransformation);
 
-			it = preRot.find(nodeName);
-			if (it != preRot.end())
-			{
-				local = local * it->second;
-			}
+			//it = preRot.find(nodeName);
+			//if (it != preRot.end())
+			//{
+			//	local = local * it->second;
+			//}
 
 			newBone.mLocalTransform = local;
 			newBone.mDefaultLocalTransform = local;
@@ -160,9 +160,10 @@ namespace ME
 		}
 	}
 
-	int Skeleton::GetBoneIndexToMatchWithAnim(const std::string& name) const
+	int Skeleton::GetBoneIndexToMatchWithAnim(const std::string& name) const //애니메이션 bone 을 모델 내의 bone과 매칭 시키기 위해 사용
 	{
-		size_t nameHash = std::hash<std::string>{}(name);
+		std::string pureName = StringUtility::extractBoneName(name);
+		size_t nameHash = std::hash<std::string>{}(pureName);
 
 		auto it = mBoneHashToIndexMap.find(nameHash);
 
@@ -173,11 +174,12 @@ namespace ME
 		}
 		else
 		{
-			auto iter = BoneNameManualMapping.find(name);
+			auto iter = mBoneNameMap->find(pureName);
 
-			if (iter != BoneNameManualMapping.end())
+			if (iter != mBoneNameMap->end())
 			{
 				std::string newName = iter->second;
+
 				size_t newNameHash = std::hash<std::string>{}(newName);
 
 				auto it2 = mBoneHashToIndexMap.find(newNameHash);

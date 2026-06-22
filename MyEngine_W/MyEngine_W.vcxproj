@@ -31,6 +31,7 @@
     <ClInclude Include="MEPlayer.h" />
     <ClInclude Include="MEPlayerScript.h" />
     <ClInclude Include="MEPlayScene.h" />
+    <ClInclude Include="MESwordScript.h" />
     <ClInclude Include="METile.h" />
     <ClInclude Include="METitleScene.h" />
     <ClInclude Include="METoolScene.h" />
@@ -48,6 +49,7 @@
     <ClCompile Include="MEPlayer.cpp" />
     <ClCompile Include="MEPlayerScript.cpp" />
     <ClCompile Include="MEPlayScene.cpp" />
+    <ClCompile Include="MESwordScript.cpp" />
     <ClCompile Include="METile.cpp" />
     <ClCompile Include="METitleScene.cpp" />
     <ClCompile Include="METoolScene.cpp" />

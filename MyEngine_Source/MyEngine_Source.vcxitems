@@ -79,6 +79,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)StringUtility.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)BoneMapManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation3D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimator.cpp" />

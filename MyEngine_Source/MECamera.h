@@ -43,6 +43,7 @@ namespace ME
 		GameObject* GetTarget() { return mtarget; }
 
 		Vector3 GetForward() { return mForward; }
+		Vector3 GetRight() { return mRight; }
 
 		void SetPitch(float pitch) { mCameraPitch = pitch; }
 		void SetRoll(float roll) { mCameraRoll = roll; }
@@ -81,6 +82,7 @@ namespace ME
 		float mCameraRoll;
 
 		Vector3 mForward;
+		Vector3 mRight;
 
 		CameraScript* mCamScript;
 		std::unique_ptr<FrustumCulling> mFrustumCulling;

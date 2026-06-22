@@ -33,6 +33,9 @@ namespace ME
 	}
 	void GunScript::Initialize()
 	{
+		WeaponScript::Initialize();
+		mOffsetPos = Vector3(116.0f, 192.0f, 22.0f);
+		mOffsetRot = Vector3(90.0f, 90.0f, 0.0f);
 		mBulletPool = std::make_unique<ObjectPool<GameObject>>(50, [this]()->GameObject*
 		{
 			return this->makeBullet();
@@ -41,10 +44,12 @@ namespace ME
 	void GunScript::Update()
 	{
 	
-		if (mGunTransform == nullptr)
+		if (mWeaponTransform == nullptr)
 		{
-			mGunTransform = GetOwner()->GetComponent<Transform>();
+			mWeaponTransform = GetOwner()->GetComponent<Transform>();
 		}
+
+		adjustGunPos();
 	
 
 		if (!mbCanShoot) {
@@ -64,7 +69,7 @@ namespace ME
 	}
 	void GunScript::LateUpdate()
 	{
-		adjustGunPos();
+		//adjustGunPos();
 	}
 	void GunScript::Render()
 	{
@@ -82,26 +87,10 @@ namespace ME
 
 	void GunScript::adjustGunPos()
 	{
-		if (mOwner == nullptr || mGunTransform == nullptr) return;
+		WeaponScript::UpdateWeaponTransform();
 
-		Bone* socket = mActorScript->GetWeaponSocketBone();
-		if (socket == nullptr || !mActorScript->IsUsingWeapon()) return;
-
+		
 		Vector3 forwardDir = mActorScript->GetAimDirection();
-
-		Matrix handLocal = socket->FinalTransform;
-		Matrix playerWorldMatrix = mOwnerTransform->GetWorldMatrix();
-		Matrix handMatrix = handLocal * playerWorldMatrix;
-		// 손 위치 & 회전 추출
-		Vector3 handPos = handMatrix.Translation();
-		Quaternion handRot = Quaternion::CreateFromRotationMatrix(handMatrix);
-
-		Vector3 offset = Vector3(96.0f, 152.0f, 22.0f);
-		Vector3 finalPos = handPos + Vector3::Transform(offset, Matrix::CreateFromQuaternion(handRot));
-
-		Matrix worldMatrix = Matrix::CreateFromQuaternion(handRot) * Matrix::CreateTranslation(finalPos);
-
-	
 		forwardDir.y = 0.0f;
 		forwardDir.Normalize();
 
@@ -110,20 +99,10 @@ namespace ME
 			float yawRad = atan2f(forwardDir.x, forwardDir.z);
 			float yawDeg = XMConvertToDegrees(yawRad);
 
-			Vector3 rt = mGunTransform->GetRotation();
+			Vector3 rt = mWeaponTransform->GetRotation();
 			rt.y = yawDeg;
-			mGunTransform->SetRotation(rt);
+			mWeaponTransform->SetRotation(rt);
 		}
-
-
-		Vector3 pos;
-		Quaternion rot;
-		Vector3 scale;
-		worldMatrix.Decompose(scale, rot, pos);
-		mGunTransform->SetPosition(pos);
-		scale = mGunTransform->GetScale();
-		mGunTransform->SetScale(scale);
-
 	
 	
 	}

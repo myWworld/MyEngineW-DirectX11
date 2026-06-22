@@ -43,6 +43,8 @@ namespace ME
             if (mLeftHandBone == nullptr && mRightHandBone == nullptr)
             {
                 Skeleton* skeleton  = mAnimator->GetSkeletonPtr();
+				if (skeleton == nullptr) return;
+
                 mLeftHandBone = skeleton->GetLeftHandTransform();
                 mRightHandBone = skeleton->GetRightHandTransform();
             }
@@ -126,13 +128,13 @@ namespace ME
 
     void  PlayerScript::Idle()
     {
-        mAnimator->PlayAnimation(L"PISTOLIDLE");
+        mAnimator->PlayAnimation(L"SWORDIDLE1");
     }
     void PlayerScript::Move()
     {
         if (mState == State::Walk)
         {
-            mAnimator->PlayAnimation(L"PISTOLWALK");
+            mAnimator->PlayAnimation(L"SWORDWALK");
         }
         
         if (mState == State::Run)
@@ -162,8 +164,14 @@ namespace ME
 
         if (mPlayerTransform == nullptr) return;
 
-        Vector3 forwardDir = mPlayerTransform->Forward();
-        Vector3 rightDir = mPlayerTransform->Right();
+        Vector3 forwardDir = renderer::mainCamera->GetForward();
+        forwardDir.y = 0.0f; 
+        forwardDir.Normalize();
+
+		Vector3 rightDir = renderer::mainCamera->GetRight();
+        rightDir.y = 0.0f;
+        rightDir.Normalize();
+
         Vector3 moveDir = (forwardDir * moveAxis.y) + (rightDir * moveAxis.x);
 
         if (moveDir.LengthSquared() > 0.0f)
@@ -219,6 +227,7 @@ namespace ME
         {
             float yawRad = atan2f(camForward.x, camForward.z);
             float yawDeg = XMConvertToDegrees(yawRad);
+            yawDeg += 180.0f;
 
             Vector3 rt = mPlayerTransform->GetRotation();
             rt.y = yawDeg;

@@ -3,6 +3,7 @@
 #include "CommonInclude.h"
 #include "MEBone.h"
 #include "MEResource.h"
+#include "BoneMapManager.h"
 
 
 #include <assimp/scene.h>
@@ -27,6 +28,9 @@ namespace ME
 
 		std::unordered_set<int> visited;
 
+		enums::eBoneProfile mBoneProfile;
+		const std::unordered_map<std::string, std::string>* mBoneNameMap;
+
 	public:
 
 
@@ -48,6 +52,12 @@ namespace ME
 
 		std::string ExtractBoneName(const std::string& name) const;
 
+		void SetBoneProfile(enums::eBoneProfile profile)
+		{
+			mBoneProfile = profile;
+			mBoneNameMap = BoneMapManager::GetBoneMap(profile);
+		}
+
 		Bone* GetLeftHandTransform();
 		Bone* GetRightHandTransform();
 
@@ -61,6 +71,8 @@ namespace ME
 				mBonesTransform = other.mBonesTransform;
 				mRootBoneHash = other.mRootBoneHash;
 				mModelType = other.mModelType;
+				mBoneProfile = other.mBoneProfile;
+				mBoneNameMap = other.mBoneNameMap;
 
 				for (int i = 0; i < mBones.size(); ++i)
 				{

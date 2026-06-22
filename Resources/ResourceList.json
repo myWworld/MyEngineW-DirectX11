@@ -3,14 +3,16 @@
     { "key": "PISTOL",  "path": "..\\Resources\\PistolTex.jpg" },
     { "key": "GUN",     "path": "..\\Resources\\M4Tex.png" },
     { "key": "ALIEN",   "path": "..\\Resources\\AlienTex.png" },
-    { "key": "SOLDIER", "path": "..\\Resources\\SoldierTex.jpg" },
     { "key": "HPBAR",   "path": "..\\Resources\\Hpbar.png" }
   ],
   "Model": [
-    { "key": "BulletModel",  "path": "..\\Resources\\Bullet.fbx" },
-    { "key": "AlienModel",   "path": "..\\Resources\\alien.fbx" },
-    { "key": "PistolModel",  "path": "..\\Resources\\Pistol.fbx" },
-    { "key": "SoldierModel", "path": "..\\Resources\\Soldier.fbx" }
+    { "key": "BulletModel",  "path": "..\\Resources\\Bullet.fbx", "profile": "None" },
+    { "key": "CharacterModel",  "path": "..\\Resources\\Character.fbx", "profile": "Humanoid" },
+    { "key": "MutantModel",  "path": "..\\Resources\\Mutant.fbx", "profile": "Humanoid" },
+    { "key": "AlienModel",   "path": "..\\Resources\\alien.fbx",  "profile": "Humanoid" },
+    { "key": "PistolModel",  "path": "..\\Resources\\Pistol.fbx", "profile": "None" },
+    { "key": "KatanaModel",  "path": "..\\Resources\\katanas.fbx", "profile": "None" },
+    { "key": "SwordModel",  "path": "..\\Resources\\Sword.fbx", "profile": "None" }
   ],
   "Animation": [
     { "key": "Idle",        "path": "..\\Resources\\Animation\\Idle2.fbx" },
@@ -19,6 +21,8 @@
     { "key": "PISTOLIDLE",  "path": "..\\Resources\\Animation\\PistolIdle.fbx" },
     { "key": "PISTOLIDLE2", "path": "..\\Resources\\Animation\\PistolIdle2.fbx" },
     { "key": "HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
-    { "key": "DANCE",       "path": "..\\Resources\\Animation\\SillyDancing.fbx" }
+    { "key": "DANCE",       "path": "..\\Resources\\Animation\\SillyDancing.fbx" },
+    { "key": "SWORDIDLE1",       "path": "..\\Resources\\Animation\\great sword idle.fbx" },
+    { "key": "SWORDWALK",       "path": "..\\Resources\\Animation\\great sword walk.fbx" }
   ]
 }
