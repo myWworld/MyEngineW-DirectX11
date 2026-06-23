@@ -27,7 +27,7 @@ namespace ME
 		Matrix playerWorldMatrix = mOwnerTransform->GetWorldMatrix();
 		Matrix handMatrix = handLocal * playerWorldMatrix;
 
-		Matrix offsetMatrix = Matrix::CreateFromYawPitchRoll(mOffsetRot.y, mOffsetRot.x, mOffsetRot.z)
+		Matrix offsetMatrix = Matrix::CreateFromQuaternion(mOffsetQuat)
 			* Matrix::CreateTranslation(mOffsetPos);
 
 		Matrix finalMatrix = offsetMatrix * handMatrix;

@@ -93,6 +93,7 @@ namespace ME
         mForce = Vector3::Zero;
         mAccelation = Vector3::Zero;
         curForceMode = eForceMode::Force;
+        mVelocity = Vector3::Zero;
    }
 
 

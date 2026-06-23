@@ -184,6 +184,9 @@ namespace ME
 		this->mPrevRootPos = Vector3::Zero;
 		mbLoop = loop;
 
+		mCurrentTime = 0.0f;
+		mbComplete = false;
+
 	}
 
 	Animator3D::Events* Animator3D::FindEvents(const std::wstring& name)

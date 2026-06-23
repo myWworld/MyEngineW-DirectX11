@@ -78,6 +78,8 @@ namespace ME
 		void SetPrevRootPos(const Vector3& pos) { mPrevRootPos = pos; }
 
 
+		bool IsAnimationComplete() { return mbComplete; }
+
 	private:
 
 		void boneTransformBind();

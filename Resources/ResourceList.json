@@ -23,6 +23,8 @@
     { "key": "HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
     { "key": "DANCE",       "path": "..\\Resources\\Animation\\SillyDancing.fbx" },
     { "key": "SWORDIDLE1",       "path": "..\\Resources\\Animation\\great sword idle.fbx" },
-    { "key": "SWORDWALK",       "path": "..\\Resources\\Animation\\great sword walk.fbx" }
+    { "key": "SWORDWALK",       "path": "..\\Resources\\Animation\\great sword walk.fbx" },
+    { "key": "SWORDATTACK1",       "path": "..\\Resources\\Animation\\great sword attack.fbx" },
+    { "key": "SWORDSLASH1",       "path": "..\\Resources\\Animation\\great sword slash.fbx" }
   ]
 }

@@ -34,8 +34,24 @@ namespace ME
 	void GunScript::Initialize()
 	{
 		WeaponScript::Initialize();
-		mOffsetPos = Vector3(116.0f, 192.0f, 22.0f);
-		mOffsetRot = Vector3(90.0f, 90.0f, 0.0f);
+		mOffsetPos = Vector3(110.0f, 140.0f, -12.0f);
+		Vector3 offsetRotDegree = Vector3(180.0f, 0.0f, -98.0f);
+
+		float pitch = XMConvertToRadians(offsetRotDegree.x);
+		float yaw = XMConvertToRadians(offsetRotDegree.y);
+		float roll = XMConvertToRadians(offsetRotDegree.z);
+
+		mOffsetQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
+
+		mIdleAnimName = L"PISTOLIDLE";
+		mWalkAnimName = L"PISTOLWALK";
+		mAttackAnimName = L"PISTOLWALK";
+
+		if (mWeaponTransform == nullptr)
+		{
+			mWeaponTransform = GetOwner()->GetComponent<Transform>();
+		}
+
 		mBulletPool = std::make_unique<ObjectPool<GameObject>>(50, [this]()->GameObject*
 		{
 			return this->makeBullet();
@@ -49,8 +65,7 @@ namespace ME
 			mWeaponTransform = GetOwner()->GetComponent<Transform>();
 		}
 
-		adjustGunPos();
-	
+
 
 		if (!mbCanShoot) {
 			mCoolDownTimer += Time::DeltaTime();
@@ -60,16 +75,18 @@ namespace ME
 			}
 		}
 
-		if (mOwnerType == OwnerType::Enemy && mbCanShoot) {
-			Fire();
+		//if (mOwnerType == OwnerType::Enemy && mbCanShoot) {
+		//	Fire();
 	
-			mCoolDownTime = (float)(rand() % 3 + 2);
-		}
+		//	mCoolDownTime = (float)(rand() % 3 + 2);
+		//}
 
 	}
 	void GunScript::LateUpdate()
 	{
 		//adjustGunPos();
+		adjustGunPos();
+
 	}
 	void GunScript::Render()
 	{
@@ -82,7 +99,10 @@ namespace ME
 			shootBullet();
 			mbCanShoot = false;
 			mCoolDownTimer = 0.0f;
+			
 		}
+		
+		mbIsAttackEnd = true;
 	}
 
 	void GunScript::adjustGunPos()
@@ -90,29 +110,30 @@ namespace ME
 		WeaponScript::UpdateWeaponTransform();
 
 		
-		Vector3 forwardDir = mActorScript->GetAimDirection();
-		forwardDir.y = 0.0f;
-		forwardDir.Normalize();
-
-		if (forwardDir.LengthSquared() > 0.0001f)
-		{
-			float yawRad = atan2f(forwardDir.x, forwardDir.z);
-			float yawDeg = XMConvertToDegrees(yawRad);
-
-			Vector3 rt = mWeaponTransform->GetRotation();
-			rt.y = yawDeg;
-			mWeaponTransform->SetRotation(rt);
-		}
+		//Vector3 forwardDir = mActorScript->GetAimDirection();
+		//forwardDir.y = 0.0f;
+		//forwardDir.Normalize();
+		//
+		//if (forwardDir.LengthSquared() > 0.0001f)
+		//{
+		//	float yawRad = atan2f(forwardDir.x, forwardDir.z);
+		//	//float yawDeg = XMConvertToDegrees(yawRad);
+		//
+		//	//Vector3 rt = mWeaponTransform->GetRotation();
+		//	//rt.y = yawDeg;
+		//	Quaternion aimRot = Quaternion::CreateFromYawPitchRoll(yawRad, 0.0f, 0.0f);
+		//	mWeaponTransform->SetRotation(aimRot);
+		//}
 	
 	
 	}
 
 	GameObject* GunScript::makeBullet()
 	{
-		if (mGunTransform == nullptr)
+		if (mWeaponTransform == nullptr)
 			return nullptr;
 
-		Transform* tr = mGunTransform;
+		Transform* tr = mWeaponTransform;
 		Vector3 gunPos = tr->GetPosition();
 	
 
@@ -158,10 +179,11 @@ namespace ME
 
 		if (bullet == nullptr) return;
 		
-		if (mGunTransform == nullptr)
-			mGunTransform = GetOwner()->GetComponent<Transform>();
+		if (mWeaponTransform == nullptr)
+			mWeaponTransform = GetOwner()->GetComponent<Transform>();
+
 		
-		Vector3 gunPos = mGunTransform->GetPosition();
+		Vector3 gunPos = mWeaponTransform->GetPosition();
 
 		Transform* bulletTr = bullet->GetComponent<Transform>();
 
@@ -169,14 +191,17 @@ namespace ME
 		Rigidbody* rb = bullet->GetComponent<Rigidbody>();
 
 		bulletTr->SetPosition(gunPos);
-		bulletTr->SetRotation(mGunTransform->GetRotation());
+	
 		
-		Vector3 dir = mGunTransform->Forward();
-		dir.Normalize();
+		Vector3 trueDir = mActorScript->GetAimDirection();
+		trueDir.y = 0.0f;
+		trueDir.Normalize();
 
-		dir = (dir + mGunTransform->Up() * 0.0001f);
-		dir.Normalize();
+		float yawRad = atan2f(trueDir.x, trueDir.z);
+		bulletTr->SetRotation(Quaternion::CreateFromYawPitchRoll(yawRad, 0.0f, 0.0f));
+
+		rb->ClearForces();
 		rb->SetLimitVelocity(Vector3(5000.0f, 1000.0f, 5000.0f));
-		rb->AddForce(dir * 2000.0f, Rigidbody::eForceMode::Impulse);
+		rb->AddForce(trueDir * 2000.0f, Rigidbody::eForceMode::Impulse);
 	}	
 }

@@ -82,7 +82,7 @@ namespace ME
 			else
 			{
 				mFovY = 75.0f;
-				offset = Vector3(0.0f, 200, 45);
+				offset = Vector3(0.0f, 80, 20);
 			}
 		
 			Vector3 camPos = mTargetPos + Vector3::Transform(offset, yawRot);

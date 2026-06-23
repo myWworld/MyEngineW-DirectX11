@@ -192,6 +192,7 @@ namespace ME
 		else if (modelName == L"SwordModel")
 		{
 			weaponScript = obj->AddComponent<SwordScript>();
+			tr->SetScale(Vector3(10.f,10.f,10.f));
 		}
 
 		

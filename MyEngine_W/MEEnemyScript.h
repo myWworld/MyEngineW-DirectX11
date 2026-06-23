@@ -84,7 +84,6 @@ namespace ME
 		Vector2 mCurMousePos;
 		float mMouseSpeed;
 
-		class Animator3D* mAnimator;
 
 		bool mbIsMoving;
 

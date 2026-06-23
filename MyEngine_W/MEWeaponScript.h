@@ -40,6 +40,9 @@ namespace ME
 
 		GameObject* GetOwnerActor() { return mOwner; }
 
+		void SetIsAttackEnd(bool end) { mbIsAttackEnd = end; }
+		bool GetIsAttackEnd() { return mbIsAttackEnd; }
+
 	protected:
 
 		virtual void UpdateWeaponTransform();
@@ -55,9 +58,17 @@ namespace ME
 		ActorScript* mActorScript;
 		OwnerType mOwnerType;
 
+		bool mbIsAttackEnd = false;
+
 	public :
-		math::Vector3 mOffsetRot;
+		math::Quaternion mOffsetQuat;
 		math::Vector3 mOffsetPos;
+
+		std::wstring mIdleAnimName;
+		std::wstring mWalkAnimName;
+		std::wstring mAttackAnimName;
+
+	
 	};
 
 }

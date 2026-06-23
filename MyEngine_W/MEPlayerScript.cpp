@@ -16,7 +16,6 @@ namespace ME
         , mbIsMoving(false)
         , mPlayerType(PlayerType::Player)
 		, mPlayerTransform(nullptr)
-		, mAnimator(nullptr)
 		, mInputHandler()
     {
     }
@@ -50,17 +49,24 @@ namespace ME
             }
         }
 
-		ICommand* command = mInputHandler.HandleActionInput();
-        if(command)
+        if (mState == State::Attack)
+        {
+            Attack(); 
+            return;   
+        }
+
+        ICommand* command = mInputHandler.HandleActionInput();
+        if (command)
         {
             command->Execute(GetOwner());
-		}
+        }
 
-        Vector2 moveInput = mInputHandler.GetMovementAxis();
+        if (mState != State::Attack)
+        {
+            Vector2 moveInput = mInputHandler.GetMovementAxis();
+            Translate(moveInput);
+        }
 
-        Translate(moveInput);
-
-   
         switch (mState)
         {
         case ME::PlayerScript::State::Idle:
@@ -68,12 +74,6 @@ namespace ME
             break;
         case ME::PlayerScript::State::Walk:
             Move();
-            break;
-        case ME::PlayerScript::State::Run:
-            Move();
-            break;
-        case ME::PlayerScript::State::Attack:
-            Attack();
             break;
         default:
             break;
@@ -112,7 +112,9 @@ namespace ME
     {
         if (mbHoldingWeapon)
         {
+            mState = State::Attack;
             mEquippedWeapon->Use();
+
         }
     }
 
@@ -128,13 +130,19 @@ namespace ME
 
     void  PlayerScript::Idle()
     {
-        mAnimator->PlayAnimation(L"SWORDIDLE1");
+        if (mEquippedWeapon)
+            mAnimator->PlayAnimation(mEquippedWeapon->mIdleAnimName);
+        else
+            mAnimator->PlayAnimation(L"Idle");
     }
     void PlayerScript::Move()
     {
         if (mState == State::Walk)
         {
-            mAnimator->PlayAnimation(L"SWORDWALK");
+            if (mEquippedWeapon)
+                mAnimator->PlayAnimation(mEquippedWeapon->mWalkAnimName);
+            else
+                mAnimator->PlayAnimation(L"FORWARDWALK");
         }
         
         if (mState == State::Run)
@@ -144,7 +152,15 @@ namespace ME
     }
     void PlayerScript::Attack()
     {
-
+        if (mAnimator->IsAnimationComplete() || mEquippedWeapon->GetIsAttackEnd())
+        {
+            mState = State::Idle;
+            mEquippedWeapon->SetIsAttackEnd(false);
+        }
+        else
+        {
+            return;
+        }
     }
     void PlayerScript::Die()
     {
@@ -191,23 +207,6 @@ namespace ME
    
     }
 
-    void PlayerScript::randomAction()
-    {
-        int prob = rand() % 10 + 1;
-
-        if (prob <= 3)
-        {
-            mState = State::Idle;
-        }
-        else if (prob <= 7)
-        {
-            mState = State::Walk;
-        }
-        else
-        {
-            mState = State::Attack;
-        }
-    }
 
 
     void PlayerScript::directionChange()
