@@ -7,6 +7,10 @@
 #include "MERenderer.h"
 #include "MEInputHandler.h"
 #include "MEWeaponScript.h"
+#include "MESwordScript.h"
+#include "../MyEngine_Source/MERigidbody.h"
+#include "../MyEngine_Source/MEFSMBrain.h"
+#include "../MyEngine_Source/MEFSMState.h"
 
 namespace ME
 {
@@ -17,6 +21,7 @@ namespace ME
         , mPlayerType(PlayerType::Player)
 		, mPlayerTransform(nullptr)
 		, mInputHandler()
+		, mState(State::Idle)
     {
     }
     PlayerScript::~PlayerScript()
@@ -24,9 +29,21 @@ namespace ME
     }
     void PlayerScript::Initialize()
     {
+        if (mAnimator == nullptr)
+        {
+            mAnimator = GetOwner()->GetComponent< Animator3D>();
+        }
+
+
+
     }
     void PlayerScript::Update()
     {
+        if(mState == State::Death)
+        {
+            return;
+		}
+
         if (mAnimator == nullptr)
         {
             mAnimator = GetOwner()->GetComponent< Animator3D>();
@@ -49,17 +66,19 @@ namespace ME
             }
         }
 
+        ICommand* command = mInputHandler.HandleActionInput();
+        if (command)
+        {
+            command->Execute(GetOwner());
+        }
+
         if (mState == State::Attack)
         {
             Attack(); 
             return;   
         }
 
-        ICommand* command = mInputHandler.HandleActionInput();
-        if (command)
-        {
-            command->Execute(GetOwner());
-        }
+
 
         if (mState != State::Attack)
         {
@@ -90,23 +109,6 @@ namespace ME
     {
     }
 
-    void PlayerScript::OnCollisionEnter(Collider* other)
-    {
-        GameObject* owner = other->GetOwner();
-
-        if (owner != nullptr && owner->GetLayerType() == enums::eLayerType::Bullet)
-        {
-            mAnimator->PlayAnimation(L"HIT");
-        }
-    }
-
-    void PlayerScript::OnCollisionStay(Collider* other)
-    {
-    }
-
-    void PlayerScript::OnCollisionExit(Collider* other)
-    {
-    }
 
     void PlayerScript::OnPrimaryAction()
     {
@@ -157,10 +159,11 @@ namespace ME
     }
     void PlayerScript::Attack()
     {
-        if (mAnimator->IsAnimationComplete() || mEquippedWeapon->GetIsAttackEnd())
+
+        if (mAnimator->IsAnimationComplete())
         {
             mState = State::Idle;
-            mEquippedWeapon->SetIsAttackEnd(false);
+ 
         }
         else
         {
@@ -246,6 +249,78 @@ namespace ME
     Vector3 PlayerScript::GetAimDirection()
     {
         return renderer::mainCamera->GetForward();
+    }
+
+    void PlayerScript::OnDeath()
+    {
+        mAnimator->PlayAnimation(L"SWORDADEATH");
+		mState = State::Death;
+    }
+
+    void PlayerScript::OnCollisionEnter(Collider* other)
+    {
+        GameObject* owner = other->GetOwner();
+
+        if (owner != nullptr &&
+            (owner->GetLayerType() == enums::eLayerType::Weapon))
+        {
+
+            GameObject* attacker = owner;
+            // DamageInfo 패킷 채우기
+            DamageInfo damageInfo;
+            WeaponScript* weaponScript = attacker->GetComponent<WeaponScript>();
+
+            if (weaponScript)
+            {
+
+                if (weaponScript->CanAttack() == false || weaponScript->GetOwnerActor() == GetOwner())
+                {
+                    return;
+                }
+
+                damageInfo.damage = weaponScript->GetDamage();
+                damageInfo.attacker = attacker;
+
+                Vector3 attackerPos = attacker->GetComponent<Transform>()->GetPosition();
+                Vector3 ownerPos = this->GetOwner()->GetComponent<Transform>()->GetPosition();
+                Vector3 dir = (ownerPos - attackerPos);
+                dir.Normalize();
+
+                damageInfo.hitPoint = Vector3::Zero; // 피격 위치 raycast로 hit point 확장가능
+                damageInfo.knockbackDir = dir; // 공격 반대 방향
+                damageInfo.knockbackForce = 10.0f; // 기본값 세팅
+
+
+                DamageProcess(damageInfo);
+
+				if (mAnimator->GetActiveAnimation()->GetName() != L"SWORDHIT")
+                    mAnimator->PlayAnimation(L"SWORDHIT");
+            }
+        }
+    }
+
+    void PlayerScript::OnCollisionStay(Collider* other)
+    {
+    }
+
+    void PlayerScript::OnCollisionExit(Collider* other)
+    {
+    }
+
+    void PlayerScript::DamageProcess(DamageInfo damageInfo)
+    {
+
+        this->SetHP(damageInfo.damage);
+
+        if (damageInfo.knockbackDir != Vector3::Zero)
+        {
+            Rigidbody* rb = GetOwner()->GetComponent<Rigidbody>();
+
+            if (rb)
+                rb->AddForce(damageInfo.knockbackDir * damageInfo.knockbackForce, Rigidbody::eForceMode::Impulse);
+
+        }
+
     }
 
     

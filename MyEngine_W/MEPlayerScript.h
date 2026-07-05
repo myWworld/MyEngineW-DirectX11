@@ -31,6 +31,7 @@ namespace ME
 			Walk,
 			Run,
 			Attack,
+			Death,
 			
 		};
 
@@ -63,8 +64,8 @@ namespace ME
 		void OnPrimaryAction() override;
 		void OnToggleWeapon() override;
 
-		void OnDeath() override {}
-		void DamageProcess(DamageInfo damageInfo) override {}
+		void OnDeath() override;
+		void DamageProcess(DamageInfo damageInfo) override;
 
 		bool IsMoving() { return mbIsMoving; }
 
@@ -90,7 +91,7 @@ namespace ME
 		void Die();
 
 		void Translate(math::Vector2 moveAxis);
-		void randomAction();
+	
 
 		void directionChange();
 

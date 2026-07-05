@@ -16,7 +16,7 @@
             "Type": "DetectTargetDecision",
             "DetectRadius": 3000.0
           },
-          "TrueState": "TRACE",
+          "TrueState": "TRACE", 
           "FalseState": null
         },
         {
@@ -90,11 +90,11 @@
     {
       "Name": "ATTACK",
       "Tasks": [
-        {
-          "Type": "PlayAnimTask",
-          "AnimName": "MONSTER_ATTACK",
-          "IsLoop": false
-        }
+      {
+        "Type": "MeleeAttackTask",
+        "mAnimNames": ["MONSTER_ATTACK", "MONSTER_ATTACK2", "MONSTER_ATTACK3"],
+        "mbIsLoop": false
+      }
       ],
       "Transitions": [
         {

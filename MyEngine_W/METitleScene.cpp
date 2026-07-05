@@ -56,6 +56,8 @@ namespace ME
 
 		CollisionManager::CollisionLayerCheck(enums::eLayerType::Player, enums::eLayerType::Bullet, true);
 		CollisionManager::CollisionLayerCheck(enums::eLayerType::Bullet, enums::eLayerType::Player, true);
+		CollisionManager::CollisionLayerCheck(enums::eLayerType::Weapon, enums::eLayerType::Player, true);
+		CollisionManager::CollisionLayerCheck(enums::eLayerType::Player, enums::eLayerType::Weapon, true);
 
 	}
 
@@ -104,8 +106,8 @@ namespace ME
 			mPlayer->AddComponent<PlayerScript>();
 			MakeCharacter(mPlayer, L"CharacterModel");
 
-			MakeWeapon(mPlayer, L"PistolModel", 5.0f);
-			MakeWeapon(mPlayer, L"SwordModel", 15.0f);
+			MakeWeapon(mPlayer, L"PistolModel",L"LeftHand", 5.0f);
+			MakeWeapon(mPlayer, L"SwordModel", L"LeftHand", 15.0f);
 		
 
 			GameObject* enemy = object::Instantiate<Player>(enums::eLayerType::Player,math::Vector3(10, 0, 0));
@@ -114,7 +116,15 @@ namespace ME
 
 			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
 			MakeCharacter(enemy, L"MutantModel");
-			MakeWeapon(enemy, L"GauntletModel", 25.0f);
+			auto* rightWeapon = MakeWeapon(enemy, L"GauntletModel", L"RightHand", 25.0f);
+			rightWeapon->SetSocketOffsetAntRot(math::Vector3(-96.0f, 149.0f, 1.0f), math::Vector3::Zero);
+
+			auto* leftWeapon = MakeWeapon(enemy, L"GauntletModel", L"LeftHand", 25.0f);
+
+			//enemyScript->SetRightWeapon(rightWeapon);
+			enemyScript->SetLeftWeapon(leftWeapon);
+			leftWeapon->SetSocketOffsetAntRot(math::Vector3(129.0f, 139.0f, -9.0f), math::Vector3::Zero); //129.0f, 139.0f, -9.0f
+			
 			
 			FSMBrain* brain = enemy->AddComponent<FSMBrain>();
 			FSMFactory::MakeFSMWithJsonFile(brain, "..\\Resources\\EnemyFSMJson.json");
@@ -185,7 +195,7 @@ namespace ME
 		}
 	}
 
-	void TitleScene::MakeWeapon(GameObject* player, std::wstring_view modelName, float damage)
+	WeaponScript* TitleScene::MakeWeapon(GameObject* player, std::wstring_view modelName, std::wstring socketName, float damage)
 	{
 		
 		GameObject* obj = object::Instantiate<GameObject>(enums::eLayerType::Weapon, math::Vector3(0, 10, 35));
@@ -210,14 +220,14 @@ namespace ME
 		else if (modelName == L"GauntletModel")
 		{
 			weaponScript = obj->AddComponent<GauntletScript>();
-			tr->SetScale(math::Vector3(10.f, 10.f, 10.f));
 			Collider* col = obj->AddComponent<BoxCollider3D>();
-			col->SetOffset(math::Vector3(9.0f, 49.0f, 3.0f));
-			col->SetSize(math::Vector3(10.f, 70.f, 10.f));
+			col->SetOffset(math::Vector3(0,0,0));
+			col->SetSize(math::Vector3(40.f, 40.f, 40.f));
 		}
 
 		weaponScript->SetOnwer(player);
 		weaponScript->SetDamage(damage);
+		weaponScript->SetSocketBoneName(socketName);
 	
 		std::shared_ptr<Model> model = Resources::Find<Model>(std::wstring(modelName));
 
@@ -227,12 +237,21 @@ namespace ME
 			ModelRenderer* modelRenderer = obj->AddComponent<ModelRenderer>();
 			modelRenderer->SetMesh(model->GetMeshes());
 			player->GetComponent<ActorScript>()->AddWeapon(weaponScript);
+
+			if (modelName == L"SwordModel")
+			{
+				Material* material = model->GetMeshes()[0]->GetMaterial().get();
+				material->SetAlbedoTexture(Resources::Find<graphics::Texture>(L"SWORD_DIFFUSE"));
+				//material->SetNormalTexture(Resources::Find<graphics::Texture>(L"SWORD_NORMAL"));
+			}
 		}
 		else
 		{
 	
 			model = nullptr;
 		}
+
+		return weaponScript;
 	}
 }
 		

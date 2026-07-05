@@ -58,6 +58,8 @@ namespace ME
 
 		Animation3D* GetActiveAnimation() { return mActiveAnimation; }
 
+		void AddEvent(const std::wstring& animationName, const std::wstring& eventName, float normalizedTime, std::function<void()> callback);
+
 		Events* FindEvents(const std::wstring& name);
 
 		std::function<void()>& GetStartEvent(const std::wstring& name);
@@ -74,8 +76,7 @@ namespace ME
 
 		Bone* GetBone(const std::wstring& boneName)
 		{
-			mSkeleton.GetBone(boneName);
-			return nullptr;
+			return mSkeleton.GetBone(boneName);
 		}
 
 		void SetApplyRootMotion(bool apply) { mbApplyRootMotion = apply; }
@@ -95,7 +96,8 @@ namespace ME
 
 	private:
 
-
+		std::unordered_map<std::wstring, std::vector<AnimationEvent>> mAnimEvents; //애니메이션 별로 이벤트 배열 저장
+		float mPrevTime = 0.0f;
 
 		Matrix mModelMatrix;
 

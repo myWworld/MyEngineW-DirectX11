@@ -7,10 +7,10 @@ namespace ME
 	{
 		if (weapon == nullptr) return;
 
-		mWeapons.push_back(weapon);
+		mInventoryWeapons.push_back(weapon);
 
 		// 만약 처음 얻은 무기라면 바로 장착
-		if (mWeapons.size() == 1)
+		if (mInventoryWeapons.size() == 1)
 		{
 			EquipWeapon(0);
 		}
@@ -23,7 +23,7 @@ namespace ME
 
 	 void ActorScript::EquipWeapon(int index)
 	 {
-		 if (mWeapons.empty() || index < 0 || index >= mWeapons.size()) return;
+		 if (mInventoryWeapons.empty() || index < 0 || index >= mInventoryWeapons.size()) return;
 
 		 // 기존 무기 비활성화 (숨기기)
 		 if (mCurrentWeaponIndex != -1 && mEquippedWeapon != nullptr)
@@ -33,9 +33,24 @@ namespace ME
 
 		 // 새 무기 장착
 		 mCurrentWeaponIndex = index;
-		 mEquippedWeapon = mWeapons[index];
+		 mEquippedWeapon = mInventoryWeapons[index];
 		 mEquippedWeapon->GetOwner()->SetActive(true); // 화면에 보이게 켬
 
+		 if (!mEquippedWeapon->IsEventsRegistered())
+		 {
+			 mEquippedWeapon->OnRegister();
+		 }
+
+		 mbHoldingWeapon = true;
+	 }
+
+
+	 void ActorScript::AttachActiveWeapon(WeaponScript* weapon)
+	 {
+		 if (weapon == nullptr) return;
+
+		 mActiveWeapons.push_back(weapon);
+		 weapon->GetOwner()->SetActive(true); 
 		 mbHoldingWeapon = true;
 	 }
 

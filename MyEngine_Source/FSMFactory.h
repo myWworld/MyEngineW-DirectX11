@@ -14,6 +14,8 @@
 #include "../MyEngine_W/MEPlayAnimTask.h"
 #include "../MyEngine_W/MERandomWanderTask.h"
 #include "../MyEngine_W/MEDestroyTask.h"
+#include "../MyEngine_W/MEMeleeAttackTask.h"
+
 #define REGISTER_TASK(type) mTaskCreators[#type] = [] () {return std::make_unique<type>();}
 #define REGISTER_DECISION(type) mDecisionCreators[#type] = [] () {return std::make_unique<type>();}
 
@@ -36,6 +38,7 @@ namespace ME
 			REGISTER_TASK(PlayAnimTask);
 			REGISTER_TASK(RandomWanderTask);
 			REGISTER_TASK(MoveToTargetTask);
+			REGISTER_TASK(MeleeAttackTask);
 			REGISTER_TASK(DestroyTask);
 
 			REGISTER_DECISION(TimerDecision);

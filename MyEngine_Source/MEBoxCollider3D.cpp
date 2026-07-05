@@ -29,13 +29,10 @@ namespace ME
 		Vector3 pos = tr->GetPosition();
 
 		Vector3 offset = GetOwner()->GetComponent<BoxCollider3D>()->GetOffset();
-		float width = (100.0f * GetSize().x);
-		float height = (100.0f * GetSize().y);
 
 
 
-		if (mRot != 0)
-			mCentralPoint = RotateCollider(mRot, pos.x + offset.x, pos.y + offset.y, width, height);
+
 	}
 	void BoxCollider3D::LateUpdate()
 	{
@@ -132,61 +129,89 @@ namespace ME
 
 	bool BoxCollider3D::IntersectWith(BoxCollider3D* other)
 	{
+		if (this->GetColliderType() != enums::eColliderType::Box3D ||
+			other->GetColliderType() != enums::eColliderType::Box3D)
+		{
+			return false;
+		}
+
 		Transform* leftTr = this->GetOwner()->GetComponent<Transform>();
 		Transform* rightTr = other->GetOwner()->GetComponent<Transform>();
 
-		Vector3 leftPos = leftTr->GetPosition() + this->GetOffset();
-		Vector3 rightPos = rightTr->GetPosition() + other->GetOffset();
+		Quaternion leftRot = leftTr->GetRotationQuat();
+		Quaternion rightRot = rightTr->GetRotationQuat();
 
-		Vector3 leftSize = this->GetSize(); //* 100.0f;
-		Vector3 rightSize = other->GetSize(); //* 100.0f;
+		Vector3 leftOffsetRotated = Vector3::Transform(this->GetOffset(), leftRot);
+		Vector3 rightOffsetRotated = Vector3::Transform(other->GetOffset(), rightRot);
 
-		BoxCollider3D* leftBC3D = this;
-		BoxCollider3D* rightBC3D = other;
+		Vector3 leftCenter = leftTr->GetPosition() + leftOffsetRotated;
+		Vector3 rightCenter = rightTr->GetPosition() + rightOffsetRotated;
 
-		enums::eColliderType leftType = this->GetColliderType();
-		enums::eColliderType rightType = other->GetColliderType();
+		Vector3 leftScale = leftTr->GetScale();
+		Vector3 rightScale = rightTr->GetScale();
 
-		if (leftType == enums::eColliderType::Box3D
-			&& rightType == enums::eColliderType::Box3D)
-		{
-			Vector3 LHeight = Vector3(0, leftSize.y, 0);
-			Vector3 RHeight = Vector3(0, rightSize.y, 0);
-
-			Vector3 leftCenterPos = leftPos + (LHeight / 2.0f);
-			Vector3 rightCenterPos = rightPos + (RHeight / 2.0f);
-
-
-			if (leftBC3D->IsRotate())
-			{
-
-				leftCenterPos = leftBC3D->GetCentralPoint();
-
-				leftSize.y = leftBC3D->GetHeight();
-				leftSize.x = leftBC3D->GetWidth();
-
-			}
-
-			if (rightBC3D->IsRotate())
-			{
-				rightCenterPos = rightBC3D->GetCentralPoint();
-
-				rightSize.y = rightBC3D->GetHeight();
-				rightSize.x = rightBC3D->GetWidth();
-
-			}
-
+		Vector3 leftExtents = this->GetSize() / 2.0f;
+		Vector3 rightExtents = other->GetSize()  / 2.0f;
 
 
 			//AABB 충돌 rect-rect
-			if (fabs(leftCenterPos.x - rightCenterPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
+		/*	if (fabs(leftCenterPos.x - rightCenterPos.x) < fabs(leftSize.x / 2.0f + rightSize.x / 2.0f)
 				&& fabs(leftCenterPos.y - rightCenterPos.y) < fabs(leftSize.y / 2.0f + rightSize.y / 2.0f)
 				&& fabs(leftCenterPos.z - rightCenterPos.z) < fabs(leftSize.z / 2.0f + rightSize.z / 2.0f))
 			{
 				return true;
+			}*/
+		
+		return CheckOBBCollision(leftCenter, leftExtents, leftRot, rightCenter, rightExtents, rightRot);
+	}
+
+	bool BoxCollider3D::CheckOBBCollision(
+		const Vector3& centerA, const Vector3& extentsA, const Quaternion& rotA,
+		const Vector3& centerB, const Vector3& extentsB, const Quaternion& rotB)
+	{
+		math::Matrix matA = math::Matrix::CreateFromQuaternion(rotA);
+		math::Matrix matB = math::Matrix::CreateFromQuaternion(rotB); //회전 행렬 생성
+
+		math::Vector3 A[3] = { matA.Right(), matA.Up(), matA.Forward() };  //검사를 진행할 A의 축 -> 면은 서로 평행이므로 A의 축 3개와 B의 축 3개를 외적하여 나온 9개의 축을 검사하면 된다 
+		math::Vector3 B[3] = { matB.Right(), matB.Up(), matB.Forward() }; //검사를 진행할 B의 축
+
+		Vector3 distBetweenCenters = centerB - centerA; //두 OBB의 중심 사이의 거리
+
+		auto SATTest = [&](const math::Vector3 axis) -> bool
+			{
+				if (axis.LengthSquared() < 1e-6f) return true; //축이 거의 0이면 충돌하지 않음
+
+				Vector3 nAxis = axis;
+				nAxis.Normalize(); //내적을 위해 정규화 -> SAT에서 기준이 되는 축이고 이 축을 기준으로 두 충돌체 A,B의 로컬 축을 투영하여 충돌 여부를 판단하기 때문에 정규화 필요
+
+				// A 박스를 축에 투영한 반지름
+				float rA = extentsA.x * fabs(A[0].Dot(nAxis)) + //-> 검사 기준인 축 위에 각 박스 길이의 반을 투영하고 더해서 중점까지거리(반지름)을 만들어낸다
+					extentsA.y * fabs(A[1].Dot(nAxis)) +
+					extentsA.z * fabs(A[2].Dot(nAxis));
+
+				// B 박스를 축에 투영한 반지름
+				float rB = extentsB.x * fabs(B[0].Dot(nAxis)) +
+					extentsB.y * fabs(B[1].Dot(nAxis)) +
+					extentsB.z * fabs(B[2].Dot(nAxis));
+				
+				return fabs(distBetweenCenters.Dot(nAxis)) <= (rA + rB); //투영된 거리와 반지름 합을 비교하여 충돌 여부 판단
+			
+			};
+
+		for (int i = 0; i < 3; i++)//검사시 하나라도 충돌이 발생하지 않으면 false를 반환하고 종료
+		{
+			if (SATTest(A[i]) == false) return false; //A의 축 3개 검사 
+			if (SATTest(B[i]) == false) return false; //B의 축 3개 검사
+		}
+
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				if (SATTest(A[i].Cross(B[j])) == false) return false; //A의 축과 B의 축을 외적하여 나온 9개의 축 검사
 			}
 		}
 
-		return false;
+		return true; //모든 축에서 충돌이 발생했으므로 true 반환
 	}
 }

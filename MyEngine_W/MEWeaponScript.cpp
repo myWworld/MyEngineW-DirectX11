@@ -1,6 +1,7 @@
 #include "MEWeaponScript.h"
 #include "MEBone.h"
 #include "MEActorScript.h"
+#include "MEAnimator3D.h"
 
 namespace ME
 {
@@ -11,6 +12,17 @@ namespace ME
 		return mActorScript->GetWeaponSocketBone();
 	}
 
+	void WeaponScript::SetSocketOffsetAntRot(math::Vector3 pos, math::Vector3 rot)
+	{
+		mOffsetPos = pos;
+
+		float pitch = XMConvertToRadians(rot.x);
+		float yaw = XMConvertToRadians(rot.y);
+		float roll = XMConvertToRadians(rot.z);
+
+		mOffsetQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
+	}
+
 	void WeaponScript::UpdateWeaponTransform()
 	{
 		AttachToSocket();
@@ -19,11 +31,13 @@ namespace ME
 	void WeaponScript::AttachToSocket()
 	{
 		if (mOwner == nullptr || mWeaponTransform == nullptr) return;
-		Bone* socket = mActorScript->GetWeaponSocketBone();
+		
+		if(mSocketBone == nullptr)
+			mSocketBone = mActorScript->GetAnimator()->GetBone(mSocketBoneName);
 
-		if (socket == nullptr || !mActorScript->IsUsingWeapon()) return;
+		if (mSocketBone == nullptr || !mActorScript->IsUsingWeapon()) return;
 	
-		Matrix handLocal = socket->FinalTransform;
+		Matrix handLocal = mSocketBone->FinalTransform;
 		Matrix playerWorldMatrix = mOwnerTransform->GetWorldMatrix();
 		Matrix handMatrix = handLocal * playerWorldMatrix;
 

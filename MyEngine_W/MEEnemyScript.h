@@ -8,7 +8,7 @@
 namespace ME
 {
 
-	
+	class WeaponScript;
 	class EnemyScript :public ActorScript
 	{
 	public:
@@ -74,6 +74,9 @@ namespace ME
 
 		Vector3 GetAimDirection() override;
 
+		void SetLeftWeapon(WeaponScript* weapon);
+		void SetRightWeapon(WeaponScript* weapon);
+
 	private:
 
 		void Idle();
@@ -104,6 +107,9 @@ namespace ME
 
 		Bone* mLeftHandBone;
 		Bone* mRightHandBone;
+
+		WeaponScript* mLeftHandWeapon;
+		WeaponScript* mRightHandWeapon;
 
 		float translateTimer = 0.0f;
 		float translateTime = 2.0f;

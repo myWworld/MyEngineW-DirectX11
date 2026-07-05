@@ -26,6 +26,7 @@ namespace ME
 		, mbCanShoot(false)
 
 	{
+		mbIsActive = true;
 	}
 	GunScript::~GunScript()
 	{
@@ -43,6 +44,7 @@ namespace ME
 
 		mOffsetQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
 
+		mWeaponType = WeaponType::Gun;
 		mIdleAnimName = L"PISTOLIDLE";
 		mWalkAnimName = L"PISTOLWALK";
 		mAttackAnimName = L"PISTOLWALK";
@@ -84,8 +86,7 @@ namespace ME
 	}
 	void GunScript::LateUpdate()
 	{
-		//adjustGunPos();
-		adjustGunPos();
+		WeaponScript::UpdateWeaponTransform();
 
 	}
 	void GunScript::Render()

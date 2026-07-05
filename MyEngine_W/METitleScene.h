@@ -5,6 +5,7 @@
 namespace ME
 {
 	class Model;
+	class WeaponScript;
 	class TitleScene:public Scene
 	{
 	public:
@@ -23,7 +24,7 @@ namespace ME
 	private:
 
 		void MakeCharacter(GameObject* player, std::wstring_view modelName);
-		void MakeWeapon(GameObject* player, std::wstring_view modelName, float damage = 10.0f);
+		WeaponScript* MakeWeapon(GameObject* player, std::wstring_view modelName, std::wstring socketName, float damage = 10.0f);
 
 	private:
 

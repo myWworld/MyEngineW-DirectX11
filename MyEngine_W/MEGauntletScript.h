@@ -17,6 +17,7 @@ namespace ME
 
 		void Use() override;
 
+		void OnRegister() override;
 
 
 	};

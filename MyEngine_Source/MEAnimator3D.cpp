@@ -39,30 +39,67 @@ namespace ME
 	{
 		if (mActiveAnimation)
 		{
-
-			mCurrentTime += Time::DeltaTime();
-
 			
 			float duration = mActiveAnimation->GetDuration();
 			float ticksPerSec = mActiveAnimation->GetTickersPerSecond();
+			float totalTime = duration / ticksPerSec;
 
-			if (mCurrentTime * ticksPerSec > duration)
+			float prevRatio = mCurrentTime / totalTime;
+
+			mCurrentTime += Time::DeltaTime();
+			float currRatio = mCurrentTime / totalTime;
+
+			bool bLooped = false;
+			if (currRatio > 1.0f)
 			{
 				mbComplete = true;
-				if (mbLoop) {
-					mCurrentTime = 0.0f; 
+				if (mbLoop)
+				{
+					bLooped = true;
+					mCurrentTime = fmod(mCurrentTime, totalTime); // 시간 초기화
+					currRatio = mCurrentTime / totalTime;
 					mbComplete = false;
+				}
+				else
+				{
+					currRatio = 1.0f; // 루프가 아니면 1.0에서 고정
+				}
+			}
+
+			auto iter = mAnimEvents.find(mActiveAnimation->GetName());
+			if (iter != mAnimEvents.end())
+			{
+				for (const auto& ev : iter->second)
+				{
+					if (bLooped)
+					{
+						// 루프가 돌았을 때: 
+						// 1. 이전 프레임 ~ 끝(1.0)까지 남았던 이벤트 실행
+						// 2. 처음(0.0) ~ 현재 프레임까지 지나친 이벤트 실행
+						if (ev.normalizedTime >= prevRatio || ev.normalizedTime <= currRatio)
+						{
+							ev.callback();
+						}
+					}
+					else
+					{
+						// 일반적인 상황: 이전 비율 < 이벤트 시간 <= 현재 비율 ->프레임 건너뛰어지는 현상 방지(sweep식으로)
+						if (ev.normalizedTime > prevRatio && ev.normalizedTime <= currRatio)
+						{
+							ev.callback();
+						}
+					}
 				}
 			}
 
 			mActiveAnimation->UpdateAnimation(mCurrentTime, &mSkeleton, this);
 
 	
-			if (mbComplete)
-			{
-				Events* events = FindEvents(mActiveAnimation->GetName());
-				if (events) events->CompleteEvent();
-			}
+		//	if (mbComplete)
+		//	{
+		//		Events* events = FindEvents(mActiveAnimation->GetName());
+		//		if (events) events->CompleteEvent();
+		//	}
 
 		}
 	}
@@ -188,6 +225,13 @@ namespace ME
 		mbComplete = false;
 
 	}
+
+	void Animator3D::AddEvent(const std::wstring& animName, const std::wstring& eventName, float normalizedTime, std::function<void()> callback)
+	{
+		mAnimEvents[animName].push_back({ eventName, normalizedTime, callback });
+		std::sort(mAnimEvents[animName].begin(), mAnimEvents[animName].end());
+	}
+
 
 	Animator3D::Events* Animator3D::FindEvents(const std::wstring& name)
 	{

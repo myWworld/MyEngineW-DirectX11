@@ -26,7 +26,14 @@ namespace ME
     }
     void EnemyScript::Initialize()
     {
+        mbHoldingWeapon = true;
 
+        if (mAnimator == nullptr)
+        {
+            mAnimator = GetOwner()->GetComponent< Animator3D>();
+        }
+
+      
     }
     void EnemyScript::Update()
     {
@@ -35,48 +42,8 @@ namespace ME
             mAnimator = GetOwner()->GetComponent< Animator3D>();
         }
         
-        translateTime += Time::DeltaTime();
 
-        OnToggleWeapon();
-
-        if (mbUseHands)
-        {
-            if (mLeftHandBone == nullptr && mRightHandBone == nullptr)
-            {
-                Skeleton* skeleton = mAnimator->GetSkeletonPtr();
-                mLeftHandBone = skeleton->GetLeftHandTransform();
-                mRightHandBone = skeleton->GetRightHandTransform();
-            }
-        }
-
-        //if (translateTime > translateTimer)
-        //{
-        //    translateTime = 0.0f;
-        //    randomState();
-        //}
-
-
-        //switch (mState)
-        //{
-        //case ME::EnemyScript::State::Idle:
-        //    Idle();
-        //    break;
-        //case ME::EnemyScript::State::Patrol:
-        //    Translate();
-        //    Move();
-        //    break;
-        //case ME::EnemyScript::State::Run:
-        //    Move();
-        //    break;
-        //case ME::EnemyScript::State::Attack:
-        //    Attack();
-        //    break;
-        //default:
-        //    break;
-        //}
-
-
-
+   
 
     }
     void EnemyScript::LateUpdate()
@@ -84,6 +51,17 @@ namespace ME
     }
     void EnemyScript::Render()
     {
+    }
+
+    void EnemyScript::SetLeftWeapon(WeaponScript* weapon) 
+    {
+        mLeftHandWeapon = weapon;
+        weapon->GetOwner()->SetActive(true); 
+    }
+    void EnemyScript::SetRightWeapon(WeaponScript* weapon)
+    {
+        mRightHandWeapon = weapon;
+        weapon->GetOwner()->SetActive(true); 
     }
 
     void EnemyScript::OnPrimaryAction()
@@ -118,85 +96,6 @@ namespace ME
 
         }
     }
-    void EnemyScript::Attack()
-    {
-
-    }
-    void EnemyScript::Die()
-    {
-
-    }
-
-    void EnemyScript::Translate()
-    {
-
-
-    }
-
-
-
-    //void EnemyScript::directionChange(Vector3 newDir)
-    //{
-
-
-    //    Transform* tr = GetOwner()->GetComponent<Transform>();
-
-    //    Vector3 curDir = tr->Forward();
-
-    //    float dotProduct = curDir.Dot(newDir);
-    //    if (dotProduct > 1.0f) dotProduct = 1.0f;
-    //    if (dotProduct < -1.0f) dotProduct = -1.0f;
-
-    //    float angle = Degree((acos(curDir.Dot(newDir))));
-
-    //    auto degClamp = [](int newDeg)  -> int {
-
-    //        if (newDeg > 360)
-    //        {
-    //            return  newDeg -= 360;
-    //        }
-
-    //        return newDeg;
-    //    };
-
-    //    angle = degClamp(angle);
-
-    //    if (angle > 5.0f)
-    //    {
-    //        Vector3 rt = tr->GetRotation();
-    //        
-    //        rt.y = degClamp(rt.y + angle);
-
-    //        
-    //        
-    //        tr->SetRotation(rt);
-    //    }
-
-    // 
-    //}
-    //void EnemyScript::randomState()
-    //{
-  
-    //        int prob = rand() % 10 + 1;
-
-    //        if (prob <= 3)
-    //        {
-    //            mState = State::Idle;
-    //        }
-    //        else if (prob <= 7)
-    //        {
-    //            mState = State::Patrol;
-
-    //            int randDir = rand() % (int)Direction::End;
-    //            mTargetDirection = (Direction)randDir;
-    //            mbTurn = false;
-    //        }
-    //        else
-    //        {
-    //            mState = State::Attack;
-    //        }
-    //    
-    //}
 
 
     Vector3 EnemyScript::GetAimDirection()
@@ -232,12 +131,19 @@ namespace ME
                 attacker = bulletScript->GetGun(); 
             }
 
+
             // DamageInfo 패킷 채우기
             DamageInfo damageInfo;
             WeaponScript* weaponScript = attacker->GetComponent<WeaponScript>();
 
             if (weaponScript)
             {
+
+                if(weaponScript->CanAttack() == false || weaponScript->GetOwnerActor() == GetOwner())
+                {
+                    return;
+				}
+
                 damageInfo.damage = weaponScript->GetDamage();
                 damageInfo.attacker = attacker;
 				

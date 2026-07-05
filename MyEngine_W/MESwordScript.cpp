@@ -2,6 +2,7 @@
 #include "../MyEngine_Source/MEAnimator3D.h"
 #include "../MyEngine_Source/MEInput.h"
 #include "../MyEngine_Source/MEBoxCollider3D.h"
+#include "../MyEngine_Source/METime.h"
 
 namespace ME
 {
@@ -26,10 +27,31 @@ namespace ME
 
 		 mOffsetQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
 
+		 mWeaponType = WeaponType::Sword;
 		 mIdleAnimName = L"SWORDIDLE1";
 		 mWalkAnimName = L"SWORDWALK";
-		 mAttackAnimName = L"SWORDATTACK1";
+		 mComboAnimNames = { L"SWORDATTACK1", L"SWORDATTACK2", L"SWORDATTACK3" };
+
+	
 	}
+
+	void SwordScript::OnRegister()
+	{
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK1", L"HitBox On", 0.3f, [this]() { this->BeginAttack(); });
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK1", L"Combo Open", 0.7f, [this]() { this->OpenComboWindow(); });
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK1", L"HitBox Off", 0.6f, [this]() { this->EndAttack(); });
+
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK2", L"HitBox On", 0.3f, [this]() { this->BeginAttack(); });
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK2", L"Combo Open", 0.7f, [this]() { this->OpenComboWindow(); });
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK2", L"HitBox Off", 0.6f, [this]() { this->EndAttack(); });
+
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK3", L"HitBox On", 0.3f, [this]() { this->BeginAttack(); });
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK3", L"Combo Open", 0.7f, [this]() { this->OpenComboWindow(); });
+		mActorScript->mAnimator->AddEvent(L"SWORDATTACK3", L"HitBox Off", 0.6f, [this]() { this->EndAttack(); });
+
+		WeaponScript::OnRegister();
+	}
+
 	void SwordScript::Update()
 	{
 
@@ -38,7 +60,17 @@ namespace ME
 			mWeaponTransform = GetOwner()->GetComponent<Transform>();
 		}
 
+		if (mbIsComboActive)
+		{
+			mComboTimer += Time::DeltaTime();
 
+			if(mComboTimer > mComboMaxTime)
+			{
+				mbIsComboActive = false;
+				mComboTimer = 0.0f;
+				mComboCount = 0;
+			}
+		}
 	}
 	void SwordScript::LateUpdate()
 	{
@@ -66,7 +98,32 @@ namespace ME
 	{
 		// 칼을 휘두를 때 작동할 로직을 여기에 작성합니다.
 		// (예: 칼의 콜라이더 판정 켜기, 검기 이펙트 생성, 효과음 재생 등)
-		mActorScript->mAnimator->PlayAnimation(L"SWORDSLASH1", false);
+
+
+		if (mbCanComboInput == false)
+			return;
+
+		mbCanComboInput = false;
+		
+		if (mbIsComboActive == false)
+		{
+			// 첫 공격 시작
+			mbIsComboActive = true;
+			mComboCount = 0;
+		}
+		else
+		{
+			// 콤보 이어나가기
+			mComboCount++;
+
+			if (mComboCount >= mComboAnimNames.size())
+			{
+				mComboCount = 0; // 3타를 다 쳤으면 다시 1타로 돌아감
+			}
+		}
+		mComboTimer = 0.0f;
+
+		mActorScript->mAnimator->PlayAnimation(mComboAnimNames[mComboCount], false);
 
 	}
 }

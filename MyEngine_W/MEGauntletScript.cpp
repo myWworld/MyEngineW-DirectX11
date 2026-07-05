@@ -2,6 +2,7 @@
 #include "../MyEngine_Source/MEAnimator3D.h"
 #include "../MyEngine_Source/MEInput.h"
 #include "../MyEngine_Source/MEBoxCollider3D.h"
+#include "MEActorScript.h"
 
 namespace ME
 {
@@ -17,19 +18,38 @@ namespace ME
 	{
 		WeaponScript::Initialize();
 
-		mOffsetPos = Vector3(70.0f, 140.0f, -10.0f); //x +로 갈 시 아래쪽으로 감 , y축 +시 왼쪽으로 이동, z축은 앞쪽같음
-		Vector3 offsetRotDegree = Vector3(90.0f, 180.0f, 15.0f);
-
-		float pitch = XMConvertToRadians(offsetRotDegree.x);
-		float yaw = XMConvertToRadians(offsetRotDegree.y);
-		float roll = XMConvertToRadians(offsetRotDegree.z);
-
-		mOffsetQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
-
-		mIdleAnimName = L"SWORDIDLE1";
-		mWalkAnimName = L"SWORDWALK";
-		mAttackAnimName = L"SWORDATTACK1";
 	}
+
+	void GauntletScript::OnRegister()
+	{
+		if (mActorScript == nullptr)
+		{
+			mActorScript = GetOwner()->GetComponent<ActorScript>();
+		}
+
+		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK", L"HitBox On", 0.3f, [this]() {
+			this->BeginAttack();
+			});
+		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK", L"HitBox Off", 0.6f, [this]() {
+			this->EndAttack();
+			});
+
+		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK2", L"HitBox On", 0.5f, [this]() {
+			this->BeginAttack();
+			});
+		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK2", L"HitBox Off", 0.8f, [this]() {
+			this->EndAttack();
+			});
+
+		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK3", L"HitBox On", 0.5f, [this]() {
+			this->BeginAttack();
+			});
+		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK3", L"HitBox Off", 0.8f, [this]() {
+			this->EndAttack();
+			}); 
+		
+	}
+
 	void GauntletScript::Update()
 	{
 
@@ -45,18 +65,18 @@ namespace ME
 
 		GauntletScript::UpdateWeaponTransform();
 
-		auto* col = GetOwner()->GetComponent<BoxCollider3D>();
-		Vector3 offset = col->GetOffset();
-		if (Input::GetKey(eKeyCode::I)) offset.z += 1.0f;
-		if (Input::GetKey(eKeyCode::K)) offset.z -= 1.0f;
-		if (Input::GetKey(eKeyCode::J)) offset.x -= 1.0f;
-		if (Input::GetKey(eKeyCode::L)) offset.x += 1.0f;
-		if (Input::GetKey(eKeyCode::P)) offset.y += 1.0f;
-		if (Input::GetKey(eKeyCode::U)) offset.y -= 1.0f;
-
-		col->SetOffset(offset);
-
-		//OutputDebugStringA((std::string("Collider Offset: ") + std::to_string(offset.x) + ", " + std::to_string(offset.y) + ", " + std::to_string(offset.z) + "\n").c_str());
+	//	auto* col = GetOwner()->GetComponent<BoxCollider3D>();
+	//	Vector3 offset = col->GetOffset();
+	//	if (Input::GetKey(eKeyCode::I)) mOffsetPos.z += 1.0f;
+	//	if (Input::GetKey(eKeyCode::K)) mOffsetPos.z -= 1.0f;
+	//	if (Input::GetKey(eKeyCode::J)) mOffsetPos.x -= 1.0f;
+	//	if (Input::GetKey(eKeyCode::L)) mOffsetPos.x += 1.0f;
+	//	if (Input::GetKey(eKeyCode::P)) mOffsetPos.y += 1.0f;
+	//	if (Input::GetKey(eKeyCode::U)) mOffsetPos.y -= 1.0f;
+	//
+	//	col->SetOffset(offset);
+	//
+	//	OutputDebugStringA((std::string("Collider Offset: ") + std::to_string(mOffsetPos.x) + ", " + std::to_string(mOffsetPos.y) + ", " + std::to_string(mOffsetPos.z) + "\n").c_str());
 	}
 	void GauntletScript::Render()
 	{

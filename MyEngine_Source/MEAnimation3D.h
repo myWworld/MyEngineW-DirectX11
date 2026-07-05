@@ -16,6 +16,19 @@ namespace ME
 	class Skeleton;
 	class Animator3D;
 
+	struct AnimationEvent
+	{
+		std::wstring eventName;
+		float normalizedTime; // 0.0 ~ 1.0
+		std::function<void()> callback;
+
+
+		bool operator<(const AnimationEvent& other) const
+		{
+			return normalizedTime < other.normalizedTime;
+		}
+	};
+
 	class Animation3D :public Resource
 	{
 	public:

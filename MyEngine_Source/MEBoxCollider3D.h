@@ -32,6 +32,10 @@ namespace ME
 
 		POINT* GetPoint() { return mPoint; }
 
+		bool CheckOBBCollision(
+			const Vector3& centerA, const Vector3& extentsA, const Quaternion& rotA,
+			const Vector3& centerB, const Vector3& extentsB, const Quaternion& rotB);
+
 	private:
 
 		Vector3 RotateCollider(float rot, int x, int y, int width, int height);

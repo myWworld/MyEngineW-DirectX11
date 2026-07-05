@@ -13,7 +13,7 @@ namespace ME
 	public:
 
 		Script();
-		~Script();
+		 ~Script();
 
 		void Initialize() override;
 		void Update()override;
