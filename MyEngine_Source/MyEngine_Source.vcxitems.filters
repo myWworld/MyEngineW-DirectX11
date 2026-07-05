@@ -164,6 +164,24 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)BoneMapManager.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMBrain.cpp">
+      <Filter>Component\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMState.cpp">
+      <Filter>Component\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMTask.cpp">
+      <Filter>Component\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMDecision.cpp">
+      <Filter>Component\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEBlackBoard.cpp">
+      <Filter>Component\FSM</Filter>
+    </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEDamageInfo.cpp">
+      <Filter>Helpers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -353,6 +371,27 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)BoneMapManager.h">
       <Filter>Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMBrain.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMState.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMTask.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMDecision.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEBlackBoard.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FSMFactory.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEDamageInfo.h">
+      <Filter>Helpers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -456,6 +495,9 @@
     </Filter>
     <Filter Include="Resource\Skeleton">
       <UniqueIdentifier>{6a3cb03a-5d5d-42d0-a9e2-7ec92966e20d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Component\FSM">
+      <UniqueIdentifier>{a0a058e7-9ab1-40f6-8330-711583dfa6d0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

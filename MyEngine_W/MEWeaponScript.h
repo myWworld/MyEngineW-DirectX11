@@ -19,6 +19,9 @@ namespace ME
 			End,
 		};
 
+		void SetDamage(float damage) { mDamageAmount = damage; }
+		float GetDamage() { return mDamageAmount; }
+
 		virtual void Use() = 0;
 
 
@@ -59,6 +62,8 @@ namespace ME
 		OwnerType mOwnerType;
 
 		bool mbIsAttackEnd = false;
+
+		float mDamageAmount = 10.0f;
 
 	public :
 		math::Quaternion mOffsetQuat;

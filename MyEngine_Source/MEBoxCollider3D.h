@@ -4,7 +4,6 @@
 namespace ME
 {
 
-
 	class BoxCollider3D :public Collider
 	{
 	public:
@@ -46,6 +45,7 @@ namespace ME
 
 		bool mbIsRotate;
 		POINT* mPoint;
+
 
 	};
 

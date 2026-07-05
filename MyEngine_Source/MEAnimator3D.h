@@ -56,6 +56,8 @@ namespace ME
 		Animation3D* FindAnimation(const std::wstring& name);
 		void PlayAnimation(const std::wstring& name, bool loop = true);
 
+		Animation3D* GetActiveAnimation() { return mActiveAnimation; }
+
 		Events* FindEvents(const std::wstring& name);
 
 		std::function<void()>& GetStartEvent(const std::wstring& name);
@@ -69,6 +71,12 @@ namespace ME
 		}
 		Skeleton GetSkeleton() { return mSkeleton; }
 		Skeleton* GetSkeletonPtr() { return &mSkeleton; }
+
+		Bone* GetBone(const std::wstring& boneName)
+		{
+			mSkeleton.GetBone(boneName);
+			return nullptr;
+		}
 
 		void SetApplyRootMotion(bool apply) { mbApplyRootMotion = apply; }
 		bool GetApplyRootMotion() { return mbApplyRootMotion; }

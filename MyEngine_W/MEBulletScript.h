@@ -22,9 +22,21 @@ namespace ME
 		void Render()override;
 
 		void SetPool(ObjectPool<GameObject>* pool) { mPool = pool; }
+		void BackToPool() 
+		{
+			if (mPool)
+			{
+				resetBulletData();
+				mPool->Return(GetOwner());
+			}
+		}
+
+		void SetGun(GameObject* gun_) { gun = gun_; }
+		GameObject* GetGun() const { return gun; }
 
 		private:
 			void resetBulletData();
+
 
 
 	private:
@@ -33,6 +45,7 @@ namespace ME
 		float mDeadTimer;
 
 		ObjectPool<GameObject>* mPool;
+		GameObject* gun;
 
 	};
 

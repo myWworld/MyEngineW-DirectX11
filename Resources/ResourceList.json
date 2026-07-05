@@ -20,11 +20,16 @@
     { "key": "PISTOLWALK",  "path": "..\\Resources\\Animation\\PistolWalk.fbx" },
     { "key": "PISTOLIDLE",  "path": "..\\Resources\\Animation\\PistolIdle.fbx" },
     { "key": "PISTOLIDLE2", "path": "..\\Resources\\Animation\\PistolIdle2.fbx" },
-    { "key": "HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
+    { "key": "MONSTER_HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
     { "key": "DANCE",       "path": "..\\Resources\\Animation\\SillyDancing.fbx" },
-    { "key": "SWORDIDLE1",       "path": "..\\Resources\\Animation\\great sword idle.fbx" },
-    { "key": "SWORDWALK",       "path": "..\\Resources\\Animation\\great sword walk.fbx" },
-    { "key": "SWORDATTACK1",       "path": "..\\Resources\\Animation\\great sword attack.fbx" },
-    { "key": "SWORDSLASH1",       "path": "..\\Resources\\Animation\\great sword slash.fbx" }
+    { "key": "SWORDIDLE1",   "path": "..\\Resources\\Animation\\great sword idle.fbx" },
+    { "key": "SWORDWALK",   "path": "..\\Resources\\Animation\\great sword walk.fbx" },
+    { "key": "SWORDATTACK1", "path": "..\\Resources\\Animation\\great sword attack.fbx" },
+    { "key": "SWORDSLASH1",   "path": "..\\Resources\\Animation\\great sword slash.fbx" },
+    { "key": "MONSTER_ATTACK",   "path": "..\\Resources\\Animation\\mutant punch.fbx" },
+    { "key": "MONSTER_WALK",   "path": "..\\Resources\\Animation\\mutant walking.fbx" },
+    { "key": "MONSTER_RUN",   "path": "..\\Resources\\Animation\\mutant run.fbx" },
+    { "key": "MONSTER_IDLE",   "path": "..\\Resources\\Animation\\mutant idle.fbx" },
+    { "key": "MONSTER_DEATH",   "path": "..\\Resources\\Animation\\mutant dying.fbx" }
   ]
 }

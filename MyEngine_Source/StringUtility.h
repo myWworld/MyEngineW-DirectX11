@@ -31,5 +31,18 @@ namespace ME
 			}
 			return newName;
 		}
+
+		static constexpr uint32_t HashStr(const std::wstring& str)
+		{
+			uint32_t hash = 2166136261u;
+
+			for (size_t i = 0; str[i] != L'\0'; ++i)
+			{
+				hash ^= static_cast<uint32_t>(str[i]);
+				hash *= 16777619u;
+			}
+
+			return hash;
+		}
 	};
 }

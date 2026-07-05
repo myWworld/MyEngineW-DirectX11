@@ -238,6 +238,21 @@ namespace ME
 		return -1;
 	}
 
+	Bone* Skeleton::GetBone(const std::wstring& boneName)
+	{
+
+		std::string strName = StringUtility::ws2s(boneName);
+
+		int index = GetBoneIndex(strName);
+
+		if (index != -1 && index < mBones.size())
+		{
+			return &mBones[index]; 
+		}
+
+		return nullptr; 
+	}
+
 	Bone* Skeleton::GetLeftHandTransform()
 	{
 		static const size_t leftHandHash = std::hash<std::string>{}("LeftHand");

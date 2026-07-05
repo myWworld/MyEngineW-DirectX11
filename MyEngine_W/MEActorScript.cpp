@@ -39,5 +39,15 @@ namespace ME
 		 mbHoldingWeapon = true;
 	 }
 
+	 void ActorScript::SetHP(float damage)
+	 {
+		 mHp -= damage;
+		 if (mHp <= 0.0f)
+		 {
+			 mHp = 0.0f;
+			 OnDeath();
+		 }
+	 }
+
 
 }

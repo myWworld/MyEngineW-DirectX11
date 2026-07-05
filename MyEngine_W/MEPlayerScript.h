@@ -63,12 +63,16 @@ namespace ME
 		void OnPrimaryAction() override;
 		void OnToggleWeapon() override;
 
+		void OnDeath() override {}
+		void DamageProcess(DamageInfo damageInfo) override {}
+
 		bool IsMoving() { return mbIsMoving; }
 
 		Bone* GetLeftHandBone() { return mLeftHandBone; }
 		Bone* GetRightHandBone() { return mRightHandBone; }
 
 		Bone* GetWeaponSocketBone() override;
+		 Bone* GetWeaponSocketBoneRight() override;
 		Vector3 GetAimDirection() override;
 
 		void SetWeaponEquipment(WeaponScript* weapon)

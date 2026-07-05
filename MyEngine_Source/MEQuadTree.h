@@ -26,16 +26,16 @@ namespace ME
 		// 매 프레임마다 트리를 비우기
 		void Clear();
 
-		// 1. 화면을 4개의 자식 노드(구역)로 쪼개는 함수
+		// 화면을 4개의 자식 노드(구역)로 쪼개는 함수
 		void Split();
 
-		// 2. 특정 충돌체가 4개의 구역 중 어디에 속하는지 인덱스(0~3)를 반환하는 함수
+		// 특정 충돌체가 4개의 구역 중 어디에 속하는지 인덱스(0~3)를 반환하는 함수
 		int GetIndex(Collider* col);
 
-		// 3. 충돌체를 트리에 삽입하는 함수
+		// 충돌체를 트리에 삽입하는 함수
 		void Insert(Collider* col);
 
-		// 4. 특정 충돌체 주변(같은 구역)에 있는 다른 충돌체들의 목록만 반환하는 함수
+		// 특정 충돌체 주변(같은 구역)에 있는 다른 충돌체들의 목록만 반환하는 함수
 		std::vector<Collider*> Retrieve(std::vector<Collider*>& returnObjects, Collider* col);
 
 	};

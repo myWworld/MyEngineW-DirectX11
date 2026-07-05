@@ -141,6 +141,7 @@ namespace ME
 		Bullet* bullet = object::Instantiate<Bullet>(enums::eLayerType::Bullet, spawnPos);
 		BulletScript* bulletScript = bullet->AddComponent<BulletScript>();
 		bulletScript->SetPool(mBulletPool.get());
+		bulletScript->SetGun(GetOwner());
 
 		BoxCollider3D* col = bullet->AddComponent<BoxCollider3D>();
 		col->SetSize(Vector3(3, 2, 2));

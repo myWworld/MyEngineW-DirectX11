@@ -1,5 +1,6 @@
 #pragma once
 #include "MEScript.h"
+#include "MEDamageInfo.h"
 #include <vector>
 
 namespace ME
@@ -10,12 +11,14 @@ namespace ME
 	{
 
 	public:
-		
+		float GetHP() { return mHp; }
+		void SetHP(float damage);
 
 		virtual void OnPrimaryAction() = 0;
 		virtual Bone* GetWeaponSocketBone() = 0;
+		virtual Bone* GetWeaponSocketBoneRight() = 0;
 		virtual Vector3 GetAimDirection() = 0;
-		bool IsUsingWeapon() { return mbHoldingWeapon; }
+		bool IsUsingWeapon() { return mbHoldingWeapon; }	
 
 		virtual void AddWeapon(WeaponScript* weapon);
 		virtual void EquipWeapon(int index);
@@ -31,6 +34,9 @@ namespace ME
 		{
 			mEquippedWeapon = weapon;
 		}
+		
+		virtual void OnDeath() = 0;
+		virtual void DamageProcess(DamageInfo info) = 0;
 
 	protected:
 		bool mbHoldingWeapon = false;
@@ -38,6 +44,9 @@ namespace ME
 		std::vector<WeaponScript*> mWeapons; // 무기 인벤토리
 		int mCurrentWeaponIndex = -1;        // 현재 들고 있는 무기의 배열 번호
 		WeaponScript* mEquippedWeapon;       // 현재 들고 있는 무기에 빠르게 접근하기 위한 캐싱 포인터
+
+
+		float mHp = 100.0f;
 
 	public:
 		class Animator3D* mAnimator = nullptr;

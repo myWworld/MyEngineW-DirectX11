@@ -10,6 +10,7 @@ namespace ME::enums
 		Floor,
 		Player,
 		Items,
+		Weapon,
 		Bullet,
 		Particle,
 		Max = 20
@@ -60,6 +61,7 @@ namespace ME::enums
 	{
 		// 사용자 로직이 가장 먼저 실행되어 위치나 상태를 결정
 		Script,
+		FSMBrain,
 
 		// 스크립트가 움직인 위치를 바탕으로 물리 연산(충돌, 중력)을 처리
 		Rigidbody,

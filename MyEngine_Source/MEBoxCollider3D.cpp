@@ -3,7 +3,9 @@
 #include "MEGameObject.h"
 #include "MERenderer.h"
 #include "MECamera.h"
-
+#include "MEResources.h"
+#include "MEShader.h"
+#include "MEMesh.h"
 
 namespace ME
 {
@@ -19,6 +21,7 @@ namespace ME
 	}
 	void BoxCollider3D::Initialize()
 	{
+		mWireShader = Resources::Find<graphics::Shader>(L"WireFrameShader");
 	}
 	void BoxCollider3D::Update()
 	{
@@ -41,7 +44,47 @@ namespace ME
 	{
 		Transform* tr = GetOwner()->GetComponent<Transform>();
 		Vector3 pos = tr->GetPosition();
+		math::Quaternion rot = tr->GetRotationQuat();
 
+		if (std::shared_ptr<graphics::Shader> shader = mWireShader.lock())
+		{
+			shader->Bind();
+
+		//graphics::GetDevice()->BindRasterizerState(renderer::rasterizerStates[(UINT)eRasterizerState::WireFrame].Get());
+			
+			Transform debugTransform; //현재 구조는 최상위 부모에대한 트랜스폼만 있어서 그거를 콜라이더 위치로 맞춰버리면 부모 위치까지 왜곡되므로 임시 객체생성
+
+			// ==========================================
+		// 오프셋 벡터를 부모의 회전 방향에 맞게 회전 -> 기존은 회전 반영을 안해서 정해진 축에 대한 오프셋을 그대로 사용해 버렸기 때문에
+			// 어디를 가든 같은 자리에 고정이 됐던점을 개선하기위해 부모의 쿼터니온을 가져와 오프셋에 적용하도록 변경
+		
+			Vector3 rotatedOffset = math::Vector3::Transform(mOffset, rot);
+
+			// 부모 위치 + 회전된 오프셋
+			debugTransform.SetPosition(pos + rotatedOffset);
+			debugTransform.SetScale(mSize);
+
+			// 박스 자체도 부모의 회전과 똑같이 (OBB)
+			debugTransform.SetRotation(rot);
+
+			debugTransform.LateUpdate();
+			debugTransform.Bind();
+
+			// 메쉬 렌더링
+			std::shared_ptr<Mesh> cubeMesh = ME::Resources::Find<Mesh>(L"CubeMesh");
+			if (cubeMesh)
+			{
+				cubeMesh->Bind();
+				graphics::GetDevice()->BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+				graphics::GetDevice()->DrawIndexed(cubeMesh->GetIndexCount(), 0, 0);
+				graphics::GetDevice()->BindPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			}
+
+
+			// 상태 복구
+
+		//	graphics::GetDevice()->BindRasterizerState(renderer::rasterizerStates[(UINT)eRasterizerState::SolidBack].Get());
+		}
 
 
 	}

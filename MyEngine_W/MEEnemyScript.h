@@ -1,5 +1,6 @@
 #pragma once
 #include "MEActorScript.h"	
+#include "MEDamageInfo.h"
 #include "MEMath.h"
 #include "MECamera.h"
 #include "MEBone.h"
@@ -53,6 +54,9 @@ namespace ME
 		void OnPrimaryAction() override;
 		void OnToggleWeapon() override;
 
+		void OnDeath() override;
+		void DamageProcess(DamageInfo damageInfo) override;
+			  
 		bool IsMoving() { return mbIsMoving; }
 
 		Bone* GetLeftHandBone() { return mLeftHandBone; }
@@ -61,6 +65,11 @@ namespace ME
 		Bone* GetWeaponSocketBone() override
 		{
 			return 	mLeftHandBone;
+		}
+
+		Bone* GetWeaponSocketBoneRight() override
+		{
+			return 	mRightHandBone;
 		}
 
 		Vector3 GetAimDirection() override;

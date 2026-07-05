@@ -405,10 +405,82 @@ namespace ME::renderer
 		}
 	}
 
+	void LoadCubeMesh()
+	{
+		std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
+
+		std::vector<graphics::Vertex> vertexes = {};
+		std::vector<UINT> indices;
+
+		vertexes.resize(8);
+
+		// 앞면 (Front)
+		vertexes[0].pos = Vector3(-0.5f, 0.5f, -0.5f);
+		vertexes[1].pos = Vector3(0.5f, 0.5f, -0.5f);
+		vertexes[2].pos = Vector3(0.5f, -0.5f, -0.5f);
+		vertexes[3].pos = Vector3(-0.5f, -0.5f, -0.5f);
+
+		// 뒷면 (Back)
+		vertexes[4].pos = Vector3(-0.5f, 0.5f, 0.5f);
+		vertexes[5].pos = Vector3(0.5f, 0.5f, 0.5f);
+		vertexes[6].pos = Vector3(0.5f, -0.5f, 0.5f);
+		vertexes[7].pos = Vector3(-0.5f, -0.5f, 0.5f);
+
+		for (int i = 0; i < 8; ++i)
+		{
+			vertexes[i].color = Vector4(0.0f, 1.0f, 0.0f, 1.0f); // 초록색
+			vertexes[i].uv = Vector2(0.0f, 0.0f);
+		}
+
+		UINT lineIndices[] = {
+		0, 1, 1, 2, 2, 3, 3, 0, // 앞면 사각형 테두리 4줄
+		4, 5, 5, 6, 6, 7, 7, 4, // 뒷면 사각형 테두리 4줄
+		0, 4, 1, 5, 2, 6, 3, 7  // 앞면과 뒷면을 이어주는 기둥 4줄
+		};
+		indices.assign(lineIndices, lineIndices + 24);
+
+		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[3] = {};
+
+		inputLayoutDesces[0].AlignedByteOffset = 0;
+		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		inputLayoutDesces[0].InputSlot = 0;
+		inputLayoutDesces[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[0].SemanticName = "POSITION";
+		inputLayoutDesces[0].SemanticIndex = 0;
+
+		inputLayoutDesces[1].AlignedByteOffset = 12;
+		inputLayoutDesces[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+		inputLayoutDesces[1].InputSlot = 0;
+		inputLayoutDesces[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[1].SemanticName = "COLOR";
+		inputLayoutDesces[1].SemanticIndex = 0;
+
+		inputLayoutDesces[2].AlignedByteOffset = 28;
+		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32_FLOAT; 
+		inputLayoutDesces[2].InputSlot = 0;
+		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		inputLayoutDesces[2].SemanticName = "TEXCOORD";
+		inputLayoutDesces[2].SemanticIndex = 0;
+
+
+		graphics::Shader* wireShader = Resources::Find<graphics::Shader>(L"WireFrameShader").get();
+
+		if (wireShader != nullptr)
+		{
+			mesh->SetVertexBufferParams(3, inputLayoutDesces, wireShader->GetVSBlob()->GetBufferPointer(), wireShader->GetVSBlob()->GetBufferSize());
+		}
+
+		mesh->CreateIB(indices);
+		mesh->CreateVB(vertexes);
+
+		ME::Resources::Insert(L"CubeMesh", mesh);
+	}
+
 	void LoadMeshes()
 	{
 		LoadTriangleMesh();
 		LoadRectMesh();
+		LoadCubeMesh();
 	}
 
 	void LoadShaders()

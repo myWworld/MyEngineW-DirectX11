@@ -12,6 +12,7 @@ namespace ME
         ,mID(mCollisionID++)
         ,mSize(Vector3::One)
         ,mOffset(Vector3::Zero)
+		, mWireShader()
     {
 
     }

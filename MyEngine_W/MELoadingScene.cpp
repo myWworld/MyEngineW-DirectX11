@@ -9,6 +9,7 @@
 #include "BoneMapManager.h"
 #include "../MyEngine_Source/StringUtility.h"
 #include "../MyEngine_Source/MEAnimation3D.h"
+#include "../MyEngine_Source/FSMFactory.h"
 
 
 #include "MEApplication.h"
@@ -79,7 +80,7 @@ namespace ME
 
 
 			renderer::Initialize();
-
+			FSMFactory::Initialize();
 			std::ifstream file("..\\Resources\\ResourceList.json");
 			json datas = json::parse(file);
 

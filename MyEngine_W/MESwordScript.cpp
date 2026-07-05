@@ -1,5 +1,7 @@
 #include "MESwordScript.h"
 #include "../MyEngine_Source/MEAnimator3D.h"
+#include "../MyEngine_Source/MEInput.h"
+#include "../MyEngine_Source/MEBoxCollider3D.h"
 
 namespace ME
 {
@@ -36,11 +38,25 @@ namespace ME
 			mWeaponTransform = GetOwner()->GetComponent<Transform>();
 		}
 
+
 	}
 	void SwordScript::LateUpdate()
 	{
 		
 		WeaponScript::UpdateWeaponTransform();
+
+	//	auto* col = GetOwner()->GetComponent<BoxCollider3D>();
+	//	Vector3 offset = col->GetOffset();
+	//	if (Input::GetKey(eKeyCode::I)) offset.z += 1.0f;
+	//	if (Input::GetKey(eKeyCode::K)) offset.z -= 1.0f;
+	//	if (Input::GetKey(eKeyCode::J)) offset.x -= 1.0f;
+	//	if (Input::GetKey(eKeyCode::L)) offset.x += 1.0f;
+	//	if (Input::GetKey(eKeyCode::P)) offset.y += 1.0f;
+	//	if (Input::GetKey(eKeyCode::U)) offset.y -= 1.0f;
+	//
+	//	col->SetOffset(offset);
+
+		//OutputDebugStringA((std::string("Collider Offset: ") + std::to_string(offset.x) + ", " + std::to_string(offset.y) + ", " + std::to_string(offset.z) + "\n").c_str());
 	}
 	void SwordScript::Render()
 	{

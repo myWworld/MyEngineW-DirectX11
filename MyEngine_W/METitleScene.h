@@ -23,7 +23,7 @@ namespace ME
 	private:
 
 		void MakeCharacter(GameObject* player, std::wstring_view modelName);
-		void MakeWeapon(GameObject* player, std::wstring_view modelName);
+		void MakeWeapon(GameObject* player, std::wstring_view modelName, float damage = 10.0f);
 
 	private:
 

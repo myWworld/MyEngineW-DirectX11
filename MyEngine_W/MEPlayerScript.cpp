@@ -128,6 +128,11 @@ namespace ME
         return mLeftHandBone;
     }
 
+    Bone* PlayerScript::GetWeaponSocketBoneRight()
+    {
+        return mRightHandBone;
+    }
+
     void  PlayerScript::Idle()
     {
         if (mEquippedWeapon)

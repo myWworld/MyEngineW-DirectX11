@@ -28,8 +28,11 @@
 #include "MEWeaponScript.h"
 #include "MESwordScript.h"
 #include "MEGunScript.h"
+#include "MEGauntletScript.h"
 #include "MEGun.h"
 #include "MECollisionManager.h"
+#include "../MyEngine_Source/MEFSMBrain.h"
+#include "../MyEngine_Source/FSMFactory.h"
 
 extern ME::Application application;
 
@@ -77,7 +80,7 @@ namespace ME
 	{
 
 		
-			GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, Vector3(0, 0, 0));
+			GameObject* camera = object::Instantiate<GameObject>(enums::eLayerType::None, math::Vector3(0, 0, 0));
 
 			Camera* cameraComp = camera->AddComponent<Camera>();
 			cameraComp->SetProjectionMatrix(Camera::eProjectionType::Perspective);
@@ -89,7 +92,7 @@ namespace ME
 		if (!mPlayer)
 		{
 
-			mPlayer = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(0, 0, 0));
+			mPlayer = object::Instantiate<Player>(enums::eLayerType::Player, math::Vector3(0, 0, 0));
 			Transform* tr = mPlayer->GetComponent<Transform>();
 			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
 			renderer::mainCamera->SetTarget(mPlayer);
@@ -101,15 +104,20 @@ namespace ME
 			mPlayer->AddComponent<PlayerScript>();
 			MakeCharacter(mPlayer, L"CharacterModel");
 
-			MakeWeapon(mPlayer, L"PistolModel");
-			MakeWeapon(mPlayer, L"SwordModel");
+			MakeWeapon(mPlayer, L"PistolModel", 5.0f);
+			MakeWeapon(mPlayer, L"SwordModel", 15.0f);
+		
 
-			GameObject* enemy = object::Instantiate<Player>(enums::eLayerType::Player, Vector3(10, 0, 0));
+			GameObject* enemy = object::Instantiate<Player>(enums::eLayerType::Player,math::Vector3(10, 0, 0));
 			Transform* transform = enemy->GetComponent<Transform>();
 			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
 
 			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
 			MakeCharacter(enemy, L"MutantModel");
+			MakeWeapon(enemy, L"GauntletModel", 25.0f);
+			
+			FSMBrain* brain = enemy->AddComponent<FSMBrain>();
+			FSMFactory::MakeFSMWithJsonFile(brain, "..\\Resources\\EnemyFSMJson.json");
 
 		}
 
@@ -161,7 +169,7 @@ namespace ME
 
 		//	Rigidbody* rb = mPlayer->AddComponent<Rigidbody>();
 			Collider* col = player->AddComponent<BoxCollider3D>();
-			col->SetSize(Vector3(50, 250, 50));
+			col->SetSize(math::Vector3(50, 250, 50));
 
 
 			UIManager::Push(enums::eUIType::HpBar);
@@ -177,10 +185,10 @@ namespace ME
 		}
 	}
 
-	void TitleScene::MakeWeapon(GameObject* player, std::wstring_view modelName)
+	void TitleScene::MakeWeapon(GameObject* player, std::wstring_view modelName, float damage)
 	{
 		
-		GameObject* obj = object::Instantiate<GameObject>(enums::eLayerType::Items, Vector3(0, 10, 35));
+		GameObject* obj = object::Instantiate<GameObject>(enums::eLayerType::Weapon, math::Vector3(0, 10, 35));
 		Transform* tr = obj->GetComponent<Transform>();
 
 		WeaponScript* weaponScript = nullptr;
@@ -192,12 +200,24 @@ namespace ME
 		else if (modelName == L"SwordModel")
 		{
 			weaponScript = obj->AddComponent<SwordScript>();
-			tr->SetScale(Vector3(10.f,10.f,10.f));
+			tr->SetScale(math::Vector3(10.f, 10.f, 10.f));
+			Collider* col = obj->AddComponent<BoxCollider3D>();
+			col->SetOffset(math::Vector3(9.0f, 49.0f, 3.0f));
+			col->SetSize(math::Vector3(10.f, 70.f, 10.f));
+
+
+		}
+		else if (modelName == L"GauntletModel")
+		{
+			weaponScript = obj->AddComponent<GauntletScript>();
+			tr->SetScale(math::Vector3(10.f, 10.f, 10.f));
+			Collider* col = obj->AddComponent<BoxCollider3D>();
+			col->SetOffset(math::Vector3(9.0f, 49.0f, 3.0f));
+			col->SetSize(math::Vector3(10.f, 70.f, 10.f));
 		}
 
-		
 		weaponScript->SetOnwer(player);
-		
+		weaponScript->SetDamage(damage);
 	
 		std::shared_ptr<Model> model = Resources::Find<Model>(std::wstring(modelName));
 

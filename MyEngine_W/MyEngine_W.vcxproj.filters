@@ -46,6 +46,36 @@
     <ClInclude Include="MESwordScript.h">
       <Filter>Script\Others</Filter>
     </ClInclude>
+    <ClInclude Include="MEMoveToTargetTask.h">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="MEPlayAnimTask.h">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="MEMeleeAttackTask.h">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="MEAnimFinishDecision.h">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClInclude>
+    <ClInclude Include="MEDetectTargetDecision.h">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClInclude>
+    <ClInclude Include="MEDistanceDecision.h">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClInclude>
+    <ClInclude Include="MERandomWanderTask.h">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="METimerDecision.h">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClInclude>
+    <ClInclude Include="MEDestroyTask.h">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClInclude>
+    <ClInclude Include="MEGauntletScript.h">
+      <Filter>Script\Others</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -65,6 +95,15 @@
     </Filter>
     <Filter Include="Script\Player">
       <UniqueIdentifier>{033ce6d9-340d-44df-81ec-9f8555e85837}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents\FSM">
+      <UniqueIdentifier>{0895cbe7-1b4b-4910-a311-671567b801a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents\FSM\Task">
+      <UniqueIdentifier>{89d3cfec-3004-4048-ad5f-6ca383a1a77e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Contents\FSM\Decision">
+      <UniqueIdentifier>{1ae21499-2379-4a23-9c23-470fb660419d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +147,36 @@
     </ClCompile>
     <ClCompile Include="MEWeaponScript.cpp" />
     <ClCompile Include="MESwordScript.cpp">
+      <Filter>Script\Others</Filter>
+    </ClCompile>
+    <ClCompile Include="MEMoveToTargetTask.cpp">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="MEPlayAnimTask.cpp">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="MEMeleeAttackTask.cpp">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="MEAnimFinishDecision.cpp">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClCompile>
+    <ClCompile Include="MEDetectTargetDecision.cpp">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClCompile>
+    <ClCompile Include="MEDistanceDecision.cpp">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClCompile>
+    <ClCompile Include="MERandomWanderTask.cpp">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="METimerDecision.cpp">
+      <Filter>Contents\FSM\Decision</Filter>
+    </ClCompile>
+    <ClCompile Include="MEDestroyTask.cpp">
+      <Filter>Contents\FSM\Task</Filter>
+    </ClCompile>
+    <ClCompile Include="MEGauntletScript.cpp">
       <Filter>Script\Others</Filter>
     </ClCompile>
   </ItemGroup>

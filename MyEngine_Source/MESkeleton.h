@@ -43,6 +43,8 @@ namespace ME
 		int GetBoneIndex(const size_t& hash) const;
 		int GetBoneIndexToMatchWithAnim(const std::string& name) const;
 
+		Bone* GetBone(const std::wstring& boneName);
+
 		void CalculateFinalTransform();
 		void RegisterBone(aiNode* node, std::unordered_map<std::string, math::Matrix>& preRot);
 		void RegisterSkinData(const aiScene* scene);

@@ -3,10 +3,15 @@
 
 namespace ME
 {
+	namespace graphics
+	{
+		class Shader;
+	}
+
 	class BoxCollider2D;
 	class CircleCollider2D;
 	class BoxCollider3D;
-
+	
 	class Collider:public Component
 	{
 
@@ -40,7 +45,7 @@ namespace ME
 
 		enums::eColliderType GetColliderType() const{ return mType; }
 
-	private:
+	protected:
 
 		static UINT32 mCollisionID;
 
@@ -50,6 +55,7 @@ namespace ME
 
 		enums::eColliderType mType;
 
+		std::weak_ptr<graphics::Shader> mWireShader;
 	};
 
 }

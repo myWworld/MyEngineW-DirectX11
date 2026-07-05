@@ -17,6 +17,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)BoneMapManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ContentAndScript.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)FSMFactory.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation3D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimator.h" />
@@ -24,6 +25,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAudioClip.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAudioListener.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAudioSource.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEBlackBoard.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBone.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider2D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.h" />
@@ -34,11 +36,16 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MECommand.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEComponent.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEConstantBuffer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEDamageInfo.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEDontDestroyOnLoad.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEEntity.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEEnums.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEFmod.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEFrustumCulling.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMBrain.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMDecision.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMState.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEFSMTask.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGameObject.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEApplication.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.h" />
@@ -87,6 +94,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAudioClip.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAudioListener.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAudioSource.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEBlackBoard.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBone.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider2D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.cpp" />
@@ -96,10 +104,15 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MECollisionManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEComponent.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEConstantBuffer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEDamageInfo.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEDontDestroyOnLoad.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEEntity.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEFmod.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEFrustumCulling.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMBrain.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMDecision.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMState.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEFSMTask.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGameObject.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEApplication.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEGraphicDevice_DX11.cpp" />
