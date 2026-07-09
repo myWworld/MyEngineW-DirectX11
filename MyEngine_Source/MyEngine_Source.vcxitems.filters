@@ -182,6 +182,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEDamageInfo.cpp">
       <Filter>Helpers</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)MENetworkManager.cpp">
+      <Filter>NetWork</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -392,6 +395,10 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEDamageInfo.h">
       <Filter>Helpers</Filter>
     </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)MENetworkManager.h">
+      <Filter>NetWork</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Protocol.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">
@@ -498,6 +505,9 @@
     </Filter>
     <Filter Include="Component\FSM">
       <UniqueIdentifier>{a0a058e7-9ab1-40f6-8330-711583dfa6d0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NetWork">
+      <UniqueIdentifier>{c0952ce1-dbb0-4b1a-83fe-e30f000af4e0}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

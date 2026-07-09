@@ -31,6 +31,7 @@ namespace ME
 			Walk,
 			Run,
 			Attack,
+			Hit,
 			Death,
 			
 		};
@@ -117,6 +118,9 @@ namespace ME
 
 		PlayerType mPlayerType;
 		InputHandler mInputHandler;
+
+		float mDeathTimer = 0.0f;
+		float mDeathTime = 5.0f;
 	};
 
 }

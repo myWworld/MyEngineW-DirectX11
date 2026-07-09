@@ -2,6 +2,8 @@
 #include "MEFSMState.h"
 #include "METime.h"
 #include "MEBlackBoard.h"
+#include "../MyEngine_Source/MENetworkManager.h"
+#include "../MyEngine_Source/Protocol.h"
 
 namespace ME
 {
@@ -29,6 +31,13 @@ namespace ME
 
 		if (mActiveState == nullptr) return;
 
+		if (ME::NetworkManager::IsHost() == false)
+		{
+			// FSM 실행 안 함.
+			// Transform 업데이트 안 함.
+			// 오직 네트워크 패킷 수신부에서 강제로 덮어씌우는 위치와 애니메이션만 렌더링됨.
+			return;
+		}
 
 		mActiveState->UpdateTask(this, mOwner);
 		mActiveState->CheckDecision(this, mOwner);

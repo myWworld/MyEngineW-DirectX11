@@ -80,7 +80,7 @@
         {
           "Decision": {
             "Type": "DistanceDecision",
-            "TargetDist": 100.0
+            "TargetDist": 140.0
           },
           "TrueState": "ATTACK",
           "FalseState": "TRACE"

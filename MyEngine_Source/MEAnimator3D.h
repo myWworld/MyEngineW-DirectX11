@@ -17,7 +17,7 @@ namespace ME
 	{
 	public:
 
-		struct Event
+		/*struct Event
 		{
 			void operator()()
 			{
@@ -38,6 +38,13 @@ namespace ME
 			Event StartEvent;
 			Event CompleteEvent;
 			Event EndEvent;
+		};*/
+
+		struct StateBehaviour
+		{
+			std::function<void()> Enter;
+			std::function<void()> Exit;
+
 		};
 
 		Animator3D();
@@ -60,11 +67,15 @@ namespace ME
 
 		void AddEvent(const std::wstring& animationName, const std::wstring& eventName, float normalizedTime, std::function<void()> callback);
 
-		Events* FindEvents(const std::wstring& name);
+	//	Events* FindEvents(const std::wstring& name);
 
-		std::function<void()>& GetStartEvent(const std::wstring& name);
-		std::function<void()>& GetCompleteEvent(const std::wstring& name);
-		std::function<void()>& GetEndEvent(const std::wstring& name);
+
+		void AddEnterBehaviour(const std::wstring& animName, std::function<void()> callback);
+		void AddExitBehaviour(const std::wstring& animName, std::function<void()> callback);
+
+		//std::function<void()>& GetStartEvent(const std::wstring& name);
+		//std::function<void()>& GetCompleteEvent(const std::wstring& name);
+		//std::function<void()>& GetEndEvent(const std::wstring& name);
 
 		void SetSkeleton(Skeleton* skeleton) { 
 			
@@ -115,7 +126,7 @@ namespace ME
 		math::Vector3 mRootMotionBasePosition = Vector3::Zero;
 
 		std::unordered_map<std::wstring, Animation3D*> mAnimations;
-		std::unordered_map<std::wstring, std::unique_ptr<Events>> mEvents;
+		std::unordered_map<std::wstring, StateBehaviour> mBehaviours;
 
 		enums::eModelType mModelType;
 

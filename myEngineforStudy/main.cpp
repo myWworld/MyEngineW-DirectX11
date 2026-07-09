@@ -1,13 +1,12 @@
 ﻿// myEngineforStudy.cpp : 애플리케이션에 대한 진입점을 정의합니다.
 //
-
+#define WIN32_LEAN_AND_MEAN 
 #include "framework.h"
 #include "myEngineforStudy.h"
-#include "windows.h"
 #include "..//MyEngine_Source/MEApplication.h"
 #include "..//MyEngine_W/MELoadScene.h"
 #include "..//MyEngine_Source//MEResources.h"
-
+#include "windows.h"
 #include "../MyEngine_Source/METexture.h"
 #include "../MyEngine_W/METoolScene.h"
 #include "../MyEngine_Source/MESceneManager.h"

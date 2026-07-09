@@ -1,21 +1,101 @@
 #include "MEUIManager.h"
 #include "MEUIHUD.h"
 #include "MEUIButton.h"
+#include <algorithm>
 
 namespace ME
 {
 	std::unordered_map<enums::eUIType, UIBase*> UIManager::mUIs = {};
 	std::stack<UIBase*> UIManager::mUIBases = {};
 	std::queue<enums::eUIType> UIManager::mRequestUIQueue = {};
-	UIBase* UIManager::mActiveUI =nullptr;
+	std::unordered_map<enums::eUIType, std::vector<std::unique_ptr<UIBase>>> UIManager::mAttachedUIs = {};
+	UIBase* UIManager::mActiveUI = nullptr;
 
 	void UIManager::Initailize()
 	{
-		UIHUD* hud = new UIHUD();
-		mUIs.insert({ enums::eUIType::HpBar,hud });
-
+		// HP Bar는 액터마다 여러 개 생기는 UI이므로 mUIs에 싱글 인스턴스로 넣지 않는다.
 		UIButton* button = new UIButton();
 		mUIs.insert({ enums::eUIType::Button, button });
+	}
+
+	UIBase* UIManager::CreateUIInstance(enums::eUIType type)
+	{
+		switch (type)
+		{
+		case enums::eUIType::HpBar:
+			return new UIHUD();
+		case enums::eUIType::Button:
+			return new UIButton();
+		default:
+			return nullptr;
+		}
+	}
+
+	UIBase* UIManager::CreateAttachedUI(enums::eUIType type, GameObject* owner)
+	{
+		if (owner == nullptr)
+			return nullptr;
+
+		std::unique_ptr<UIBase> ui(CreateUIInstance(type));
+		if (ui == nullptr)
+			return nullptr;
+
+		ui->SetOwner(owner);
+		ui->Initialize();
+		ui->Active();
+
+		UIBase* rawPtr = ui.get();
+		mAttachedUIs[type].push_back(std::move(ui));
+
+		return rawPtr;
+	}
+
+	bool UIManager::RemoveAttachedUI(UIBase* targetUI)
+	{
+		if (targetUI == nullptr)
+			return false;
+
+		for (auto& pair : mAttachedUIs)
+		{
+			std::vector<std::unique_ptr<UIBase>>& uiList = pair.second;
+
+			auto iter = std::find_if(uiList.begin(), uiList.end(),
+				[targetUI](const std::unique_ptr<UIBase>& ui)
+				{
+					return ui.get() == targetUI;
+				});
+
+			if (iter != uiList.end())
+			{
+				(*iter)->UIClear();
+				uiList.erase(iter);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	void UIManager::RemoveAttachedUI(GameObject* owner)
+	{
+		if (owner == nullptr)
+			return;
+
+		for (auto& pair : mAttachedUIs)
+		{
+			std::vector<std::unique_ptr<UIBase>>& uiList = pair.second;
+
+			uiList.erase(std::remove_if(uiList.begin(), uiList.end(),
+				[owner](const std::unique_ptr<UIBase>& ui)
+				{
+					if (ui != nullptr && ui->GetOwner() == owner)
+					{
+						ui->UIClear();
+						return true;
+					}
+					return false;
+				}), uiList.end());
+		}
 	}
 
 	void UIManager::Render()
@@ -25,25 +105,35 @@ namespace ME
 		while (!uiBases.empty())
 		{
 			UIBase* uiBase = uiBases.top();
+			uiBases.pop();
 
 			if (uiBase)
 			{
 				uiBase->Render();
-				uiBases.pop();
 			}
+		}
 
-
+		for (auto& pair : mAttachedUIs)
+		{
+			for (std::unique_ptr<UIBase>& ui : pair.second)
+			{
+				if (ui)
+				{
+					ui->Render();
+				}
+			}
 		}
 	}
+
 	void UIManager::OnLoad(enums::eUIType type)
 	{
 		std::unordered_map<enums::eUIType, UIBase*>::iterator iter
-		= mUIs.find(type);
+			= mUIs.find(type);
 
 		if (iter == mUIs.end())
 		{
 			OnFail();
-			return;	
+			return;
 		}
 
 		OnComplete(iter->second);
@@ -56,14 +146,23 @@ namespace ME
 		while (!uiBases.empty())
 		{
 			UIBase* uiBase = uiBases.top();
+			uiBases.pop();
 
 			if (uiBase)
 			{
 				uiBase->Update();
-				uiBases.pop();
 			}
+		}
 
-
+		for (auto& pair : mAttachedUIs)
+		{
+			for (std::unique_ptr<UIBase>& ui : pair.second)
+			{
+				if (ui)
+				{
+					ui->Update();
+				}
+			}
 		}
 
 		if (mRequestUIQueue.size() > 0)
@@ -81,14 +180,23 @@ namespace ME
 		while (!uiBases.empty())
 		{
 			UIBase* uiBase = uiBases.top();
+			uiBases.pop();
 
 			if (uiBase)
 			{
 				uiBase->LateUpdate();
-				uiBases.pop();
 			}
+		}
 
-
+		for (auto& pair : mAttachedUIs)
+		{
+			for (std::unique_ptr<UIBase>& ui : pair.second)
+			{
+				if (ui)
+				{
+					ui->LateUpdate();
+				}
+			}
 		}
 	}
 	void UIManager::OnComplete(UIBase* addUI)
@@ -114,12 +222,8 @@ namespace ME
 				if (uiBase)
 				{
 					uiBase->InActive();
-					
 				}
-
-
 			}
-
 		}
 
 		mUIBases.push(addUI);
@@ -132,11 +236,30 @@ namespace ME
 	}
 	void UIManager::Release()
 	{
+		for (auto& pair : mAttachedUIs)
+		{
+			for (std::unique_ptr<UIBase>& ui : pair.second)
+			{
+				if (ui)
+				{
+					ui->UIClear();
+				}
+			}
+			pair.second.clear();
+		}
+		mAttachedUIs.clear();
+
+		while (!mUIBases.empty())
+		{
+			mUIBases.pop();
+		}
+
 		for (auto iter : mUIs)
 		{
 			delete iter.second;
 			iter.second = nullptr;
 		}
+		mUIs.clear();
 	}
 
 	void UIManager::Push(enums::eUIType type)
@@ -182,8 +305,6 @@ namespace ME
 			}
 
 			uibase->UIClear();
-
-
 		}
 
 		while (tempStack.size() > 0)

@@ -5,7 +5,9 @@
     { "key": "ALIENTEX",   "path": "..\\Resources\\Textures\\AlienTex.png" },
     { "key": "SWORD_DIFFUSE",   "path": "..\\Resources\\Textures\\espada2_Material.015_Diffuse.png" },
      { "key": "SWORD_NORMAL",   "path": "..\\Resources\\Textures\\Sting_Normal.png" },
-    { "key": "HPBARTEX",   "path": "..\\Resources\\Textures\\Hpbar.png" }
+    { "key": "HPBARTEX",   "path": "..\\Resources\\Textures\\HpBar.png" },
+    { "key": "HPFRAMETEX",   "path": "..\\Resources\\Textures\\HPFrame.png" },
+    { "key": "HPFILLTEX",   "path": "..\\Resources\\Textures\\HPFill.png" }
   ],
   "Model": [
     { "key": "SwordModel",  "path": "..\\Resources\\Sword.fbx", "profile": "None" },
@@ -19,18 +21,16 @@
   ],
   "Animation": [
     { "key": "Idle",        "path": "..\\Resources\\Animation\\Idle2.fbx" },
-    { "key": "FORWARDWALK", "path": "..\\Resources\\Animation\\ForwardWalk.fbx" },
     { "key": "PISTOLWALK",  "path": "..\\Resources\\Animation\\PistolWalk.fbx" },
     { "key": "PISTOLIDLE",  "path": "..\\Resources\\Animation\\PistolIdle.fbx" },
-    { "key": "PISTOLIDLE2", "path": "..\\Resources\\Animation\\PistolIdle2.fbx" },
     { "key": "SWORDHIT",         "path": "..\\Resources\\Animation\\Great Sword hit.fbx" },
     { "key": "SWORDATTACK1",         "path": "..\\Resources\\Animation\\Great Sword Slash.fbx" },
     { "key": "SWORDATTACK2",         "path": "..\\Resources\\Animation\\Great Sword Slash2.fbx" },
     { "key": "SWORDATTACK3",         "path": "..\\Resources\\Animation\\Great Sword Slash3.fbx" },
-    { "key": "SWORDADEATH",         "path": "..\\Resources\\Animation\\two handed sword death.fbx" },
-    { "key": "DANCE",       "path": "..\\Resources\\Animation\\SillyDancing.fbx" },
+    { "key": "SWORDADEATH",         "path": "..\\Resources\\Animation\\Two Handed Sword Death.fbx" },
     { "key": "SWORDIDLE1",   "path": "..\\Resources\\Animation\\great sword idle.fbx" },
     { "key": "SWORDWALK",   "path": "..\\Resources\\Animation\\great sword walk.fbx" },
+     { "key": "FORWARDWALK", "path": "..\\Resources\\Animation\\ForwardWalk.fbx" },
 
         { "key": "MONSTER_HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
     { "key": "MONSTER_ATTACK",   "path": "..\\Resources\\Animation\\mutant punch.fbx" },

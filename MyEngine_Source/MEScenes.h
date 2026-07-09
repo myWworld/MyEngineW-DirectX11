@@ -8,7 +8,8 @@
 
 namespace ME 
 {
-
+	class GameObject;
+	class WeaponScript;
 	class Scene : public Entity
 	{
 	public:
@@ -30,11 +31,19 @@ namespace ME
 		void EraseGameObject(GameObject* gameObj);
 
 		Layer* GetLayer(const enums::eLayerType type) { return mLayers[(UINT)type].get(); }
+		std::unordered_map<UINT, GameObject*>& GetRemotePlayers() { return mRemotePlayers; }
+		void AddRemotePlayer(UINT id, std::unique_ptr<GameObject> remotePlayer);
+		void EraseRemotePlayer(UINT id);
+
+
+		virtual void MakeCharacter(GameObject* player, std::wstring_view modelName) {}
+		virtual WeaponScript* MakeWeapon(GameObject* player, std::wstring_view modelName, std::wstring socketName, float damage = 10.0f) {return nullptr;}
 
 	private: 
 		void createLayers();
 	private:
 		std::vector<std::unique_ptr<Layer>> mLayers;
+		std::unordered_map<UINT, GameObject*> mRemotePlayers;
 	};
 
 }

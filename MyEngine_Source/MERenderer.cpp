@@ -229,7 +229,6 @@ namespace ME::renderer
 		vertexes[1].color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 		vertexes[1].uv = Vector2(1.0f, 0.0f);
 
-		vertexes[2].pos = Vector3(-0.5f, -0.5f, 0.0f);
 		vertexes[2].pos = Vector3(0.5f, -0.5f, 0.0f);
 		vertexes[2].color = Vector4(0.0f, 0.0f, 1.0f, 1.0f);
 		vertexes[2].uv = Vector2(1.0f, 1.0f);
@@ -247,6 +246,8 @@ namespace ME::renderer
 		indices.push_back(2);
 
 		D3D11_INPUT_ELEMENT_DESC inputLayoutDesces[4] = {};
+
+		
 		inputLayoutDesces[0].AlignedByteOffset = 0;
 		inputLayoutDesces[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[0].InputSlot = 0;
@@ -261,15 +262,14 @@ namespace ME::renderer
 		inputLayoutDesces[1].SemanticName = "COLOR";
 		inputLayoutDesces[1].SemanticIndex = 0;
 
-		inputLayoutDesces[2].AlignedByteOffset = 28; //12 + 16
+		inputLayoutDesces[2].AlignedByteOffset = 28; // pos(12) + color(16)
 		inputLayoutDesces[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
 		inputLayoutDesces[2].InputSlot = 0;
 		inputLayoutDesces[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 		inputLayoutDesces[2].SemanticName = "NORMAL";
 		inputLayoutDesces[2].SemanticIndex = 0;
 
-
-		inputLayoutDesces[3].AlignedByteOffset = 40; //12 + 16
+		inputLayoutDesces[3].AlignedByteOffset = 52; // pos(12) + color(16) + normal(12) + tangent(12)
 		inputLayoutDesces[3].Format = DXGI_FORMAT_R32G32_FLOAT;
 		inputLayoutDesces[3].InputSlot = 0;
 		inputLayoutDesces[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
@@ -486,7 +486,11 @@ namespace ME::renderer
 	void LoadShaders()
 	{
 		ME::Resources::Load<graphics::Shader>(L"TriangleShader", L"..\\Shaders_SOURCE\\Triangle");
-		ME::Resources::Load<graphics::Shader>(L"SpriteDefaultShader", L"..\\Shaders_SOURCE\\SpriteDefault");
+
+		graphics::Shader* spriteShader = ME::Resources::Load<graphics::Shader>(L"SpriteDefaultShader", L"..\\Shaders_SOURCE\\SpriteDefault").get();
+		spriteShader->SetBlendState(graphics::eBlendState::AlphaBlend);
+		spriteShader->SetDepthStencilState(graphics::eDepthStencilState::DepthNone);
+
 		ME::Resources::Load<graphics::Shader>(L"WireFrameShader", L"..\\Shaders_SOURCE\\WireFrame");
 		ME::Resources::Load<graphics::Shader>(L"ModelShader", L"..\\Shaders_SOURCE\\Model");
 		ME::Resources::Load<graphics::Shader>(L"StaticModelShader", L"..\\Shaders_SOURCE\\StaticModel");
@@ -517,8 +521,12 @@ namespace ME::renderer
 	{
 		constantBuffers[CBSLOT_TRANSFORM] = new ConstantBuffer(eCBType::Transform);
 		constantBuffers[CBSLOT_TRANSFORM]->Create(sizeof(TransformCB));
+
 		constantBuffers[CBSLOT_ANIMATION] = new ConstantBuffer(eCBType::Animation);
 		constantBuffers[CBSLOT_ANIMATION]->Create(sizeof(AnimationCB));
+
+		constantBuffers[CBSLOT_UI] = new ConstantBuffer(eCBType::UI);
+		constantBuffers[CBSLOT_UI]->Create(sizeof(UICB));
 
 	}
 

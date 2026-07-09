@@ -89,25 +89,6 @@ namespace ME
 			Resources::LoadFromJSON<Animation3D>(datas, "Animation");
 
 			BoneMapManager::LoadJsonBoneMap("..\\Resources\\BoneMap.json", enums::eBoneProfile::Humanoid);
-			//Resources::Load<graphics::Texture>(L"PISTOL", L"..\\Resources\\PistolTex.jpg");
-			//Resources::Load<graphics::Texture>(L"GUN", L"..\\Resources\\M4Tex.png");
-			//Resources::Load<graphics::Texture>(L"ALIEN", L"..\\Resources\\AlienTex.png");
-			//Resources::Load<graphics::Texture>(L"SOLDIER", L"..\\Resources\\SoldierTex.jpg");
-			//Resources::Load<graphics::Texture>(L"HPBAR", L"..\\Resources\\Hpbar.png");
-
-			//Resources::Load<Model>(L"BulletModel", L"..\\Resources\\Bullet.fbx");
-			//Resources::Load<Model>(L"AlienModel", L"..\\Resources\\alien.fbx");
-			//Resources::Load<Model>(L"PistolModel", L"..\\Resources\\Pistol.fbx");
-			//Resources::Load<Model>(L"SoldierModel", L"..\\Resources\\Soldier.fbx");
-
-			//Resources::Load<Animation3D>(L"Idle", L"..\\Resources\\Animation\\Idle2.fbx");
-			//Resources::Load<Animation3D>(L"FORWARDWALK", L"..\\Resources\\Animation\\ForwardWalk.fbx");
-			//Resources::Load<Animation3D>(L"PISTOLWALK", L"..\\Resources\\Animation\\PistolWalk.fbx");
-			//Resources::Load<Animation3D>(L"PISTOLIDLE", L"..\\Resources\\Animation\\PistolIdle.fbx");
-			//Resources::Load<Animation3D>(L"PISTOLIDLE2", L"..\\Resources\\Animation\\PistolIdle2.fbx");
-			//Resources::Load<Animation3D>(L"HIT", L"..\\Resources\\Animation\\HitReaction.fbx");
-			//Resources::Load<Animation3D>(L"DANCE", L"..\\Resources\\Animation\\SillyDancing.fbx");
-
 			
 			SceneManager::CreateScene<TitleScene>(L"TitleScene");
 		

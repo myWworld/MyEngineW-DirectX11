@@ -17,7 +17,7 @@ namespace ME
 
 		void Use() override;
 
-		void OnRegister() override;
+		void OnRegister(ActorScript* ownerActor) override;
 
 
 	};

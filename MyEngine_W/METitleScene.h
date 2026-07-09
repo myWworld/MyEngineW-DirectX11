@@ -21,10 +21,11 @@ namespace ME
 		void OnEnter() override;
 		void OnExit() override;
 
+		void MakeCharacter(GameObject* player, std::wstring_view modelName) override;
+		WeaponScript* MakeWeapon(GameObject* player, std::wstring_view modelName, std::wstring socketName, float damage) override;
+
 	private:
 
-		void MakeCharacter(GameObject* player, std::wstring_view modelName);
-		WeaponScript* MakeWeapon(GameObject* player, std::wstring_view modelName, std::wstring socketName, float damage = 10.0f);
 
 	private:
 

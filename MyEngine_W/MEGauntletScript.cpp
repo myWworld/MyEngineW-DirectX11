@@ -17,37 +17,47 @@ namespace ME
 	void GauntletScript::Initialize()
 	{
 		WeaponScript::Initialize();
-
+		mWeaponType = WeaponType::Gauntlet;
 	}
 
-	void GauntletScript::OnRegister()
+	void GauntletScript::OnRegister(ActorScript* ownerActor)
 	{
-		if (mActorScript == nullptr)
+		if (ownerActor == nullptr)
 		{
-			mActorScript = GetOwner()->GetComponent<ActorScript>();
+			return;
+		}
+		mActorScript = ownerActor;
+		Animator3D* animator = ownerActor->GetAnimator();
+
+		if (animator == nullptr)
+		{
+			ownerActor->SetAnimator();
+			animator = ownerActor->GetAnimator();
 		}
 
-		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK", L"HitBox On", 0.3f, [this]() {
+
+		animator->AddEvent(L"MONSTER_ATTACK", L"HitBox On", 0.1f, [this]() {
 			this->BeginAttack();
 			});
-		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK", L"HitBox Off", 0.6f, [this]() {
+		animator->AddEvent(L"MONSTER_ATTACK", L"HitBox Off", 0.6f, [this]() {
 			this->EndAttack();
 			});
 
-		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK2", L"HitBox On", 0.5f, [this]() {
+		animator->AddEvent(L"MONSTER_ATTACK2", L"HitBox On", 0.25f, [this]() {
 			this->BeginAttack();
 			});
-		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK2", L"HitBox Off", 0.8f, [this]() {
+		animator->AddEvent(L"MONSTER_ATTACK2", L"HitBox Off", 0.7f, [this]() {
 			this->EndAttack();
 			});
 
-		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK3", L"HitBox On", 0.5f, [this]() {
+		animator->AddEvent(L"MONSTER_ATTACK3", L"HitBox On", 0.3f, [this]() {
 			this->BeginAttack();
 			});
-		mActorScript->mAnimator->AddEvent(L"MONSTER_ATTACK3", L"HitBox Off", 0.8f, [this]() {
+		animator->AddEvent(L"MONSTER_ATTACK3", L"HitBox Off", 0.8f, [this]() {
 			this->EndAttack();
 			}); 
 		
+		WeaponScript::OnRegister(ownerActor);
 	}
 
 	void GauntletScript::Update()
@@ -86,7 +96,7 @@ namespace ME
 	{
 		// 칼을 휘두를 때 작동할 로직을 여기에 작성합니다.
 		// (예: 칼의 콜라이더 판정 켜기, 검기 이펙트 생성, 효과음 재생 등)
-		mActorScript->mAnimator->PlayAnimation(L"SWORDSLASH1", false);
+	//	mActorScript->mAnimator->PlayAnimation(L"SWORDSLASH1", false);
 
 	}
 }

@@ -11,6 +11,7 @@
 
 #define CBSLOT_TRANSFORM 0
 #define CBSLOT_ANIMATION 1
+#define CBSLOT_UI 2
 
 namespace ME::graphics
 {
@@ -74,6 +75,7 @@ namespace ME::graphics
 	{
 		Transform,
 		Animation,
+		UI,
 		None,
 		End,
 	};
@@ -129,6 +131,7 @@ namespace ME::graphics
 	{
 		DepthNone,
 		LessEqual,
+		UI_Depth,
 		End,
 	};
 
@@ -154,6 +157,12 @@ namespace ME::graphics
 	{
 		math::Matrix BoneMatrices[256];
 
+	};
+
+	CBUFFER(UICB, CBSLOT_UI) 
+	{
+		float hpRatio;
+		math::Vector3 padding;
 	};
 
 }

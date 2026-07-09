@@ -4,6 +4,7 @@
 
 namespace ME
 {
+
 class SwordScript : public WeaponScript
 {
 public:
@@ -18,7 +19,7 @@ public:
 
 	void Use() override;
 
-	void OnRegister() override;
+	void OnRegister(ActorScript* ownerActor) override;
 
 	void OpenComboWindow()
 	{
@@ -26,6 +27,11 @@ public:
 	}
 
 	bool CanComboInput() {return mbCanComboInput;}
+
+private:
+	
+	void LockInput();
+	void ResetAttackFlags();
 
 private :
 

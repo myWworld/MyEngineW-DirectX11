@@ -46,5 +46,8 @@ namespace ME
 
 		if(mMetallicTexture)
 			mMetallicTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Metalic);
+
+		if(mSpriteTexture)
+			mSpriteTexture->Bind(graphics::eShaderStage::PS, (UINT)graphics::eTextureType::Sprite);
 	}
 }

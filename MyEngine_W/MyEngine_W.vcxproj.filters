@@ -19,7 +19,6 @@
     <ClInclude Include="METitleScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="MEPlayScene.h" />
     <ClInclude Include="MEPlayer.h">
       <Filter>Contents</Filter>
     </ClInclude>
@@ -75,6 +74,12 @@
     </ClInclude>
     <ClInclude Include="MEGauntletScript.h">
       <Filter>Script\Others</Filter>
+    </ClInclude>
+    <ClInclude Include="MERemotePlayerScript.h">
+      <Filter>Script\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="MEPlayScene.h">
+      <Filter>Script\Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="MEGauntletScript.cpp">
       <Filter>Script\Others</Filter>
+    </ClCompile>
+    <ClCompile Include="MERemotePlayerScript.cpp">
+      <Filter>Script\Player</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

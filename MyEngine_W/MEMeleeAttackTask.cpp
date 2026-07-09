@@ -14,7 +14,7 @@ namespace ME
 
 		int randomIndex = rand() % mAnimNames.size();
 
-		std::wstring wAnimName(mAnimNames[randomIndex].begin(), mAnimNames[randomIndex].end());
+		mAnimNameW = std::wstring(mAnimNames[randomIndex].begin(), mAnimNames[randomIndex].end());
 
 	}
 
@@ -31,6 +31,7 @@ namespace ME
 		if (activeAnim != targetAnim)
 		{
 			mAnimator->PlayAnimation(mAnimNameW, mbIsLoop);
+
 		}
 
 	}

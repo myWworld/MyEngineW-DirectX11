@@ -33,6 +33,7 @@ namespace ME
 		void SetSpecularTexture(std::shared_ptr<graphics::Texture> texture) { mSpecularTexture = texture; }
 		void SetRoughnessTexture(std::shared_ptr<graphics::Texture> texture) { mRoughnessTexture = texture; }
 		void SetMetallicTexture(std::shared_ptr<graphics::Texture> texture) { mMetallicTexture = texture; }
+		void SetSpriteTexture(std::shared_ptr<graphics::Texture> texture) { mSpriteTexture = texture; }
 
 	private:
 		
@@ -41,6 +42,7 @@ namespace ME
 		std::shared_ptr<graphics::Texture> mSpecularTexture;
 		std::shared_ptr<graphics::Texture> mRoughnessTexture;
 		std::shared_ptr<graphics::Texture> mMetallicTexture;
+		std::shared_ptr<graphics::Texture> mSpriteTexture;
 	
 		XMFLOAT3 AmbientColor;
 		XMFLOAT3 DiffuseColor;

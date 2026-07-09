@@ -30,26 +30,51 @@ namespace ME
 		 mWeaponType = WeaponType::Sword;
 		 mIdleAnimName = L"SWORDIDLE1";
 		 mWalkAnimName = L"SWORDWALK";
-		 mComboAnimNames = { L"SWORDATTACK1", L"SWORDATTACK2", L"SWORDATTACK3" };
 
 	
 	}
 
-	void SwordScript::OnRegister()
+	void SwordScript::OnRegister(ActorScript* ownerActor)
 	{
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK1", L"HitBox On", 0.3f, [this]() { this->BeginAttack(); });
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK1", L"Combo Open", 0.7f, [this]() { this->OpenComboWindow(); });
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK1", L"HitBox Off", 0.6f, [this]() { this->EndAttack(); });
+		if (ownerActor == nullptr)
+			return;
 
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK2", L"HitBox On", 0.3f, [this]() { this->BeginAttack(); });
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK2", L"Combo Open", 0.7f, [this]() { this->OpenComboWindow(); });
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK2", L"HitBox Off", 0.6f, [this]() { this->EndAttack(); });
+		mActorScript = ownerActor;
+		Animator3D* animator = ownerActor->GetAnimator();
 
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK3", L"HitBox On", 0.3f, [this]() { this->BeginAttack(); });
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK3", L"Combo Open", 0.7f, [this]() { this->OpenComboWindow(); });
-		mActorScript->mAnimator->AddEvent(L"SWORDATTACK3", L"HitBox Off", 0.6f, [this]() { this->EndAttack(); });
+		if (animator == nullptr)
+		{
+			ownerActor->SetAnimator();
+			animator = ownerActor->GetAnimator();
+		}
 
-		WeaponScript::OnRegister();
+		mComboAnimNames = { L"SWORDATTACK1", L"SWORDATTACK2", L"SWORDATTACK3" };
+
+		for (int i = 0; i < 3; i++)
+		{
+
+			animator->AddEvent(mComboAnimNames[i], L"HitBox On", 0.3f, [this]() { this->BeginAttack(); });
+			animator->AddEvent(mComboAnimNames[i], L"Combo Open", 0.7f, [this]() { this->OpenComboWindow(); });
+			animator->AddEvent(mComboAnimNames[i], L"HitBox Off", 0.6f, [this]() { this->EndAttack(); });
+
+			animator->AddEnterBehaviour(mComboAnimNames[i], [this]() { this->LockInput(); });
+			animator->AddExitBehaviour(mComboAnimNames[i], [this]() { this->ResetAttackFlags(); });
+		}
+
+		WeaponScript::OnRegister(ownerActor);
+	}
+
+	void SwordScript::LockInput()
+	{
+		mbCanComboInput = false;
+	}
+
+	void SwordScript::ResetAttackFlags()
+	{
+		EndAttack();             // 켜져있을지 모르는 히트박스 무조건 끄기
+		mbCanComboInput = true;  // 막아둔 입력 창 무조건 열기
+
+
 	}
 
 	void SwordScript::Update()
@@ -102,8 +127,6 @@ namespace ME
 
 		if (mbCanComboInput == false)
 			return;
-
-		mbCanComboInput = false;
 		
 		if (mbIsComboActive == false)
 		{

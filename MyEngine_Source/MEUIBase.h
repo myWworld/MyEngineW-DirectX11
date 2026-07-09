@@ -3,7 +3,7 @@
 
 namespace ME
 {
-	
+
 
 	class UIBase :public Entity
 	{
@@ -11,7 +11,7 @@ namespace ME
 		UIBase(enums::eUIType type);
 		virtual ~UIBase();
 
-		struct Event 
+		struct Event
 		{
 			void operator=(std::function<void()> func)
 			{
@@ -22,7 +22,7 @@ namespace ME
 			{
 				if (mEvent != nullptr)
 					mEvent();
-			}	
+			}
 
 
 			std::function<void()> mEvent;
@@ -36,7 +36,7 @@ namespace ME
 
 		void Update();
 		void LateUpdate();
-	
+
 		void UIClear();
 
 		virtual void OnInit();
@@ -59,8 +59,11 @@ namespace ME
 		Vector2 GetSize() { return mSize; }
 
 		void SetOwner(class GameObject* owner) { this->mOwner = owner; }
+		class GameObject* GetOwner() const { return mOwner; }
 		void SetFollowOwner(bool follow) { mbFollowingOwner = follow; }
-		
+
+		math::Vector2 WolrdPosToScreenPos(math::Vector3& worldPos);
+
 	protected:
 		Vector2 mPosition;
 		Vector2 mSize;

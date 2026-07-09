@@ -33,6 +33,9 @@
 #include "MECollisionManager.h"
 #include "../MyEngine_Source/MEFSMBrain.h"
 #include "../MyEngine_Source/FSMFactory.h"
+#include "../MyEngine_Source/MEUIHUD.h"
+#include "../MyEngine_Source/MENetworkManager.h"
+#include "../MyEngine_Source/Protocol.h"
 
 extern ME::Application application;
 
@@ -103,31 +106,43 @@ namespace ME
 			//sr->SetMaterial(Resources::Find<Material>(L"SpriteMaterial"));
 			//sr->SetSprite(Resources::Find<graphics::Texture>(L"TITLE"));
 			//
-			mPlayer->AddComponent<PlayerScript>();
+
 			MakeCharacter(mPlayer, L"CharacterModel");
+			mPlayer->AddComponent<PlayerScript>();
 
 			MakeWeapon(mPlayer, L"PistolModel",L"LeftHand", 5.0f);
 			MakeWeapon(mPlayer, L"SwordModel", L"LeftHand", 15.0f);
 		
 
-			GameObject* enemy = object::Instantiate<Player>(enums::eLayerType::Player,math::Vector3(10, 0, 0));
-			Transform* transform = enemy->GetComponent<Transform>();
-			//tr->SetScale(Vector3(0.2f, 0.2f, 0.2f));
+			Pkt_C_Enter enterPkt = {};
+			enterPkt.header.type = ePacketType::C_ENTER;
+			enterPkt.modelType = eModelType::Character;
+			enterPkt.weaponType = eWeaponType::Gun; 
+			enterPkt.x = tr->GetPosition().x;
+			enterPkt.y = tr->GetPosition().y;
+			enterPkt.z = tr->GetPosition().z;
 
-			EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
-			MakeCharacter(enemy, L"MutantModel");
-			auto* rightWeapon = MakeWeapon(enemy, L"GauntletModel", L"RightHand", 25.0f);
-			rightWeapon->SetSocketOffsetAntRot(math::Vector3(-96.0f, 149.0f, 1.0f), math::Vector3::Zero);
+			ME::NetworkManager::SendPacket(&enterPkt);
 
-			auto* leftWeapon = MakeWeapon(enemy, L"GauntletModel", L"LeftHand", 25.0f);
 
-			//enemyScript->SetRightWeapon(rightWeapon);
-			enemyScript->SetLeftWeapon(leftWeapon);
-			leftWeapon->SetSocketOffsetAntRot(math::Vector3(129.0f, 139.0f, -9.0f), math::Vector3::Zero); //129.0f, 139.0f, -9.0f
-			
-			
-			FSMBrain* brain = enemy->AddComponent<FSMBrain>();
-			FSMFactory::MakeFSMWithJsonFile(brain, "..\\Resources\\EnemyFSMJson.json");
+			//GameObject* enemy = object::Instantiate<Player>(enums::eLayerType::Player,math::Vector3(10, 0, 0));
+			//Transform* transform = enemy->GetComponent<Transform>();
+			//
+			//MakeCharacter(enemy, L"MutantModel");
+			//EnemyScript* enemyScript = enemy->AddComponent<EnemyScript>();
+			//
+			//auto* rightWeapon = MakeWeapon(enemy, L"GauntletModel", L"RightHand", 10.0f);
+			//rightWeapon->SetSocketOffsetAntRot(math::Vector3(-96.0f, 149.0f, 1.0f), math::Vector3::Zero);
+			//
+			//auto* leftWeapon = MakeWeapon(enemy, L"GauntletModel", L"LeftHand", 10.0f);
+			//
+			////enemyScript->SetRightWeapon(rightWeapon);
+			//enemyScript->SetLeftWeapon(leftWeapon);
+			//leftWeapon->SetSocketOffsetAntRot(math::Vector3(129.0f, 139.0f, -9.0f), math::Vector3::Zero); //129.0f, 139.0f, -9.0f
+			//
+			//
+			//FSMBrain* brain = enemy->AddComponent<FSMBrain>();
+			//FSMFactory::MakeFSMWithJsonFile(brain, "..\\Resources\\EnemyFSMJson.json");
 
 		}
 
@@ -182,8 +197,7 @@ namespace ME
 			col->SetSize(math::Vector3(50, 250, 50));
 
 
-			UIManager::Push(enums::eUIType::HpBar);
-
+			//UIManager::Push(enums::eUIType::HpBar); //esc 메뉴, 환경 설정등 씬에서 유일하게 렌더할 것들 용도
 
 			animator->SetSkeleton(&model->GetSkeleton());
 	

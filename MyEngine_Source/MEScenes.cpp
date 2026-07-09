@@ -85,6 +85,30 @@ namespace ME
 		mLayers[(UINT)type]->AddGameObject(std::move(gameObject));
 	}
 
+	void Scene::AddRemotePlayer(UINT id, std::unique_ptr<GameObject> remotePlayer)
+	{
+		// 소유권을 넘기기(move) 전에 주소를 먼저 확보
+		mRemotePlayers[id] = remotePlayer.get();
+
+		//  소유권을 Layer로 
+		mLayers[(UINT)enums::eLayerType::Player]->AddGameObject(std::move(remotePlayer));
+	}
+
+	void Scene::EraseRemotePlayer(UINT id)
+	{
+
+		auto it = mRemotePlayers.find(id);
+		if (it != mRemotePlayers.end())
+		{
+
+			GameObject* player = it->second;
+
+			EraseGameObject(player);
+
+			mRemotePlayers.erase(it);
+		}
+	}
+
 	void Scene::EraseGameObject(GameObject* gameObj)
 	{
 		enums::eLayerType layerType = gameObj->GetLayerType();

@@ -10,6 +10,7 @@
 #include "../MyEngine_Source/MEFSMBrain.h"
 #include "../MyEngine_Source/MEFSMState.h"
 #include "MEBulletScript.h"
+#include "../MyEngine_Source/MEUIHUD.h"
 
 namespace ME
 {
@@ -26,14 +27,12 @@ namespace ME
     }
     void EnemyScript::Initialize()
     {
+
+        ActorScript::Initialize();
+
         mbHoldingWeapon = true;
-
-        if (mAnimator == nullptr)
-        {
-            mAnimator = GetOwner()->GetComponent< Animator3D>();
-        }
-
-      
+        mHeadBone = mAnimator->GetBone(L"Head");
+       
     }
     void EnemyScript::Update()
     {
@@ -51,17 +50,18 @@ namespace ME
     }
     void EnemyScript::Render()
     {
+        ActorScript::Render();
     }
 
     void EnemyScript::SetLeftWeapon(WeaponScript* weapon) 
     {
         mLeftHandWeapon = weapon;
-        weapon->GetOwner()->SetActive(true); 
+        static_cast<ActorScript*>(this)->AttachActiveWeapon(weapon);
     }
     void EnemyScript::SetRightWeapon(WeaponScript* weapon)
     {
         mRightHandWeapon = weapon;
-        weapon->GetOwner()->SetActive(true); 
+        static_cast<ActorScript*>(this)->AttachActiveWeapon(weapon);
     }
 
     void EnemyScript::OnPrimaryAction()

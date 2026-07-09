@@ -60,6 +60,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEMesh.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEModel.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEModelRenderer.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MENetworkManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEObject.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEObjectPool.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEQuadTree.h" />
@@ -83,6 +84,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MEUIManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEVertexBuffer.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ObjectAndScript.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)Protocol.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)StringUtility.h" />
   </ItemGroup>
   <ItemGroup>
@@ -126,6 +128,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEMesh.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEModel.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEModelRenderer.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MENetworkManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEObjectPool.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEQuadTree.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MERenderer.cpp" />

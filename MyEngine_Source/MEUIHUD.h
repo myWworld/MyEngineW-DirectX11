@@ -21,14 +21,8 @@ namespace ME
 		void OnRender()override;
 		void OnClear()override;
 
-		void SetOwner(GameObject* owner) { mOwner = owner; }
-
-
 	private:
 		graphics::Texture* mTexture;
-		
-		GameObject* mOwner;
-
 	};
 
 }

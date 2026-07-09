@@ -53,8 +53,9 @@ namespace ME
 			}
 		}
 
-		virtual void OnRegister() { mbIsRegistered = true; }
-		bool IsEventsRegistered() {
+		virtual void OnRegister(ActorScript* ownerActor) { mbIsRegistered = true; }
+		bool IsEventsRegistered()
+		{
 			return mbIsRegistered;
 		}
 

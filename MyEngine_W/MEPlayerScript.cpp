@@ -11,6 +11,8 @@
 #include "../MyEngine_Source/MERigidbody.h"
 #include "../MyEngine_Source/MEFSMBrain.h"
 #include "../MyEngine_Source/MEFSMState.h"
+#include "../MyEngine_Source/Protocol.h"
+#include "../MyEngine_Source/MENetworkManager.h"
 
 namespace ME
 {
@@ -29,18 +31,21 @@ namespace ME
     }
     void PlayerScript::Initialize()
     {
-        if (mAnimator == nullptr)
-        {
-            mAnimator = GetOwner()->GetComponent< Animator3D>();
-        }
-
-
+        ActorScript::Initialize();
+        mHeadBone = mAnimator->GetBone(L"Head");
 
     }
     void PlayerScript::Update()
     {
         if(mState == State::Death)
         {
+            mDeathTimer += Time::DeltaTime();
+
+            if (mDeathTime < mDeathTimer)
+            {
+                this->GetOwner()->SetActive(false);
+                this->mEquippedWeapon->GetOwner()->SetActive(false);
+            }
             return;
 		}
 
@@ -64,6 +69,16 @@ namespace ME
                 mLeftHandBone = skeleton->GetLeftHandTransform();
                 mRightHandBone = skeleton->GetRightHandTransform();
             }
+        }
+
+        if (mState == State::Hit)
+        {
+            // 피격 애니메이션이 완전히 끝났다면 다시 Idle 상태로 복귀
+            if (mAnimator->IsAnimationComplete())
+            {
+                mState = State::Idle;
+            }
+            return; 
         }
 
         ICommand* command = mInputHandler.HandleActionInput();
@@ -107,6 +122,7 @@ namespace ME
     }
     void PlayerScript::Render()
     {
+        ActorScript::Render();
     }
 
 
@@ -114,6 +130,8 @@ namespace ME
     {
         if (mbHoldingWeapon)
         {
+            mEquippedWeapon->SetIsAttackEnd(false);
+
             mState = State::Attack;
             mEquippedWeapon->Use();
 
@@ -160,10 +178,10 @@ namespace ME
     void PlayerScript::Attack()
     {
 
-        if (mAnimator->IsAnimationComplete())
+        if (mAnimator->IsAnimationComplete() || mEquippedWeapon->GetIsAttackEnd())
         {
             mState = State::Idle;
- 
+            mEquippedWeapon->SetIsAttackEnd(false);
         }
         else
         {
@@ -210,7 +228,16 @@ namespace ME
         mbIsMoving = true;
         mState = State::Walk;
         
+        {
+            Pkt_C_Move myMove = {};
+            myMove.x = pos.x;
+            myMove.y = pos.y;
+            myMove.z = pos.z;
 
+            myMove.header.type = ePacketType::C_MOVE;
+
+            NetworkManager::SendPacket(&myMove);
+        }
 
    
     }
@@ -253,12 +280,17 @@ namespace ME
 
     void PlayerScript::OnDeath()
     {
-        mAnimator->PlayAnimation(L"SWORDADEATH");
+        mAnimator->PlayAnimation(L"SWORDADEATH",false);
 		mState = State::Death;
     }
 
     void PlayerScript::OnCollisionEnter(Collider* other)
     {
+        if (mState == State::Death)
+        {
+            return;
+        }
+
         GameObject* owner = other->GetOwner();
 
         if (owner != nullptr &&
@@ -273,7 +305,9 @@ namespace ME
             if (weaponScript)
             {
 
-                if (weaponScript->CanAttack() == false || weaponScript->GetOwnerActor() == GetOwner())
+                if (weaponScript->CanAttack() == false 
+                    || weaponScript->GetOwnerActor() == GetOwner()
+                     || mState == State::Hit)
                 {
                     return;
                 }
@@ -293,8 +327,20 @@ namespace ME
 
                 DamageProcess(damageInfo);
 
+                if (mState == State::Death)
+                {
+                    return;
+                }
+
+                mState = State::Hit;
+
+                if (mEquippedWeapon)
+                {
+                    mEquippedWeapon->SetIsAttackEnd(true);
+                }
+
 				if (mAnimator->GetActiveAnimation()->GetName() != L"SWORDHIT")
-                    mAnimator->PlayAnimation(L"SWORDHIT");
+                    mAnimator->PlayAnimation(L"SWORDHIT", false);
             }
         }
     }

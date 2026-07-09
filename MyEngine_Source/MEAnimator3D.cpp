@@ -17,7 +17,7 @@ namespace ME
 		, mActiveAnimation(nullptr)
 		, mAnimations{}
 		, mbLoop(false)
-		, mEvents{}
+		//, mEvents{}
 		, mModelType(enums::eModelType::StaticBone)
 		, mSkeleton{}
 		, mModelMatrix{}
@@ -30,7 +30,7 @@ namespace ME
 	Animator3D::~Animator3D()
 	{
 		mAnimations.clear();
-		mEvents.clear();
+		//mEvents.clear();
 	}
 	void Animator3D::Initialize()
 	{
@@ -168,9 +168,9 @@ namespace ME
 
 		std::shared_ptr<Animation3D> animation = Resources::Load<Animation3D>(name, path);
 
-		auto events = std::make_unique<Events>();
+		//auto events = std::make_unique<Events>();
 
-		mEvents.insert({ name, std::move(events)});
+		//mEvents.insert({ name, std::move(events)});
 		mAnimations.insert({ name, animation.get()});
 
 	}
@@ -200,21 +200,33 @@ namespace ME
 
 		if (mActiveAnimation)
 		{
-			Events* currentEvents
+			auto iter = mBehaviours.find(mActiveAnimation->GetName());
+			if (iter != mBehaviours.end() && iter->second.Exit)
+			{
+				iter->second.Exit();
+			}
+
+			/*Events* currentEvents
 				= FindEvents(mActiveAnimation->GetName());
 
 			if (currentEvents)
 			{
 				currentEvents->EndEvent();
-			}
+			}*/
 		}
 
-		Events* nextEvents
+		/*Events* nextEvents
 			= FindEvents(animation->GetName());
 
 		if (nextEvents)
 		{
 			nextEvents->StartEvent();
+		}*/
+
+		auto nextIter = mBehaviours.find(animation->GetName());
+		if (nextIter != mBehaviours.end() && nextIter->second.Enter)
+		{
+			nextIter->second.Enter(); 
 		}
 
 		mActiveAnimation = animation.get();
@@ -232,32 +244,41 @@ namespace ME
 		std::sort(mAnimEvents[animName].begin(), mAnimEvents[animName].end());
 	}
 
-
-	Animator3D::Events* Animator3D::FindEvents(const std::wstring& name)
+	void Animator3D::AddEnterBehaviour(const std::wstring& animName, std::function<void()> callback)
 	{
-		auto iter = mEvents.find(name);
-		if (iter == mEvents.end())
-			return nullptr;
-
-		return iter->second.get();
+		mBehaviours[animName].Enter = std::move(callback);
+	}
+	void Animator3D::AddExitBehaviour(const std::wstring& animName, std::function<void()> callback)
+	{
+		mBehaviours[animName].Exit = std::move(callback);
 	}
 
-	std::function<void()>& Animator3D::GetStartEvent(const std::wstring& name)
-	{
-		Events* events = FindEvents(name);
-		return events->StartEvent.mEvent;
 
-	}
-	std::function<void()>& Animator3D::GetCompleteEvent(const std::wstring& name)
-	{
-		Events* events = FindEvents(name);
-		return events->CompleteEvent.mEvent;
-	}
-	std::function<void()>& Animator3D::GetEndEvent(const std::wstring& name)
-	{
-		Events* events = FindEvents(name);
-		return events->EndEvent.mEvent;
-	}
+	//Animator3D::Events* Animator3D::FindEvents(const std::wstring& name)
+	//{
+	//	auto iter = mEvents.find(name);
+	//	if (iter == mEvents.end())
+	//		return nullptr;
+	//
+	//	return iter->second.get();
+	//}
+	//
+	//std::function<void()>& Animator3D::GetStartEvent(const std::wstring& name)
+	//{
+	//	Events* events = FindEvents(name);
+	//	return events->StartEvent.mEvent;
+	//
+	//}
+	//std::function<void()>& Animator3D::GetCompleteEvent(const std::wstring& name)
+	//{
+	//	Events* events = FindEvents(name);
+	//	return events->CompleteEvent.mEvent;
+	//}
+	//std::function<void()>& Animator3D::GetEndEvent(const std::wstring& name)
+	//{
+	//	Events* events = FindEvents(name);
+	//	return events->EndEvent.mEvent;
+	//}
 
 
 	std::unordered_map<std::string, std::string> BoneNameManualMapping = {

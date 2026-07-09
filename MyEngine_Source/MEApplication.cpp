@@ -5,10 +5,10 @@
 #include "MEResources.h"
 #include "MECollisionManager.h"
 #include "MEUIManager.h"
-
+#include "MENetworkManager.h"
 #include "MEFmod.h"
 #include "MERenderer.h"
-
+#include "Protocol.h"
 
 
 namespace ME 
@@ -56,7 +56,9 @@ namespace ME
 		 CollisionManager::Iniatialize();
 		 UIManager::Initailize();
 		 SceneManager::Initialize();
-		 
+		 NetworkManager::Initialize();
+		
+
 	}
 
 	void Application::AdjustWindowRect(HWND hwnd, UINT width, UINT height)
@@ -99,6 +101,7 @@ namespace ME
    		CollisionManager::Update();
 		UIManager::Update();
 		SceneManager::Update();
+		NetworkManager::Update();
 
 		
 	}
@@ -145,7 +148,7 @@ namespace ME
 
 		renderer::Release();
 
-
+		ME::NetworkManager::Release();
 
 	}
 
