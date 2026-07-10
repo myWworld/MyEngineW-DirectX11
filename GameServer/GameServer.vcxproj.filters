@@ -27,6 +27,9 @@
     <ClCompile Include="PacketUtility.cpp">
       <Filter>유틸리티</Filter>
     </ClCompile>
+    <ClCompile Include="MEServerMonsterFSMContext.cpp">
+      <Filter>유틸리티</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PacketUtility.h">
@@ -34,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="ServerWorld.h">
       <Filter>ServerWorld</Filter>
+    </ClInclude>
+    <ClInclude Include="MEServerMonsterFSMContext.h">
+      <Filter>유틸리티</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

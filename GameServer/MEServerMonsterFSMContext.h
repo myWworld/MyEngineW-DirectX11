@@ -5,8 +5,7 @@
 
 class ServerWorld;
 
-class ServerMonsterFSMContext final
-    : public ME::IFSMContext
+class ServerMonsterFSMContext final : public ME::IFSMContext
 {
 public:
     ServerMonsterFSMContext(
@@ -48,4 +47,5 @@ private:
 
     float mDeltaTime;
 };
+
 

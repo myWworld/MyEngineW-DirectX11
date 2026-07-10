@@ -124,16 +124,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="PacketUtility.cpp" />
-    <ClCompile Include="ServerTypes.h" />
-    <ClCompile Include="ServerWorld.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="PacketUtility.h" />
-    <ClInclude Include="ServerWorld.h" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <!-- GameServer -->
+  <ClCompile Include="main.cpp" />
+  <ClCompile Include="PacketUtility.cpp" />
+  <ClCompile Include="ServerWorld.cpp" />
+  <ClCompile Include="MEServerMonsterFSMContext.cpp" />
+  <!-- FSM Core -->
+  <ClCompile Include="..\MyEngine_Source\FSMBrainCore.cpp" />
+  <ClCompile Include="..\MyEngine_Source\MEFSMState.cpp" />
+
+
+  <!-- FSM Tasks -->
+  <ClCompile Include="..\MyEngine_W\MEPlayAnimTask.cpp" />
+  <ClCompile Include="..\MyEngine_W\MERandomWanderTask.cpp" />
+  <ClCompile Include="..\MyEngine_W\MEMoveToTargetTask.cpp" />
+  <ClCompile Include="..\MyEngine_W\MEMeleeAttackTask.cpp" />
+  <ClCompile Include="..\MyEngine_W\MEDestroyTask.cpp" />
+
+  <!-- FSM Decisions -->
+  <ClCompile Include="..\MyEngine_W\MEDetectTargetDecision.cpp" />
+  <ClCompile Include="..\MyEngine_W\MEDistanceDecision.cpp" />
+  <ClCompile Include="..\MyEngine_W\METimerDecision.cpp" />
+  <ClCompile Include="..\MyEngine_W\MEAnimFinishDecision.cpp" />
+</ItemGroup>
+
+<ItemGroup>
+  <ClInclude Include="PacketUtility.h" />
+  <ClInclude Include="ServerTypes.h" />
+  <ClInclude Include="ServerWorld.h" />
+  <ClInclude Include="MEServerMonsterFSMContext.h" />
+</ItemGroup>
+
+<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>

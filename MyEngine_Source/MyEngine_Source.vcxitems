@@ -74,7 +74,6 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MESceneManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScenes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScript.h" />
-    <ClInclude Include="$(MSBuildThisFileDirectory)MEServerMonsterFSMContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEShader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MESkeleton.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MESpriteRenderer.h" />
@@ -144,7 +143,6 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MESceneManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScenes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScript.cpp" />
-    <ClCompile Include="$(MSBuildThisFileDirectory)MEServerMonsterFSMContext.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEShader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MESkeleton.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MESpriteRenderer.cpp" />

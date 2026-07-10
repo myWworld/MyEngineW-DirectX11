@@ -1,6 +1,6 @@
 #include "MEServerMonsterFSMContext.h"
 
-#include "../GameServer/ServerWorld.h"
+#include "ServerWorld.h"
 
 #include <limits>
 

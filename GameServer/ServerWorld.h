@@ -1,6 +1,6 @@
 #pragma once
 #include "../MyEngine_Source/FSMBrainCore.h"
-#include "../MyEngine_Source/MEServerMonsterFSMContext.h"
+#include "MEServerMonsterFSMContext.h"
 
 #include "PacketUtility.h"
 #include "ServerTypes.h"
