@@ -98,7 +98,7 @@ namespace ME
         return Vector3::Forward;
     }
 
-    void RemotePlayerScript::ApplyMove(float x, float y, float z)
+    void RemotePlayerScript::ApplyMove(float x, float y, float z, float yaw)
     {
         CacheComponents();
 
@@ -108,6 +108,90 @@ namespace ME
         mTransform->SetPosition(x, y, z);
     }
 
+
+
+    void RemotePlayerScript::ApplyAttack(
+        eWeaponType weaponType,
+        std::uint8_t attackIndex,
+        const Vector3& direction)
+    {
+        // IDLE/WALK는 같은 상태면 계속 PlayAnimation 호출하지 않기.
+        // 계속 호출하면 애니메이션이 매 프레임 첫 프레임으로 리셋될 수 있음.
+
+        if (weaponType == eWeaponType::Sword)
+        {
+            switch (attackIndex)
+            {
+
+                case 0:
+
+                    mAnimator->PlayAnimation(L"SWORDATTACK1", false);
+                    break;
+
+                case 1:
+                    mAnimator->PlayAnimation(L"SWORDATTACK2", false);
+                    break;
+
+                case 2:
+                    mAnimator->PlayAnimation(L"SWORDATTACK3", false);
+                    break;
+
+                default:
+                    break;
+        
+            }
+        }
+        else if (weaponType == eWeaponType::Gun)
+        {
+
+        }
+    
+    }
+
+    void RemotePlayerScript::RegisterWeapon(
+        eWeaponType type,
+        WeaponScript* weapon)
+    {
+        if (weapon == nullptr)
+            return;
+
+        mWeaponMap[type] = weapon;
+
+        weapon->WeaponOnOff(false);
+    }
+
+    void RemotePlayerScript::ApplyWeaponChange(
+        eWeaponType weaponType)
+    {
+        auto iter = mWeaponMap.find(weaponType);
+
+        if (iter == mWeaponMap.end())
+        {
+            return;
+        }
+
+        WeaponScript* nextWeapon = iter->second;
+
+        if (nextWeapon == nullptr) return;
+
+        if (mCurrentWeapon == nextWeapon) return;
+
+        mCurrentWeaponType = weaponType;
+        
+        if (mCurrentWeapon)
+        {
+            mCurrentWeapon->WeaponOnOff(false);
+        }
+
+        mCurrentWeapon = nextWeapon;
+        mCurrentWeapon->WeaponOnOff(true);
+        
+        if (!mbPlayingAction)
+        {
+            ApplyState(mCurrentRemoteState);
+        }
+    }
+
     void RemotePlayerScript::ApplyState(ePlayerState state)
     {
         CacheComponents();
@@ -115,14 +199,8 @@ namespace ME
         if (mAnimator == nullptr)
             return;
 
-        // IDLE/WALK는 같은 상태면 계속 PlayAnimation 호출하지 않기.
-        // 계속 호출하면 애니메이션이 매 프레임 첫 프레임으로 리셋될 수 있음.
-        if (mCurrentRemoteState == state &&
-            state != ePlayerState::ATTACK_1 &&
-            state != ePlayerState::ATTACK_2)
-        {
+        if (mbPlayingAction)
             return;
-        }
 
         mCurrentRemoteState = state;
 
@@ -142,13 +220,8 @@ namespace ME
                 mAnimator->PlayAnimation(L"FORWARDWALK", true);
             break;
 
-        case ePlayerState::ATTACK_1:
-     
-            mAnimator->PlayAnimation(L"SWORDATTACK1", false);
-            break;
-
-        case ePlayerState::ATTACK_2:
-            mAnimator->PlayAnimation(L"SWORDATTACK2", false);
+        case ePlayerState::HIT:
+            mAnimator->PlayAnimation(L"SWORDHIT", false);
             break;
 
         case ePlayerState::DEATH:

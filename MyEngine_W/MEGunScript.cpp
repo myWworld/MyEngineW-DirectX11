@@ -44,7 +44,9 @@ namespace ME
 
 		mOffsetQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
 
-		mWeaponType = WeaponType::Gun;
+		mWeaponType = eWeaponType::Gun;
+
+
 		mIdleAnimName = L"PISTOLIDLE";
 		mWalkAnimName = L"PISTOLWALK";
 		mAttackAnimName = L"PISTOLWALK";

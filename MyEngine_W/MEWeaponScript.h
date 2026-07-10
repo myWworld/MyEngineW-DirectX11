@@ -2,11 +2,20 @@
 #include "MEScript.h"
 #include "MEGameObject.h"
 #include "METransform.h"
+#include "MEComponent.h"
 #include "MEActorScript.h"
 #include <unordered_set>
+#include "../MyEngine_Source/Protocol.h"
 
 namespace ME
 {
+	struct WeaponAttackInfo
+	{
+		// 검이면 0, 1, 2가 각각
+		// SWORDATTACK1, SWORDATTACK2, SWORDATTACK3
+		std::uint8_t attackIndex = 0;
+	};
+
 	class ActorScript;
 	class Bone;
 	class WeaponScript : public Script	
@@ -20,13 +29,6 @@ namespace ME
 			End,
 		};
 		
-		enum class WeaponType
-		{
-			Sword,
-			Gauntlet,
-			Gun,
-			End,
-		};
 
 		WeaponScript(){}
 		virtual ~WeaponScript() = default;
@@ -38,8 +40,17 @@ namespace ME
 
 		void SetSocketOffsetAntRot(math::Vector3 pos, math::Vector3 rot);
 
-		virtual void Use() = 0;
+		virtual bool Use(WeaponAttackInfo& outAttackInfo) = 0;
 
+		void WeaponOnOff(bool on) { 
+			
+			if(mOwner)
+				mOwner->SetActive(on); 
+			else
+			{
+				this->GetOwner()->SetActive(on);
+			}
+		}
 
 		virtual void SetOnwer(GameObject* owner)
 		{
@@ -82,7 +93,7 @@ namespace ME
 
 		bool CanAttack() { return mbIsActive; } // 데미지 처리에서 체크
 
-		WeaponType GetWeponType() { return mWeaponType; }
+		eWeaponType GetWeaponType() const { return mWeaponType; }
 
 	protected:
 
@@ -104,7 +115,7 @@ namespace ME
 
 		float mDamageAmount = 10.0f;
 
-		WeaponType mWeaponType = WeaponType::End;
+		eWeaponType mWeaponType = eWeaponType::Gun;
 
 		bool mbIsRegistered = false;
 

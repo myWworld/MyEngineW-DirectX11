@@ -27,7 +27,7 @@ namespace ME
 
 		 mOffsetQuat = Quaternion::CreateFromYawPitchRoll(yaw, pitch, roll);
 
-		 mWeaponType = WeaponType::Sword;
+		 mWeaponType = eWeaponType::Sword;
 		 mIdleAnimName = L"SWORDIDLE1";
 		 mWalkAnimName = L"SWORDWALK";
 
@@ -119,15 +119,26 @@ namespace ME
 	{
 	}
 
-	void SwordScript::Use()
+	bool SwordScript::Use(WeaponAttackInfo& outAttackInfo)
 	{
 		// 칼을 휘두를 때 작동할 로직을 여기에 작성합니다.
 		// (예: 칼의 콜라이더 판정 켜기, 검기 이펙트 생성, 효과음 재생 등)
 
 
 		if (mbCanComboInput == false)
-			return;
-		
+			return false;
+
+		if (mActorScript == nullptr)
+			return false;
+
+		Animator3D* animator = mActorScript->GetAnimator();
+
+		if (animator == nullptr)
+			return false;
+
+		if (mComboAnimNames.empty())
+			return false;
+
 		if (mbIsComboActive == false)
 		{
 			// 첫 공격 시작
@@ -145,8 +156,15 @@ namespace ME
 			}
 		}
 		mComboTimer = 0.0f;
+		const std::size_t selectedAttackIndex = mComboCount;
 
-		mActorScript->mAnimator->PlayAnimation(mComboAnimNames[mComboCount], false);
+		animator->PlayAnimation(mComboAnimNames[mComboCount], false);
+
+
+		outAttackInfo.attackIndex =
+			static_cast<std::uint8_t>(selectedAttackIndex);
+
+		return true;
 
 	}
 }

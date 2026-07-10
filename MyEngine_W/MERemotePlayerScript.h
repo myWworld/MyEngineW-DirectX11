@@ -37,13 +37,27 @@ namespace ME
         Bone* GetWeaponSocketBoneRight() override;
         Vector3 GetAimDirection() override;
 
-        void ApplyMove(float x, float y, float z);
-        void ApplyState(ePlayerState state);
+        void RegisterWeapon(
+            eWeaponType type,
+            WeaponScript* weapon);
 
-        void SetWeaponEquipment(WeaponScript* weapon)
-        {
-            mEquippedWeapon = weapon;
-        }
+        void ApplyMove(
+            float x,
+            float y,
+            float z,
+            float yaw);
+
+        void ApplyState(
+            ePlayerState state);
+
+        void ApplyAttack(
+            eWeaponType weaponType,
+            std::uint8_t attackIndex,
+            const Vector3& direction);
+
+        void ApplyWeaponChange(
+            eWeaponType weaponType);
+
 
     private:
         void CacheComponents();
@@ -55,5 +69,15 @@ namespace ME
         ePlayerState mCurrentRemoteState = ePlayerState::IDLE;
         Bone* mLeftHandBone;
         Bone* mRightHandBone;
+
+        eWeaponType mCurrentWeaponType = eWeaponType::None;
+        WeaponScript* mGun = nullptr;
+        WeaponScript* mSword = nullptr;
+
+        WeaponScript* mCurrentWeapon = nullptr;
+
+        std::unordered_map<eWeaponType, WeaponScript*> mWeaponMap;
+
+        bool mbPlayingAction = false;
     };
 }

@@ -11,7 +11,7 @@
 #include "../MyEngine_Source/MERigidbody.h"
 #include "../MyEngine_Source/MEFSMBrain.h"
 #include "../MyEngine_Source/MEFSMState.h"
-#include "../MyEngine_Source/Protocol.h"
+
 #include "../MyEngine_Source/MENetworkManager.h"
 
 namespace ME
@@ -114,6 +114,7 @@ namespace ME
         }
 
         
+        SendTransformIfChanged();
       
       
     }
@@ -128,19 +129,48 @@ namespace ME
 
     void PlayerScript::OnPrimaryAction()
     {
-        if (mbHoldingWeapon)
+        if (!mbHoldingWeapon || mEquippedWeapon == nullptr)
+            return;
+
+        WeaponAttackInfo attackInfo = {};
+
+        // 실제 공격이 시작된 경우에만 패킷 전송
+        if (!mEquippedWeapon->Use(attackInfo))
+            return;
+
+        mEquippedWeapon->SetIsAttackEnd(false);
+        mState = State::Attack;
+
+        Vector3 aimDirection = GetAimDirection();
+
+        if (aimDirection.LengthSquared() > 0.0001f)
         {
-            mEquippedWeapon->SetIsAttackEnd(false);
-
-            mState = State::Attack;
-            mEquippedWeapon->Use();
-
+            aimDirection.Normalize();
         }
+
+        Pkt_C_Attack packet = {};
+
+        packet.header.type = ePacketType::C_ATTACK;
+        packet.attackIndex = attackInfo.attackIndex;
+
+        packet.dir_x = aimDirection.x;
+        packet.dir_y = aimDirection.y;
+        packet.dir_z = aimDirection.z;
+
+        NetworkManager::SendPacket(&packet);
     }
 
     void PlayerScript::OnToggleWeapon()
     {
 		ActorScript::OnToggleWeapon();
+
+        if (mEquippedWeapon == nullptr) return;
+
+        Pkt_C_WeaponChange packet = {};
+        packet.header.type = ePacketType::C_WEAPON_CHANGE;
+        packet.weaponType = mEquippedWeapon->GetWeaponType();
+
+        NetworkManager::SendPacket(&packet);
     }
 
     Bone* PlayerScript::GetWeaponSocketBone()
@@ -159,6 +189,8 @@ namespace ME
             mAnimator->PlayAnimation(mEquippedWeapon->mIdleAnimName);
         else
             mAnimator->PlayAnimation(L"Idle");
+
+
     }
     void PlayerScript::Move()
     {
@@ -201,6 +233,9 @@ namespace ME
         {
             mState = State::Idle;
             mbIsMoving = false;
+
+            SendStateIfChanged(ePlayerState::IDLE);
+
             return;
         }
 
@@ -227,18 +262,8 @@ namespace ME
 
         mbIsMoving = true;
         mState = State::Walk;
+        SendStateIfChanged(ePlayerState::WALK);
         
-        {
-            Pkt_C_Move myMove = {};
-            myMove.x = pos.x;
-            myMove.y = pos.y;
-            myMove.z = pos.z;
-
-            myMove.header.type = ePacketType::C_MOVE;
-
-            NetworkManager::SendPacket(&myMove);
-        }
-
    
     }
 
@@ -271,6 +296,79 @@ namespace ME
 
     
         
+    }
+
+
+    void PlayerScript::SendTransformIfChanged()
+    {
+        if (mPlayerTransform == nullptr)
+            return;
+
+        mTransformSendTimer += Time::DeltaTime();
+
+        // 초당 최대 20회 전송
+        if (mTransformSendTimer < 0.05f)
+            return;
+
+        Vector3 position = mPlayerTransform->GetPosition();
+        Vector3 rotation = mPlayerTransform->GetRotation();
+
+        const float yaw = rotation.y;
+
+        Vector3 positionDelta = position - mLastSentPosition;
+
+        bool positionChanged =
+            positionDelta.LengthSquared() > 0.25f;
+
+        float yawDelta = yaw - mLastSentYaw;
+
+        // 0도/360도 경계 처리
+        while (yawDelta > 180.0f)
+            yawDelta -= 360.0f;
+
+        while (yawDelta < -180.0f)
+            yawDelta += 360.0f;
+
+        bool rotationChanged =
+            std::abs(yawDelta) > 0.5f;
+
+        if (!mHasSentTransform ||
+            positionChanged ||
+            rotationChanged)
+        {
+            Pkt_C_Move packet = {};
+
+            packet.header.type = ePacketType::C_MOVE;
+
+            packet.x = position.x;
+            packet.y = position.y;
+            packet.z = position.z;
+
+            packet.yaw = yaw;
+
+            NetworkManager::SendPacket(&packet);
+
+            mLastSentPosition = position;
+            mLastSentYaw = yaw;
+            mHasSentTransform = true;
+        }
+
+        mTransformSendTimer = 0.0f;
+    }
+
+    void PlayerScript::SendStateIfChanged(ePlayerState newState)
+    {
+        if (mHasSentNetworkState && mLastSentNetworkState == newState) return;
+
+        Pkt_C_State packet = {};
+
+        packet.header.type = ePacketType::C_STATE;
+        packet.state = newState;
+
+        NetworkManager::SendPacket(&packet);
+
+        mLastSentNetworkState = newState;
+        mHasSentNetworkState = true;
     }
 
     Vector3 PlayerScript::GetAimDirection()

@@ -4,6 +4,7 @@
 #include "MECamera.h"
 #include "MEBone.h"
 #include "MEInputHandler.h"
+#include "../MyEngine_Source/Protocol.h"
 
 namespace ME
 {
@@ -92,6 +93,9 @@ namespace ME
 		void Die();
 
 		void Translate(math::Vector2 moveAxis);
+
+		void SendTransformIfChanged();
+		void SendStateIfChanged(ePlayerState newState);
 	
 
 		void directionChange();
@@ -112,6 +116,14 @@ namespace ME
 
 		Transform* mPlayerTransform;
 	
+		Vector3 mLastSentPosition = Vector3::Zero;
+		float mLastSentYaw = 0.0f;
+
+		float mTransformSendTimer = 0.0f;
+		bool mHasSentTransform = false;
+
+		ePlayerState mLastSentNetworkState = ePlayerState::IDLE;
+		bool mHasSentNetworkState = false;
 
 		Bone* mLeftHandBone;
 		Bone* mRightHandBone;

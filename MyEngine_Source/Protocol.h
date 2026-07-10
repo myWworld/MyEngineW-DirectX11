@@ -8,7 +8,7 @@ using EntityId = std::uint32_t;
 //C_ 패킷: 클라이언트가 서버에게 요청/보고하는 패킷
 //S_ 패킷 : 서버가 검증 / 확정해서 클라이언트들에게 뿌리는 패킷
 
-enum class ePacketType : unsigned short
+enum class ePacketType : std::uint16_t
 {
     C_ENTER = 1,
     S_ASSIGN_ID = 2,
@@ -21,20 +21,33 @@ enum class ePacketType : unsigned short
     C_STATE = 7,
     S_STATE = 8,
 
+    C_ATTACK = 9,
+    S_ATTACK = 10,
+
+    S_DAMAGE = 11,
+
+    C_WEAPON_CHANGE = 12,
+    S_WEAPON_CHANGE = 13,
+
     S_MONSTER_STATE = 20,
 };
 
-enum class ePlayerState : unsigned char
+enum class ePlayerState : std::uint32_t //공격제외 애니메이션
 {
     IDLE = 0,
     WALK = 1,
-    ATTACK_1 = 2,
-    ATTACK_2 = 3,
-    ATTACK_3 = 4,
-    DEATH = 5
+    HIT = 2,
+    DEATH = 3
 };
 
-enum class eMonsterState : unsigned char
+enum class eAttackType : std::uint32_t
+{
+    ATTACK_1 = 1,
+    ATTACK_2 = 2,
+    ATTACK_3 = 3,
+};
+
+enum class eMonsterState : std::uint32_t
 {
     IDLE = 0,
     WALK = 1,
@@ -54,6 +67,8 @@ enum class eWeaponType : std::uint32_t
 {
     Sword = 1,
     Gun = 2,
+    Gauntlet = 3,
+    None = 4,
 };
 
 struct PacketHeader
@@ -76,10 +91,12 @@ struct Pkt_C_Enter
 
     eModelType modelType;
     eWeaponType weaponType;
+    ePlayerState state;
 
     float x;
     float y;
     float z;
+    float yaw;
 };
 
 // 서버 -> 클라이언트: 몇 번 플레이어가 입장
@@ -91,10 +108,12 @@ struct Pkt_S_Enter
 
     eModelType modelType;
     eWeaponType weaponType;
+    ePlayerState state;
 
     float x;
     float y;
     float z;
+    float yaw;
 };
 
 // 클라이언트 -> 서버: 나 이 위치로 움직였음
@@ -106,6 +125,7 @@ struct Pkt_C_Move
     float x;
     float y;
     float z;
+    float yaw;
 };
 
 // 서버 -> 클라이언트: 몇 번 플레이어가 이 위치로 움직였다
@@ -118,6 +138,7 @@ struct Pkt_S_Move
     float x;
     float y;
     float z;
+    float yaw;
 };
 
 // 클라이언트 -> 서버: 상태 바뀜
@@ -136,6 +157,52 @@ struct Pkt_S_State
     EntityId entityId;
     ePlayerState state;
 };
+
+// 클라이언트 -> 서버: 무기 바뀜
+struct Pkt_C_WeaponChange
+{
+    PacketHeader header;
+
+    eWeaponType weaponType;
+};
+
+// 서버 -> 클라이언트: 몇 번 플레이어가 무기 바꿈
+struct Pkt_S_WeaponChange
+{
+    PacketHeader header;
+
+    EntityId entityId;
+    eWeaponType weaponType;
+};
+
+// 클라이언트 -> 서버: 공격함 
+struct Pkt_C_Attack
+{
+    PacketHeader header;
+
+    std::uint8_t attackIndex;
+
+
+    float dir_x; //넉백 방향
+    float dir_y;
+    float dir_z;
+};
+
+// 서버 -> 클라이언트: 몇 번 플레이어가 몇 번 플레이어를 공격했는지
+struct Pkt_S_Attack
+{
+    PacketHeader header;
+
+    EntityId entityId;
+
+    eWeaponType weaponType;
+    std::uint8_t attackIndex;
+
+    float dir_x; //넉백 방향
+    float dir_y;
+    float dir_z;
+};
+
 
 // 서버 -> 클라이언트: 몇 번 플레이어가 나감
 struct Pkt_S_Leave

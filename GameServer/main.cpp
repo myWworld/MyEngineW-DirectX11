@@ -37,13 +37,31 @@ void HandleClient(SOCKET clientSocket, EntityId clientId)
 		{
 			Pkt_C_Move* movePacket = reinterpret_cast<Pkt_C_Move*>(buffer);
 
-			HandleMove(clientSocket, clientId, movePacket);
+			HandleMove(clientId, movePacket);
 			break;
 		}
 
 		case ePacketType::C_STATE:
 		{
-			// 나중에 HandleState(clientSocket, clientId, statePacket) 만들면 됨
+			Pkt_C_State* statePacket = reinterpret_cast<Pkt_C_State*>(buffer);
+			std::cout << "[상태변환] C_ENTER playerId: " << clientId << std::endl;
+			HandleState(clientSocket, clientId, statePacket);
+			break;
+		}
+
+		case ePacketType::C_ATTACK:
+		{
+			Pkt_C_Attack* attackPacket = reinterpret_cast<Pkt_C_Attack*>(buffer);
+			std::cout << "[공격] C_ENTER playerId: " << clientId << std::endl;
+			HandleAttack(clientSocket, clientId, attackPacket);
+			break;
+		}
+
+		case ePacketType::C_WEAPON_CHANGE:
+		{
+			Pkt_C_WeaponChange* weaponChangePacket = reinterpret_cast<Pkt_C_WeaponChange*>(buffer);
+			std::cout << "[무기변환] C_ENTER playerId: " << clientId << std::endl;
+			HandleWeaponChange(clientSocket, clientId, weaponChangePacket);
 			break;
 		}
 

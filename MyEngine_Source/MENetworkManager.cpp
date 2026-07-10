@@ -139,34 +139,55 @@ namespace ME
 				else if (enterPkt->modelType == eModelType::Alien)
 					modelKey = L"AlienModel";
 
-				std::wstring weaponKey = L"";
+		/*		std::wstring weaponKey = L"";
 
 				if (enterPkt->weaponType == eWeaponType::Sword)
 					weaponKey = L"SwordModel";
 				else if (enterPkt->weaponType == eWeaponType::Gun)
-					weaponKey = L"PistolModel";
+					weaponKey = L"PistolModel";*/
 
 				activeScene->MakeCharacter(dummyPlayer.get(), modelKey);
 				RemotePlayerScript* remoteScript = dummyPlayer->AddComponent<RemotePlayerScript>();
 
-				WeaponScript* weapon = nullptr;
-
-				if (!weaponKey.empty())
-				{
-					weapon = activeScene->MakeWeapon(
+				WeaponScript* gun =
+					activeScene->MakeWeapon(
 						dummyPlayer.get(),
-						weaponKey,
+						L"PistolModel",
 						L"LeftHand",
 						0.0f
 					);
 
-					remoteScript->SetWeaponEquipment(weapon);
-				}
+				WeaponScript* sword =
+					activeScene->MakeWeapon(
+						dummyPlayer.get(),
+						L"SwordModel",
+						L"LeftHand",
+						0.0f
+					);
 
-				dummyPlayer->GetComponent<Transform>()->SetPosition(
+				remoteScript->RegisterWeapon(
+					eWeaponType::Gun,
+					gun
+				);
+
+				remoteScript->RegisterWeapon(
+					eWeaponType::Sword,
+					sword
+				);
+
+				remoteScript->ApplyWeaponChange(
+					enterPkt->weaponType
+				);
+
+				remoteScript->ApplyState(
+					enterPkt->state
+				);
+
+				remoteScript->ApplyMove(
 					enterPkt->x,
 					enterPkt->y,
-					enterPkt->z
+					enterPkt->z,
+					enterPkt->yaw
 				);
 
 				activeScene->AddRemotePlayer(enterPkt->entityId, std::move(dummyPlayer));
@@ -184,6 +205,8 @@ namespace ME
 
 				GameObject* targetPlayer = iter->second;
 
+				if (targetPlayer == nullptr) return;
+
 				RemotePlayerScript* remoteScript =
 					targetPlayer->GetComponent<RemotePlayerScript>();
 
@@ -192,7 +215,60 @@ namespace ME
 					remoteScript->ApplyMove(
 						movePkt->x,
 						movePkt->y,
-						movePkt->z
+						movePkt->z,
+						movePkt->yaw
+					);
+				}
+
+				break;
+			}
+
+			case ePacketType::C_ATTACK:
+			{
+				Pkt_S_Attack* attackPkt = reinterpret_cast<Pkt_S_Attack*>(packetData.data());
+
+				auto iter = remotePlayers.find(attackPkt->entityId);
+				if (iter == remotePlayers.end())
+					break;
+
+				GameObject* targetPlayer = iter->second;
+
+				if (targetPlayer == nullptr) return;
+
+				RemotePlayerScript* remoteScript =
+					targetPlayer->GetComponent<RemotePlayerScript>();
+
+				if (remoteScript)
+				{
+					remoteScript->ApplyAttack(
+						attackPkt->weaponType,
+						attackPkt->attackIndex,
+						math::Vector3(attackPkt->dir_x, attackPkt->dir_y, attackPkt->dir_z)
+					);
+				}
+
+				break;
+			}
+
+			case ePacketType::C_WEAPON_CHANGE:
+			{
+				Pkt_S_WeaponChange* weaponChangePkt = reinterpret_cast<Pkt_S_WeaponChange*>(packetData.data());
+
+				auto iter = remotePlayers.find(weaponChangePkt->entityId);
+				if (iter == remotePlayers.end())
+					break;
+
+				GameObject* targetPlayer = iter->second;
+
+				if (targetPlayer == nullptr) return;
+
+				RemotePlayerScript* remoteScript =
+					targetPlayer->GetComponent<RemotePlayerScript>();
+
+				if (remoteScript)
+				{
+					remoteScript->ApplyWeaponChange(
+						weaponChangePkt->weaponType
 					);
 				}
 

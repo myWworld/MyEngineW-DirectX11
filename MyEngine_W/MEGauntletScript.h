@@ -15,7 +15,7 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
-		void Use() override;
+		bool Use(WeaponAttackInfo& outAttackInfo) override;
 
 		void OnRegister(ActorScript* ownerActor) override;
 

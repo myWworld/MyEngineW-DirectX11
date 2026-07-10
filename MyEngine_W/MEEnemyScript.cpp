@@ -66,16 +66,16 @@ namespace ME
 
     void EnemyScript::OnPrimaryAction()
     {
-        if (mbHoldingWeapon)
+        /*if (mbHoldingWeapon)
         {
             mEquippedWeapon->Use();
-        }
+        }*/
     }
 
     void EnemyScript::OnToggleWeapon()
     {
-        if(!mbHoldingWeapon)
-            ActorScript::OnToggleWeapon();
+   /*     if(!mbHoldingWeapon)
+            ActorScript::OnToggleWeapon();*/
 
 
     }

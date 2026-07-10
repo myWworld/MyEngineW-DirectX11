@@ -17,7 +17,7 @@ namespace ME
 	void GauntletScript::Initialize()
 	{
 		WeaponScript::Initialize();
-		mWeaponType = WeaponType::Gauntlet;
+		mWeaponType = eWeaponType::Gauntlet;
 	}
 
 	void GauntletScript::OnRegister(ActorScript* ownerActor)
@@ -92,11 +92,11 @@ namespace ME
 	{
 	}
 
-	void GauntletScript::Use()
+	bool GauntletScript::Use(WeaponAttackInfo& outAttackInfo) 
 	{
 		// 칼을 휘두를 때 작동할 로직을 여기에 작성합니다.
 		// (예: 칼의 콜라이더 판정 켜기, 검기 이펙트 생성, 효과음 재생 등)
 	//	mActorScript->mAnimator->PlayAnimation(L"SWORDSLASH1", false);
-
+		return true;
 	}
 }
