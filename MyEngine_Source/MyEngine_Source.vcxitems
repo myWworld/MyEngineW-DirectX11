@@ -17,7 +17,9 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)BoneMapManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ContentAndScript.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)FSMBrainCore.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FSMFactory.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IFSMContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimation3D.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEAnimator.h" />
@@ -89,6 +91,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)BoneMapManager.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)FSMBrainCore.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimation3D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEAnimator.cpp" />

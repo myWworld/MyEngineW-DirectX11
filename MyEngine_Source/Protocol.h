@@ -30,6 +30,9 @@ enum class ePacketType : std::uint16_t
     S_WEAPON_CHANGE = 13,
 
     S_MONSTER_STATE = 20,
+    S_MONSTER_SPAWN = 21,
+    S_MONSTER_MOVE = 22,
+    S_MONSTER_DESPAWN = 23,
 };
 
 enum class ePlayerState : std::uint32_t //공격제외 애니메이션
@@ -53,7 +56,9 @@ enum class eMonsterState : std::uint32_t
     WALK = 1,
     ATTACK_1 = 2,
     ATTACK_2 = 3,
-    DEATH = 4
+    ATTACK_3 = 4,
+    HIT = 5,
+    DEATH = 6,
 };
 
 enum class eModelType : std::uint32_t
@@ -212,6 +217,38 @@ struct Pkt_S_Leave
     EntityId entityId;
 };
 
+// 서버 -> 클라이언트: 몬스터 스폰
+struct Pkt_S_MonsterSpawn
+{
+    PacketHeader header;
+
+    EntityId entityId;
+
+    eModelType modelType;
+    eWeaponType weaponType;
+    eMonsterState state;
+
+    float x;
+    float y;
+    float z;
+    float yaw;
+
+    float hp;
+    float maxHp;
+};
+
+
+struct Pkt_S_MonsterMove
+{
+    PacketHeader header;
+
+    EntityId entityId;
+
+    float x;
+    float y;
+    float z;
+    float yaw;
+};
 // 서버 -> 클라이언트: 몬스터 상태
 struct Pkt_S_MonsterState
 {
@@ -219,6 +256,13 @@ struct Pkt_S_MonsterState
 
     EntityId entityId;
     eMonsterState state;
+};
+
+struct Pkt_S_MonsterDespawn
+{
+    PacketHeader header;
+
+    EntityId entityId;
 };
 
 #pragma pack(pop)

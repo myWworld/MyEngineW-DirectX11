@@ -2,6 +2,8 @@
 #include "MEFSMTask.h"
 #include "MEFSMDecision.h"
 #include "MEFSMBrain.h"
+#include "FSMBrainCore.h"
+#include "IFSMContext.h"
 
 namespace ME
 {
@@ -23,30 +25,35 @@ namespace ME
 	{
 	}
 
-	void FSMState::EnterState(FSMBrain* brain, GameObject* owner)
+	void FSMState::EnterState(
+		FSMBrainCore* brain,
+		IFSMContext& context)
 	{
 		for (const auto& task : mTasks)
 		{
-			task->Enter(brain, owner);
-		}
-	}
-	void FSMState::ExitState(FSMBrain* brain, GameObject* owner)
-	{
-		for (const auto& task : mTasks)
-		{
-			task->Exit(brain, owner);
+			task->Enter(brain, context);
 		}
 	}
 
-	void FSMState::UpdateTask(FSMBrain* brain, GameObject* owner)
+	void FSMState::UpdateTask(
+		FSMBrainCore* brain,
+		IFSMContext& context)
 	{
 		for (const auto& task : mTasks)
 		{
-			task->Execute(brain, owner);
+			task->Execute(brain, context);
 		}
 	}
 
-	void FSMState::CheckDecision(FSMBrain* brain, GameObject* owner)
+	void FSMState::UpdateTask(FSMBrainCore* brain,IFSMContext& context)
+	{
+		for (const auto& task : mTasks)
+		{
+			task->Execute(brain, context);
+		}
+	}
+
+	void FSMState::CheckDecision(FSMBrainCore* brain, IFSMContext& context)
 	{
 		for (const auto& transition : mTransitions)
 		{

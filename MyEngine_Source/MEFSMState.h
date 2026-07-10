@@ -33,10 +33,11 @@ namespace ME
 		FSMState();
 		~FSMState();
 
-		void EnterState(FSMBrain* brain,  GameObject* owner);
-		void ExitState(FSMBrain* brain, GameObject* owner);
-		void UpdateTask(FSMBrain* brain,GameObject* owner);
-		void CheckDecision(FSMBrain* brain, GameObject* owner);
+		void EnterState(FSMBrainCore* brain, IFSMContext& context);
+		void ExitState(FSMBrainCore* brain, IFSMContext& context);
+
+		void UpdateTask(FSMBrainCore* brain, IFSMContext& context);
+		void CheckDecision(FSMBrainCore* brain, IFSMContext& context);
 
 		void AddTransition(FSMTransition&& transition);
 

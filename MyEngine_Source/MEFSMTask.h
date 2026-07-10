@@ -37,17 +37,12 @@ namespace ME
 				}
 			}
 
-			virtual void Enter(FSMBrain* brain, GameObject* owner)
+			void Execute(FSMBrainCore* brain, IFSMContext& context)
 			{
-				bIsFinished = false; // 다시 이 상태로 돌아왔을 때 플래그를 무조건 초기화
-				OnEnter(brain, owner); 
-			}
-			
-			void Execute(FSMBrain* brain, GameObject* owner)
-			{
-				if (bIsFinished) return;
+				if (bIsFinished)
+					return;
 
-				OnExecute(brain, owner);
+				OnExecute(brain, context);
 
 				if (!bIsLoop)
 				{
@@ -55,15 +50,21 @@ namespace ME
 				}
 			}
 
-			virtual void Exit(FSMBrain* brain, GameObject* owner)
+			void Exit(FSMBrainCore* brain, IFSMContext& context)
 			{
-				OnExit(brain, owner);     
+				OnExit(brain, context);
 			}
 
 	protected:
-		virtual void OnEnter(FSMBrain* brain, GameObject* owner) {}
-		virtual void OnExecute(FSMBrain* brain, GameObject* owner) = 0;
-		virtual void OnExit(FSMBrain* brain, GameObject* owner) {}
+		virtual void OnEnter(FSMBrainCore* brain, IFSMContext& context)
+		{
+		}
+
+		virtual void OnExecute(FSMBrainCore* brain, IFSMContext& context) = 0;
+
+		virtual void OnExit(FSMBrainCore* brain, IFSMContext& context)
+		{
+		}
 
 		template<typename T>
 		void BindProperty(const std::string& name, T* memberPtr) //json파일에 있는 task별 멤버 변수, 자식에게서 포인터로 받아들인뒤 나중에 람다함수 실행

@@ -185,6 +185,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MENetworkManager.cpp">
       <Filter>NetWork</Filter>
     </ClCompile>
+    <ClCompile Include="$(MSBuildThisFileDirectory)FSMBrainCore.cpp">
+      <Filter>Component\FSM</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h">
@@ -399,6 +402,12 @@
       <Filter>NetWork</Filter>
     </ClInclude>
     <ClInclude Include="$(MSBuildThisFileDirectory)Protocol.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)IFSMContext.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)FSMBrainCore.h">
+      <Filter>Component\FSM</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Common">

@@ -40,6 +40,7 @@
     <ClInclude Include="MEPlayScene.h" />
     <ClInclude Include="MEMoveToTargetTask.h" />
     <ClInclude Include="MERandomWanderTask.h" />
+    <ClInclude Include="MERemoteMonsterScript.h" />
     <ClInclude Include="MERemotePlayerScript.h" />
     <ClInclude Include="MESwordScript.h" />
     <ClInclude Include="METile.h" />
@@ -69,6 +70,7 @@
     <ClCompile Include="MEPlayScene.cpp" />
     <ClCompile Include="MEMoveToTargetTask.cpp" />
     <ClCompile Include="MERandomWanderTask.cpp" />
+    <ClCompile Include="MERemoteMonsterScript.cpp" />
     <ClCompile Include="MERemotePlayerScript.cpp" />
     <ClCompile Include="MESwordScript.cpp" />
     <ClCompile Include="METile.cpp" />

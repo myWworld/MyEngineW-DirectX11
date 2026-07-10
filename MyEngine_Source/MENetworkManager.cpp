@@ -11,6 +11,9 @@
 #include "../MyEngine_Source/MEAnimator3D.h"
 #include "../MyEngine_W/MEPlayerScript.h"
 #include "../MyEngine_W/MERemotePlayerScript.h"
+#include "../MyEngine_Source/MEFSMBrain.h"
+#include "../MyEngine_W/MERemoteMonsterScript.h"
+#include "../MyEngine_W/MEWeaponScript.h"
 
 namespace ME
 {
@@ -278,6 +281,160 @@ namespace ME
 			case ePacketType::S_LEAVE:
 			{
 				Pkt_S_Leave* leavePkt = reinterpret_cast<Pkt_S_Leave*>(packetData.data());
+
+				auto iter = remotePlayers.find(leavePkt->entityId);
+
+				if (iter != remotePlayers.end())
+				{
+					object::Destroy(iter->second);
+					remotePlayers.erase(iter);
+				}
+
+				break;
+			}
+
+			case ePacketType::S_MONSTER_SPAWN:
+			{
+
+				Pkt_S_MonsterSpawn* packet = reinterpret_cast< Pkt_S_MonsterSpawn*>(packetData.data());
+
+
+				if (packet->entityId == mMyEntityId)
+					break;
+
+				if (remotePlayers.find(packet->entityId) != remotePlayers.end())
+					break;
+
+				std::unique_ptr<GameObject> enemyDummy = std::make_unique<GameObject>();
+				Transform* transform = enemyDummy->GetComponent<Transform>();
+				
+				std::wstring modelKey;
+
+				if (packet->modelType == eModelType::Character)
+					modelKey = L"CharacterModel";
+				else if (packet->modelType == eModelType::Mutant)
+					modelKey = L"MutantModel";
+				else if (packet->modelType == eModelType::Alien)
+					modelKey = L"AlienModel";
+
+				activeScene->MakeCharacter(enemyDummy.get(), modelKey);
+				RemoteMonsterScript* remoteScript = enemyDummy->AddComponent<RemoteMonsterScript>();
+
+				WeaponScript* leftGauntlet =
+					activeScene->MakeWeapon(
+						enemyDummy.get(),
+						L"GauntletModel",
+						L"LeftHand",
+						0.0f
+					);
+
+				WeaponScript* rightGauntlet =
+					activeScene->MakeWeapon(
+						enemyDummy.get(),
+						L"GauntletModel",
+						L"RightHand",
+						0.0f
+					);
+
+				rightGauntlet->SetSocketOffsetAntRot(math::Vector3(-96.0f, 149.0f, 1.0f), math::Vector3::Zero);
+
+
+				leftGauntlet->SetSocketOffsetAntRot(math::Vector3(129.0f, 139.0f, -9.0f), math::Vector3::Zero); //129.0f, 139.0f, -9.0f
+
+				remoteScript->RegisterWeapon(
+					eWeaponType::Gauntlet,
+					leftGauntlet
+				);
+
+				remoteScript->RegisterWeapon(
+					eWeaponType::Gauntlet,
+					rightGauntlet
+				);
+
+			//	remoteScript->ApplyWeaponChange(
+			//		packet->weaponType
+			//	);
+
+				remoteScript->ApplyState(
+					packet->state
+				);
+
+				remoteScript->ApplyMove(
+					packet->x,
+					packet->y,
+					packet->z,
+					packet->yaw
+				);
+
+				activeScene->AddRemotePlayer(packet->entityId, std::move(enemyDummy));
+				
+				
+				
+				//FSMBrain* brain = enemy->AddComponent<FSMBrain>();
+				//FSMFactory::MakeFSMWithJsonFile(brain, "..\\Resources\\EnemyFSMJson.json");
+
+
+				break;
+			}
+
+
+			case ePacketType::S_MONSTER_MOVE:
+			{
+
+				Pkt_S_MonsterMove* movePkt = reinterpret_cast<Pkt_S_MonsterMove*>(packetData.data());
+
+				auto iter = remotePlayers.find(movePkt->entityId);
+				if (iter == remotePlayers.end())
+					break;
+
+				GameObject* targetMonster = iter->second;
+
+				if (targetMonster == nullptr) return;
+
+				RemoteMonsterScript* remoteScript =
+					targetMonster->GetComponent<RemoteMonsterScript>();
+
+				if (remoteScript)
+				{
+					remoteScript->ApplyMove(
+						movePkt->x,
+						movePkt->y,
+						movePkt->z,
+						movePkt->yaw
+					);
+				}
+
+				break;
+			}
+
+
+			case ePacketType::S_MONSTER_STATE:
+			{
+
+				Pkt_S_MonsterState* statePkt = reinterpret_cast<Pkt_S_MonsterState*>(packetData.data());
+
+				auto iter = remotePlayers.find(statePkt->entityId);
+				if (iter == remotePlayers.end())
+					break;
+
+				GameObject* targetMonster = iter->second;
+
+				RemoteMonsterScript* remoteScript =
+					targetMonster->GetComponent<RemoteMonsterScript>();
+
+				if (remoteScript)
+				{
+					remoteScript->ApplyState(statePkt->state);
+				}
+
+				break;
+			}
+
+
+			case ePacketType::S_MONSTER_DESPAWN:
+			{
+
+				Pkt_S_MonsterDespawn* leavePkt = reinterpret_cast<Pkt_S_MonsterDespawn*>(packetData.data());
 
 				auto iter = remotePlayers.find(leavePkt->entityId);
 
