@@ -33,6 +33,7 @@ enum class ePacketType : std::uint16_t
     S_MONSTER_SPAWN = 21,
     S_MONSTER_MOVE = 22,
     S_MONSTER_DESPAWN = 23,
+    S_MONSTER_ATTACK = 24,
 };
 
 enum class ePlayerState : std::uint32_t //공격제외 애니메이션
@@ -59,6 +60,8 @@ enum class eMonsterState : std::uint32_t
     ATTACK_3 = 4,
     HIT = 5,
     DEATH = 6,
+
+    RUN = 7
 };
 
 enum class eModelType : std::uint32_t
@@ -256,6 +259,20 @@ struct Pkt_S_MonsterState
 
     EntityId entityId;
     eMonsterState state;
+};
+
+struct Pkt_S_MonsterAttack
+{
+    PacketHeader header;
+
+    EntityId entityId;
+    EntityId targetEntityId;
+
+    std::uint8_t attackIndex;
+
+    float dir_x;
+    float dir_y;
+    float dir_z;
 };
 
 struct Pkt_S_MonsterDespawn

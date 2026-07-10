@@ -162,7 +162,7 @@ namespace ME
                 auto brain = GetOwner()->GetComponent<FSMBrain>();
                 if (brain)
                 {
-                    std::string currentState = brain->mActiveState->GetStateName();
+                    std::string currentState = brain->GetActiveState()->GetStateName();
 
                     if (currentState != "DAMAGE" && this->GetHP() > 0)
                     {

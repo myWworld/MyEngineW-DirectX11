@@ -2,10 +2,6 @@
 
 #include "../MyEngine_Source/Protocol.h"
 
-#include <WinSock2.h>
-#pragma comment(lib, "ws2_32.lib")
-
-
 #include <cstdint>
 #include <variant>
 
@@ -23,9 +19,14 @@ struct ServerPlayer
     ServerVec3 position;
     float yaw = 0.0f;
 
-    eModelType modelType = eModelType::Character;
-    eWeaponType weaponType = eWeaponType::Gun;
-    ePlayerState state = ePlayerState::IDLE;
+    eModelType modelType =
+        eModelType::Character;
+
+    eWeaponType weaponType =
+        eWeaponType::Gun;
+
+    ePlayerState state =
+        ePlayerState::IDLE;
 
     float hp = 100.0f;
     bool alive = true;
@@ -40,9 +41,14 @@ struct ServerMonster
 {
     EntityId entityId = 0;
 
-    eModelType modelType = eModelType::Mutant;
-    eWeaponType weaponType = eWeaponType::Gauntlet;
-    eMonsterState state = eMonsterState::IDLE;
+    eModelType modelType =
+        eModelType::Mutant;
+
+    eWeaponType weaponType =
+        eWeaponType::Gauntlet;
+
+    eMonsterState state =
+        eMonsterState::IDLE;
 
     ServerVec3 position;
     float yaw = 0.0f;
@@ -53,21 +59,44 @@ struct ServerMonster
 
     EntityId targetPlayerId = 0;
 
-    float moveSpeed = 100.0f;
-    float attackRange = 150.0f;
-    float attackCooldown = 0.0f;
-
     float colliderRadius = 35.0f;
     float colliderHalfHeight = 125.0f;
+
+    // 순찰
+    ServerVec3 patrolOrigin;
+    ServerVec3 patrolTarget;
+    bool hasPatrolTarget = false;
+
+    // non-loop 애니메이션 서버 타이머
+    float actionRemainingTime = 0.0f;
+
+    // 복제
+    bool transformDirty = false;
+    bool stateDirty = false;
+
+    float moveReplicationTimer = 0.0f;
+
+    // 공격 이벤트
+    bool attackEventPending = false;
+
+    std::uint8_t attackIndex = 0;
+
+    EntityId attackTargetId = 0;
+    ServerVec3 attackDirection;
+
+    // DESTROY 상태
+    bool destroyRequested = false;
 };
 
-// C_ENTER를 받았을 때 넣을 명령
 struct EnterCommand
 {
     EntityId entityId = 0;
 
-    eModelType modelType = eModelType::Character;
-    eWeaponType weaponType = eWeaponType::Gun;
+    eModelType modelType =
+        eModelType::Character;
+
+    eWeaponType weaponType =
+        eWeaponType::Gun;
 
     ServerVec3 position;
     float yaw = 0.0f;
@@ -89,18 +118,23 @@ struct MoveCommand
 struct StateCommand
 {
     EntityId entityId = 0;
-    ePlayerState state = ePlayerState::IDLE;
+
+    ePlayerState state =
+        ePlayerState::IDLE;
 };
 
 struct WeaponChangeCommand
 {
     EntityId entityId = 0;
-    eWeaponType weaponType = eWeaponType::Gun;
+
+    eWeaponType weaponType =
+        eWeaponType::Gun;
 };
 
 struct AttackCommand
 {
     EntityId entityId = 0;
+
     std::uint8_t attackIndex = 0;
 
     ServerVec3 direction;

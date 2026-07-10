@@ -1,103 +1,97 @@
 #include "MEFSMBrain.h"
-#include "MEFSMState.h"
+
+#include "MEClientFSMContext.h"
+#include "MENetworkManager.h"
 #include "METime.h"
-#include "MEBlackBoard.h"
-#include "../MyEngine_Source/MENetworkManager.h"
-#include "../MyEngine_Source/Protocol.h"
 
 namespace ME
 {
-	FSMBrain::FSMBrain() :
-		Component(enums::eComponentType::FSMBrain)
-		, mActiveState(nullptr)
-		, mOwner(nullptr)
-	{
-		mBlackboard = std::make_unique<BlackBoard>();
-	}
-	FSMBrain::~FSMBrain()
-	{
+    FSMBrain::FSMBrain()
+        : Component(
+            enums::eComponentType::FSMBrain)
+    {
+    }
 
-	}
+    FSMBrain::~FSMBrain() = default;
 
-	void FSMBrain::Initialize()
-	{
-		mOwner = this->GetOwner();
-	}
-	void FSMBrain::Update()
-	{
-		if(mOwner == nullptr) 
-			mOwner = this->GetOwner();
+    void FSMBrain::Initialize()
+    {
+        mContext =
+            std::make_unique<ClientFSMContext>(
+                GetOwner()
+            );
+    }
 
+    void FSMBrain::Update()
+    {
+        if (!mContext)
+            return;
 
-		if (mActiveState == nullptr) return;
+        // 온라인 원격 몬스터는 FSMBrain 자체를 붙이지 않는다.
+        // 기존 Host/오프라인 몬스터만 이 Wrapper를 실행한다.
+        if (!NetworkManager::IsHost())
+            return;
 
-		if (ME::NetworkManager::IsHost() == false)
-		{
-			// FSM 실행 안 함.
-			// Transform 업데이트 안 함.
-			// 오직 네트워크 패킷 수신부에서 강제로 덮어씌우는 위치와 애니메이션만 렌더링됨.
-			return;
-		}
+        mContext->SetDeltaTime(
+            Time::DeltaTime()
+        );
 
-		mActiveState->UpdateTask(this, mOwner);
-		mActiveState->CheckDecision(this, mOwner);
+        mCore.Update(*mContext);
+    }
 
-		
-	}
-	
-	void FSMBrain::LateUpdate()
-	{
+    void FSMBrain::LateUpdate()
+    {
+    }
 
-	}
+    void FSMBrain::Render()
+    {
+    }
 
-	void FSMBrain::Render()
-	{
+    FSMBrainCore& FSMBrain::GetCore()
+    {
+        return mCore;
+    }
 
-	}
+    const FSMBrainCore& FSMBrain::GetCore() const
+    {
+        return mCore;
+    }
 
-	void FSMBrain::AddState(const std::string& name, std::unique_ptr<FSMState> state)
-	{
-		mStates[name] = std::move(state);
-	}
+    BlackBoard* FSMBrain::GetBlackboard()
+    {
+        return mCore.GetBlackboard();
+    }
 
-	void FSMBrain::SetInitialState(const std::string& name)
-	{
-		mActiveState = mStates[name].get();
+    FSMState* FSMBrain::GetActiveState() const
+    {
+        return mCore.GetActiveState();
+    }
 
-		if (mActiveState)
-		{
-			mActiveState->EnterState(this, GetOwner());
-		}
-	}
+    void FSMBrain::ChangeState(
+        FSMState* nextState)
+    {
+        mCore.ChangeState(nextState);
+    }
 
-	void FSMBrain::ChangeState(FSMState* nextState)
-	{
-		if (nextState == nullptr)return;
-		if (mActiveState == nextState) return;
+    void FSMBrain::SendFSMEvent(
+        const std::string& eventName)
+    {
+        mCore.SendFSMEvent(eventName);
+    }
 
-	//	OutputDebugStringA("[FSM] 상태가 변경되었습니다!!!\n");
+    void FSMBrain::AddState(
+        const std::string& name,
+        std::unique_ptr<FSMState> state)
+    {
+        mCore.AddState(
+            name,
+            std::move(state)
+        );
+    }
 
-		if (mActiveState != nullptr)
-		{
-			mActiveState->ExitState(this, mOwner);
-		}
-
-		mActiveState = nextState;
-
-		if (mActiveState != nullptr)
-		{
-			mActiveState->EnterState(this, mOwner);
-		}
-	}
-
-	void FSMBrain::SendFSMEvent(std::string eventName)
-	{
-		if (mStates.find(eventName) == mStates.end())
-		{
-			OutputDebugStringA("[FSM] 이벤트 이름이 존재하지 않습니다!!!\n");
-			return;
-		}
-		FSMState* nextState = mStates[eventName].get();
-		ChangeState(nextState);
-	}
+    bool FSMBrain::SetInitialState(
+        const std::string& name)
+    {
+        return mCore.SetInitialState(name);
+    }
 }

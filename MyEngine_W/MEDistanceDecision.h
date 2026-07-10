@@ -1,39 +1,28 @@
 #pragma once
-#include "../MyEngine_Source/MEFSMDecision.h"
 
+#include "../MyEngine_Source/MEFSMDecision.h"
 
 namespace ME
 {
-	class Transform;
-	class DistanceDecision :public FSMDecision
-	{
+    class DistanceDecision final
+        : public FSMDecision
+    {
+    public:
+        DistanceDecision()
+            : mTargetDist(100.0f)
+        {
+            BindProperty(
+                "TargetDist",
+                &mTargetDist
+            );
+        }
 
-	public:
-		DistanceDecision() :
-			mTargetDist(50.0f)
-			, target(nullptr)
-			, ownerTr(nullptr)
+    protected:
+        bool CheckDecision(
+            FSMBrainCore* brain,
+            IFSMContext& context) override;
 
-		{
-			BindProperty("TargetDist", &mTargetDist);
-		}
-
-
-	protected:
-
-		bool CheckDecision(FSMBrain* brain, GameObject* owner) override;
-
-
-	public:
-
-		float mTargetDist;
-
-
-	private:
-
-		Transform* target;
-		Transform* ownerTr;
-
-	};
+    private:
+        float mTargetDist;
+    };
 }
-

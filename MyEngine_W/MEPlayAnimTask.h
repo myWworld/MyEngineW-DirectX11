@@ -1,37 +1,40 @@
 #pragma once
+
 #include "../MyEngine_Source/MEFSMTask.h"
+
 #include <string>
 
 namespace ME
 {
-	class Animator3D;
-	class PlayAnimTask :public FSMTask
-	{
-	public:
+    class PlayAnimTask final : public FSMTask
+    {
+    public:
+        PlayAnimTask()
+            : mAnimName()
+            , mbIsLoop(false)
+        {
+            BindProperty(
+                "AnimName",
+                &mAnimName
+            );
 
-		PlayAnimTask()
-			: mAnimName()
-			, mbIsLoop(false)
-			,mAnimator(nullptr)
-		{
-			BindProperty("AnimName", &mAnimName);
-			BindProperty("IsLoop", &mbIsLoop);
-		}
+            BindProperty(
+                "IsLoop",
+                &mbIsLoop
+            );
+        }
 
-		void OnEnter(FSMBrain* brain, GameObject* owner)override;
-		void OnExecute(FSMBrain* brain, GameObject* owner) override;
-		void OnExit(FSMBrain* brain, GameObject* owner)override {}
+    protected:
+        void OnEnter(
+            FSMBrainCore* brain,
+            IFSMContext& context) override;
 
+        void OnExecute(
+            FSMBrainCore* brain,
+            IFSMContext& context) override;
 
-	public:
-
-		std::string mAnimName;
-		bool mbIsLoop;
-
-	private:
-
-		Animator3D* mAnimator;
-		std::wstring mAnimNameW;
-	};
-
+    private:
+        std::string mAnimName;
+        bool mbIsLoop;
+    };
 }

@@ -1,43 +1,49 @@
 #pragma once
+
+#include "FSMBrainCore.h"
 #include "MEComponent.h"
-#include <unordered_map>
+
+#include <memory>
+#include <string>
 
 namespace ME
 {
+    class BlackBoard;
+    class ClientFSMContext;
+    class FSMState;
 
-	class FSMState;
-	class BlackBoard;
-	class FSMBrain: public Component
-	{
+    class FSMBrain : public Component
+    {
+    public:
+        FSMBrain();
+        ~FSMBrain();
 
-	public:
-		FSMBrain();
-		~FSMBrain();
+        void Initialize() override;
+        void Update() override;
+        void LateUpdate() override;
+        void Render() override;
 
-		void Initialize()override;
-		void Update()override;
-		void LateUpdate()override;
-		void Render() override;
-		
-		BlackBoard* GetBlackboard() { return mBlackboard.get(); }
+        FSMBrainCore& GetCore();
+        const FSMBrainCore& GetCore() const;
 
-		void ChangeState(FSMState* nextState);
+        BlackBoard* GetBlackboard();
 
-		void SendFSMEvent(std::string eventName);
+        FSMState* GetActiveState() const;
 
-		void AddState(const std::string& name, std::unique_ptr<FSMState> state);
+        void ChangeState(FSMState* nextState);
+        void SendFSMEvent(const std::string& eventName);
 
-		void SetInitialState(const std::string& name);
+        void AddState(
+            const std::string& name,
+            std::unique_ptr<FSMState> state);
 
-	public:
+        bool SetInitialState(
+            const std::string& name);
 
-		GameObject* mOwner;
-		std::unique_ptr<BlackBoard> mBlackboard;
-		std::unordered_map<std::string, std::unique_ptr<FSMState>> mStates;
-		FSMState* mActiveState;
+    private:
+        FSMBrainCore mCore;
 
-	};
-
-
+        std::unique_ptr<ClientFSMContext>
+            mContext;
+    };
 }
-

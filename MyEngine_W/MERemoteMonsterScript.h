@@ -1,18 +1,20 @@
 #pragma once
 
 #include "MEActorScript.h"
-#include "MEMath.h"
 #include "MEBone.h"
+#include "MEMath.h"
+
 #include "../MyEngine_Source/Protocol.h"
 
 namespace ME
 {
-    class Transform;
     class Animator3D;
-    class WeaponScript;
     class Collider;
+    class Transform;
+    class WeaponScript;
 
-    class RemoteMonsterScript : public ActorScript
+    class RemoteMonsterScript
+        : public ActorScript
     {
     public:
         RemoteMonsterScript();
@@ -24,7 +26,9 @@ namespace ME
         void Render() override;
 
         void OnCollisionEnter(Collider* other) override;
+
         void OnCollisionStay(Collider* other) override;
+
         void OnCollisionExit(Collider* other) override;
 
         void OnPrimaryAction() override;
@@ -35,10 +39,13 @@ namespace ME
 
         Bone* GetWeaponSocketBone() override;
         Bone* GetWeaponSocketBoneRight() override;
+
         Vector3 GetAimDirection() override;
 
-        void RegisterWeapon(
-            eWeaponType type,
+        void SetLeftWeapon(
+            WeaponScript* weapon);
+
+        void SetRightWeapon(
             WeaponScript* weapon);
 
         void ApplyMove(
@@ -52,30 +59,34 @@ namespace ME
             bool forced = false);
 
         void ApplyAttack(
-            eWeaponType weaponType,
             std::uint8_t attackIndex,
             const Vector3& direction);
-
 
     private:
         void CacheComponents();
         void CacheBones();
 
+        void PlayPersistentState();
+
     private:
         Transform* mTransform = nullptr;
 
-        ePlayerState mCurrentRemoteState = ePlayerState::IDLE;
-        Bone* mLeftHandBone;
-        Bone* mRightHandBone;
+        Bone* mLeftHandBone = nullptr;
+        Bone* mRightHandBone = nullptr;
 
-        eWeaponType mCurrentWeaponType = eWeaponType::None;
-        WeaponScript* mGun = nullptr;
-        WeaponScript* mSword = nullptr;
+        WeaponScript* mLeftWeapon = nullptr;
+        WeaponScript* mRightWeapon = nullptr;
 
-        WeaponScript* mCurrentWeapon = nullptr;
+        eMonsterState mCurrentRemoteState =
+            eMonsterState::IDLE;
 
-        std::unordered_map<eWeaponType, WeaponScript*> mWeaponMap;
+        eMonsterState mLastPlayedState =
+            eMonsterState::IDLE;
+
+        Vector3 mAttackDirection =
+            Vector3::Forward;
 
         bool mbPlayingAction = false;
+        bool mbHasPlayedState = false;
     };
 }

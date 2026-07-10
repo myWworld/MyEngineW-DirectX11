@@ -1,6 +1,13 @@
 #pragma once
+#include "../MyEngine_Source/FSMBrainCore.h"
+#include "../MyEngine_Source/MEServerMonsterFSMContext.h"
 
+#include "PacketUtility.h"
 #include "ServerTypes.h"
+#include <memory>
+#include <random>
+#include <string>
+#include <vector>
 
 #include <atomic>
 #include <cstdint>
@@ -9,8 +16,11 @@
 #include <queue>
 #include <unordered_map>
 
+class ServerMonsterFSMContext;
 class ServerWorld
 {
+    friend class ServerMonsterFSMContext;
+
 public:
     using SendToCallback =
         std::function<void(
@@ -57,19 +67,6 @@ public:
         bool broadcast);
 
 private:
-    void ProcessCommands();
-    void Tick(float deltaTime);
-
-    void HandleCommand(const EnterCommand& command);
-    void HandleCommand(const LeaveCommand& command);
-    void HandleCommand(const MoveCommand& command);
-    void HandleCommand(const StateCommand& command);
-    void HandleCommand(const WeaponChangeCommand& command);
-    void HandleCommand(const AttackCommand& command);
-
-
-    void UpdateMonsters(float deltaTime);
-    void UpdateProjectiles(float deltaTime);
 
     template <typename T>
     void SendTo(EntityId targetId, const T& packet)
@@ -101,7 +98,77 @@ private:
         );
     }
 
+    void ProcessCommands();
+    void Tick(float deltaTime);
+
+    void HandleCommand(const EnterCommand& command);
+    void HandleCommand(const LeaveCommand& command);
+    void HandleCommand(const MoveCommand& command);
+    void HandleCommand(const StateCommand& command);
+    void HandleCommand(const WeaponChangeCommand& command);
+    void HandleCommand(const AttackCommand& command);
+
+
+  
+
+    void UpdateMonsters(float deltaTime);
+    void UpdateProjectiles(float deltaTime);
+
+
+
+    EntityId FindClosestAlivePlayer(
+        const ServerVec3& position,
+        float maxDistance) const;
+
+    ServerPlayer* FindAlivePlayer(
+        EntityId entityId);
+
+    const ServerPlayer* FindAlivePlayer(
+        EntityId entityId) const;
+
+    float DistanceSquaredXZ(
+        const ServerVec3& lhs,
+        const ServerVec3& rhs) const;
+
+    void SelectRandomPatrolTarget(
+        ServerMonster& monster,
+        float radius);
+
+    bool MoveMonsterToward(
+        ServerMonster& monster,
+        const ServerVec3& target,
+        float speed,
+        float stoppingDistance,
+        float deltaTime);
+
+    void ApplyMonsterAnimation(
+        ServerMonster& monster,
+        const std::string& animationName,
+        bool loop);
+
+    void BeginMonsterMeleeAttack(
+        ServerMonster& monster,
+        const std::vector<std::string>& animationNames);
+
+    float GetMonsterAnimationDuration(
+        const std::string& animationName) const;
+
+    void FlushMonsterReplication(
+        float deltaTime);
+
+    void DespawnRequestedMonsters();
+
 private:
+
+
+    std::unordered_map<EntityId,std::unique_ptr<ME::FSMBrainCore>>  mMonsterBrains;
+
+    std::mt19937 mRandomEngine
+    {
+        std::random_device{}()
+    };
+
+
     // 이 맵은 ServerWorld 스레드만 수정
     std::unordered_map<EntityId, ServerPlayer> mPlayers;
     std::unordered_map<EntityId, ServerMonster> mMonsters;

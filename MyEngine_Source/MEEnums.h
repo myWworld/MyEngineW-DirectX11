@@ -13,6 +13,7 @@ namespace ME::enums
 		Weapon,
 		Bullet,
 		Particle,
+		Monster,
 		Max = 20
 	};
 

@@ -1,36 +1,54 @@
 #pragma once
 
+#include "MEFSMState.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
 
-class FSMState;
-class IFSMContext;
-
-class FSMBrainCore
+namespace ME
 {
-public:
-    void Update(IFSMContext& context);
+    class BlackBoard;
+    class IFSMContext;
 
-    void ChangeState(FSMState* nextState);
-    void SendFSMEvent(const std::string& eventName);
+    class FSMBrainCore
+    {
+    public:
+        FSMBrainCore();
+        ~FSMBrainCore();
 
-    void AddState(
-        const std::string& name,
-        std::unique_ptr<FSMState> state);
+        FSMBrainCore(const FSMBrainCore&) = delete;
+        FSMBrainCore& operator=(const FSMBrainCore&) = delete;
 
-    void SetInitialState(
-        const std::string& name,
-        IFSMContext& context);
+        void Update(IFSMContext& context);
 
-public:
-    std::unordered_map<
-        std::string,
-        std::unique_ptr<FSMState>> mStates;
+        void ChangeState(FSMState* nextState);
+        void SendFSMEvent(const std::string& eventName);
 
-    FSMState* mActiveState = nullptr;
+        void AddState(
+            const std::string& name,
+            std::unique_ptr<FSMState> state);
 
-private:
-    IFSMContext* mCurrentContext = nullptr;
+        bool SetInitialState(const std::string& name);
 
-};
+        FSMState* FindState(const std::string& name) const;
+        FSMState* GetActiveState() const;
+
+        std::string GetActiveStateName() const;
+        float GetStateElapsedTime() const;
+
+        BlackBoard* GetBlackboard() const;
+
+        void Clear();
+
+    private:
+        std::unordered_map<std::string, std::unique_ptr<FSMState>> mStates;
+
+        FSMState* mActiveState = nullptr;
+        IFSMContext* mCurrentContext = nullptr;
+
+        std::unique_ptr<BlackBoard> mBlackboard;
+
+        float mStateElapsedTime = 0.0f;
+        bool mbStarted = false;
+    };
+}

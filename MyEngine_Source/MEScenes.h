@@ -31,9 +31,19 @@ namespace ME
 		void EraseGameObject(GameObject* gameObj);
 
 		Layer* GetLayer(const enums::eLayerType type) { return mLayers[(UINT)type].get(); }
+		
 		std::unordered_map<UINT, GameObject*>& GetRemotePlayers() { return mRemotePlayers; }
 		void AddRemotePlayer(UINT id, std::unique_ptr<GameObject> remotePlayer);
 		void EraseRemotePlayer(UINT id);
+
+		std::unordered_map<UINT, GameObject*>& GetRemoteMonsters()
+		{
+			return mRemoteMonsters;
+		}
+
+		void AddRemoteMonster(UINT id, std::unique_ptr<GameObject> monster);
+
+		void EraseRemoteMonster(UINT id);
 
 
 		virtual void MakeCharacter(GameObject* player, std::wstring_view modelName) {}
@@ -44,6 +54,7 @@ namespace ME
 	private:
 		std::vector<std::unique_ptr<Layer>> mLayers;
 		std::unordered_map<UINT, GameObject*> mRemotePlayers;
+		std::unordered_map<UINT, GameObject*> mRemoteMonsters;
 	};
 
 }

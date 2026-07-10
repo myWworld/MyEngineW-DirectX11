@@ -1,61 +1,79 @@
 #pragma once
-#include <vector>
-#include <string>
+
 #include <memory>
+#include <string>
+#include <vector>
 
 namespace ME
 {
-	class FSMDecision;
-	class FSMTask;
-	class FSMBrain;
-	class GameObject;
-	class FSMState;
+    class FSMBrainCore;
+    class IFSMContext;
+    class FSMDecision;
+    class FSMTask;
 
-	struct FSMTransition
-	{
-		std::unique_ptr<FSMDecision> Decision;
-		FSMState* TrueState;
-		FSMState* FalseState;
+    class FSMState;
 
-		FSMTransition(std::unique_ptr<FSMDecision> decision, FSMState* trueState, FSMState* falseState = nullptr);
+    struct FSMTransition
+    {
+        std::unique_ptr<FSMDecision> Decision;
 
-		FSMTransition(FSMTransition&& other) noexcept;
+        FSMState* TrueState = nullptr;
+        FSMState* FalseState = nullptr;
 
-	};
+        FSMTransition(
+            std::unique_ptr<FSMDecision> decision,
+            FSMState* trueState,
+            FSMState* falseState = nullptr);
 
+        FSMTransition(
+            FSMTransition&& other) noexcept;
 
-	class FSMState
-	{
+        FSMTransition& operator=(
+            FSMTransition&& other) noexcept;
 
-	public:
+        FSMTransition(const FSMTransition&) = delete;
+        FSMTransition& operator=(const FSMTransition&) = delete;
+    };
 
+    class FSMState
+    {
+    public:
+        FSMState();
+        ~FSMState();
 
-		FSMState();
-		~FSMState();
+        void EnterState(
+            FSMBrainCore* brain,
+            IFSMContext& context);
 
-		void EnterState(FSMBrainCore* brain, IFSMContext& context);
-		void ExitState(FSMBrainCore* brain, IFSMContext& context);
+        void ExitState(
+            FSMBrainCore* brain,
+            IFSMContext& context);
 
-		void UpdateTask(FSMBrainCore* brain, IFSMContext& context);
-		void CheckDecision(FSMBrainCore* brain, IFSMContext& context);
+        void UpdateTask(
+            FSMBrainCore* brain,
+            IFSMContext& context);
 
-		void AddTransition(FSMTransition&& transition);
+        void CheckDecision(
+            FSMBrainCore* brain,
+            IFSMContext& context);
 
-		void AddTransition(std::unique_ptr<FSMDecision> decision, FSMState* trueState, FSMState* falseState);
+        void AddTransition(
+            std::unique_ptr<FSMDecision> decision,
+            FSMState* trueState,
+            FSMState* falseState = nullptr);
 
-		void AddTask(std::unique_ptr<FSMTask> task);
-		void SetStateName(const std::string& name) { mStateName = name; }
-		std::string GetStateName() const { return mStateName; }
+        void AddTask(
+            std::unique_ptr<FSMTask> task);
 
-	public:
+        void SetStateName(
+            const std::string& name);
 
+        const std::string& GetStateName() const;
 
-		std::vector<FSMTransition> mTransitions;
-		std::vector<std::unique_ptr<FSMTask>> mTasks;
-		std::string mStateName;
+    private:
+        std::vector<FSMTransition> mTransitions;
+        std::vector<std::unique_ptr<FSMTask>> mTasks;
 
-	};
-
-
+        std::string mStateName;
+    };
 }
-

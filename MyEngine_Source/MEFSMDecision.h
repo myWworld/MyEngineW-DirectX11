@@ -1,81 +1,100 @@
 #pragma once
-#include "METime.h"
+
+#include "IFSMContext.h"
 #include "json.hpp"
-#include <unordered_map>
+
+#include <algorithm>
 #include <functional>
 #include <string>
+#include <unordered_map>
 
 namespace ME
 {
-	class FSMBrain;
-	class GameObject;
+    class FSMBrainCore;
 
-	enum class eDecisionResult
-	{
-		True,
-		False,
-		Pending,
-		End,
-	};
+    enum class eDecisionResult
+    {
+        True,
+        False,
+        Pending
+    };
 
-	class FSMDecision
-	{
-	private:
-		std::unordered_map<std::string, std::function<void(const nlohmann::json&)>> mProperties;
+    class FSMDecision
+    {
+    public:
+        FSMDecision()
+            : mEvaluationTimer(0.0f)
+            , mCheckInterval(0.2f)
+        {
+        }
 
-	public:
+        virtual ~FSMDecision() = default;
 
-		FSMDecision():mTimer(0.0f) , mCheckInterval(0.2f){}
-		virtual ~FSMDecision() = default;
+        void LoadFromJson(
+            const nlohmann::json& json)
+        {
+            for (auto& [key, setter] : mProperties)
+            {
+                if (json.contains(key))
+                {
+                    setter(json[key]);
+                }
+            }
+        }
 
-		virtual void LoadFromJson(const nlohmann::json& j) final
-		{
-			// 등록된 모든 프로퍼티를 순회하며
-			for (auto& [key, setterFunc] : mProperties)
-			{
-				// JSON에 그 이름이 있으면 람다 함수 실행
-				if (j.contains(key))
-				{
-					setterFunc(j[key]);
-				}
-			}
-		}
+        eDecisionResult Decision(
+            FSMBrainCore* brain,
+            IFSMContext& context)
+        {
+            mEvaluationTimer += (std::max)(0.0f, context.GetDeltaTime());
 
-		eDecisionResult Decision(FSMBrain* brain, GameObject* owner)
-		{
-			mTimer += Time::DeltaTime();
+            if (mCheckInterval > 0.0f &&
+                mEvaluationTimer < mCheckInterval)
+            {
+                return eDecisionResult::Pending;
+            }
 
+            mEvaluationTimer = 0.0f;
 
-			if (mTimer >= mCheckInterval)
-			{
-				mTimer = 0.0f;
-				return  CheckDecision(brain, owner) ? eDecisionResult::True : eDecisionResult::False;	
-			}
+            return CheckDecision(brain, context)
+                ? eDecisionResult::True
+                : eDecisionResult::False;
+        }
 
-			return eDecisionResult::Pending;
-		}
-	
-		void SetIntervalTime(float intervalTime) { mCheckInterval = intervalTime; }
+        void ResetRuntime()
+        {
+            mEvaluationTimer = 0.0f;
+        }
 
+        void SetIntervalTime(float interval)
+        {
+            mCheckInterval = interval;
+        }
 
+    protected:
+        virtual bool CheckDecision(
+            FSMBrainCore* brain,
+            IFSMContext& context) = 0;
 
-	protected:
+        template <typename T>
+        void BindProperty(
+            const std::string& name,
+            T* member)
+        {
+            mProperties[name] =
+                [member](const nlohmann::json& value)
+                {
+                    *member = value.get<T>();
+                };
+        }
 
-		virtual bool CheckDecision(FSMBrain* brain, GameObject* owner) = 0;
-		
-		template<typename T>
-		void BindProperty(const std::string& name, T* memberPtr) //json파일에 있는 Decision별 멤버 변수, 자식에게서 포인터로 받아들인뒤 나중에 람다함수 실행
-		{
-			mProperties[name] = [memberPtr](const nlohmann::json& j)
-				{
-					*memberPtr = j.get<T>();
-				};
-		}
+    private:
+        std::unordered_map<
+            std::string,
+            std::function<void(const nlohmann::json&)>>
+            mProperties;
 
-	protected:
-
-		float mTimer;
-		float mCheckInterval;
-
-	};
+        float mEvaluationTimer;
+        float mCheckInterval;
+    };
 }

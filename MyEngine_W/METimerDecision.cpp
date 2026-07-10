@@ -1,19 +1,17 @@
 #include "METimerDecision.h"
-#include "../MyEngine_Source/METime.h"
+
+#include "../MyEngine_Source/FSMBrainCore.h"
 
 namespace ME
 {
-	bool TimerDecision::CheckDecision(FSMBrain* brain, GameObject* owner)
-	{
-		mTimer += Time::DeltaTime();
+    bool TimerDecision::CheckDecision(
+        FSMBrainCore* brain,
+        IFSMContext& context)
+    {
+        if (brain == nullptr)
+            return false;
 
-		if (mTimer >= mCheckTime)
-		{
-			mTimer = 0.0f;
-
-			return true;
-		}
-
-		return false;
-	}
+        return brain->GetStateElapsedTime()
+            >= mCheckTime;
+    }
 }

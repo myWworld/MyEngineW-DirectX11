@@ -1,8 +1,8 @@
 #include "MERemoteMonsterScript.h"
 
+#include "MEAnimator3D.h"
 #include "MEGameObject.h"
 #include "METransform.h"
-#include "MEAnimator3D.h"
 #include "MEWeaponScript.h"
 
 namespace ME
@@ -25,12 +25,27 @@ namespace ME
 
     void RemoteMonsterScript::Update()
     {
-        // 원격 플레이어는 입력 처리 X
-        // 원격 플레이어는 NetworkManager::SendPacket X
-        // 원격 플레이어는 카메라 기준 회전 X
-
         CacheComponents();
         CacheBones();
+
+        if (!mbPlayingAction ||
+            mAnimator == nullptr)
+        {
+            return;
+        }
+
+        if (!mAnimator->IsAnimationComplete())
+            return;
+
+        if (mCurrentRemoteState ==
+            eMonsterState::DEATH)
+        {
+            return;
+        }
+
+        mbPlayingAction = false;
+
+        PlayPersistentState();
     }
 
     void RemoteMonsterScript::LateUpdate()
@@ -42,117 +57,278 @@ namespace ME
         ActorScript::Render();
     }
 
-    void RemoteMonsterScript::OnCollisionEnter(Collider* other)
+    void RemoteMonsterScript::OnCollisionEnter(
+        Collider* other)
     {
-        // 원격 플레이어는 로컬 충돌로 데미지 처리하지 않는 걸 추천.
-        // 데미지는 S_DAMAGE, S_STATE 같은 서버 패킷으로 반영.
+        // 서버 S_DAMAGE 적용 전까지 로컬 데미지 처리하지 않음
     }
 
-    void RemoteMonsterScript::OnCollisionStay(Collider* other)
+    void RemoteMonsterScript::OnCollisionStay(
+        Collider* other)
     {
     }
 
-    void RemoteMonsterScript::OnCollisionExit(Collider* other)
+    void RemoteMonsterScript::OnCollisionExit(
+        Collider* other)
     {
     }
 
     void RemoteMonsterScript::OnPrimaryAction()
     {
-        // 원격 플레이어는 내 입력으로 공격하지 않음.
     }
 
     void RemoteMonsterScript::OnToggleWeapon()
     {
-        // 원격 플레이어는 내 입력으로 무기 전환하지 않음.
-        // 무기 전환도 나중에 S_WEAPON_CHANGE 같은 패킷으로 처리.
     }
 
     void RemoteMonsterScript::OnDeath()
     {
-        ApplyState(eMonsterState::DEATH);
+        ApplyState(
+            eMonsterState::DEATH,
+            true
+        );
     }
 
-    void RemoteMonsterScript::DamageProcess(DamageInfo damageInfo)
+    void RemoteMonsterScript::DamageProcess(
+        DamageInfo damageInfo)
     {
-        // 원격 플레이어의 HP/데미지는 로컬 충돌로 계산하지 않는 게 좋음.
-        // 나중에 서버가 S_DAMAGE 또는 S_STATE로 알려주는 값만 반영.
+        // S_DAMAGE 단계에서 구현
     }
 
-    Bone* RemoteMonsterScript::GetWeaponSocketBone()
+    Bone* RemoteMonsterScript::
+        GetWeaponSocketBone()
     {
         CacheBones();
         return mLeftHandBone;
     }
 
-    Bone* RemoteMonsterScript::GetWeaponSocketBoneRight()
+    Bone* RemoteMonsterScript::
+        GetWeaponSocketBoneRight()
     {
         CacheBones();
         return mRightHandBone;
     }
 
-    Vector3 RemoteMonsterScript::GetAimDirection()
+    Vector3 RemoteMonsterScript::
+        GetAimDirection()
     {
-        // 원격 플레이어는 renderer::mainCamera를 쓰면 안 됨.
-        // 일단 기본 전방값 반환.
-        // 엔진에 Transform::GetForward()가 있으면 그걸 쓰는 게 더 좋음.
-        return Vector3::Forward;
+        return mAttackDirection;
     }
 
-    void RemoteMonsterScript::ApplyMove(float x, float y, float z, float yaw)
+    void RemoteMonsterScript::SetLeftWeapon(
+        WeaponScript* weapon)
+    {
+        mLeftWeapon = weapon;
+
+        if (mLeftWeapon)
+        {
+            mLeftWeapon->WeaponOnOff(true);
+        }
+    }
+
+    void RemoteMonsterScript::SetRightWeapon(
+        WeaponScript* weapon)
+    {
+        mRightWeapon = weapon;
+
+        if (mRightWeapon)
+        {
+            mRightWeapon->WeaponOnOff(true);
+        }
+    }
+
+    void RemoteMonsterScript::ApplyMove(
+        float x,
+        float y,
+        float z,
+        float yaw)
     {
         CacheComponents();
 
         if (mTransform == nullptr)
             return;
 
-        mTransform->SetPosition(x, y, z);
+        mTransform->SetPosition(
+            x,
+            y,
+            z
+        );
 
-        Vector3 rot = mTransform->GetRotation();
-        rot.y = yaw;
-        mTransform->SetRotation(rot);
+        Vector3 rotation =
+            mTransform->GetRotation();
+
+        rotation.y = yaw;
+
+        mTransform->SetRotation(
+            rotation
+        );
     }
 
-
-
-    void RemoteMonsterScript::ApplyAttack(
-        eWeaponType weaponType,
-        std::uint8_t attackIndex,
-        const Vector3& direction)
-    {
-     
-
-    }
-
-    void RemoteMonsterScript::RegisterWeapon(
-        eWeaponType type,
-        WeaponScript* weapon)
-    {
-        if (weapon == nullptr)
-            return;
-
-        mWeaponMap[type] = weapon;
-
-        weapon->WeaponOnOff(true);
-    }
-
-
-    void RemoteMonsterScript::ApplyState(eMonsterState state, bool forced)
+    void RemoteMonsterScript::ApplyState(
+        eMonsterState state,
+        bool forced)
     {
         CacheComponents();
 
-  
+        if (mAnimator == nullptr)
+            return;
+
+        switch (state)
+        {
+        case eMonsterState::ATTACK_1:
+            ApplyAttack(
+                0,
+                mAttackDirection
+            );
+            return;
+
+        case eMonsterState::ATTACK_2:
+            ApplyAttack(
+                1,
+                mAttackDirection
+            );
+            return;
+
+        case eMonsterState::ATTACK_3:
+            ApplyAttack(
+                2,
+                mAttackDirection
+            );
+            return;
+
+        case eMonsterState::HIT:
+            mbPlayingAction = true;
+
+            mAnimator->PlayAnimation(
+                L"MONSTER_HIT",
+                false
+            );
+            return;
+
+        case eMonsterState::DEATH:
+            mCurrentRemoteState =
+                eMonsterState::DEATH;
+
+            mbPlayingAction = true;
+
+            mAnimator->PlayAnimation(
+                L"MONSTER_DEATH",
+                false
+            );
+            return;
+
+        default:
+            break;
+        }
+
+        mCurrentRemoteState = state;
+
+        if (mbPlayingAction)
+            return;
+
+        if (!forced &&
+            mbHasPlayedState &&
+            mLastPlayedState == state)
+        {
+            return;
+        }
+
+        PlayPersistentState();
+    }
+
+    void RemoteMonsterScript::ApplyAttack(
+        std::uint8_t attackIndex,
+        const Vector3& direction)
+    {
+        CacheComponents();
+
+        if (mAnimator == nullptr)
+            return;
+
+        mAttackDirection = direction;
+        mbPlayingAction = true;
+
+        switch (attackIndex)
+        {
+        case 0:
+            mAnimator->PlayAnimation(
+                L"MONSTER_ATTACK",
+                false
+            );
+            break;
+
+        case 1:
+            mAnimator->PlayAnimation(
+                L"MONSTER_ATTACK2",
+                false
+            );
+            break;
+
+        case 2:
+            mAnimator->PlayAnimation(
+                L"MONSTER_ATTACK3",
+                false
+            );
+            break;
+
+        default:
+            mbPlayingAction = false;
+            break;
+        }
+    }
+
+    void RemoteMonsterScript::PlayPersistentState()
+    {
+        if (mAnimator == nullptr)
+            return;
+
+        switch (mCurrentRemoteState)
+        {
+        case eMonsterState::IDLE:
+            mAnimator->PlayAnimation(
+                L"MONSTER_IDLE",
+                true
+            );
+            break;
+
+        case eMonsterState::WALK:
+            mAnimator->PlayAnimation(
+                L"MONSTER_WALK",
+                true
+            );
+            break;
+
+        case eMonsterState::RUN:
+            mAnimator->PlayAnimation(
+                L"MONSTER_RUN",
+                true
+            );
+            break;
+
+        default:
+            return;
+        }
+
+        mLastPlayedState =
+            mCurrentRemoteState;
+
+        mbHasPlayedState = true;
     }
 
     void RemoteMonsterScript::CacheComponents()
     {
         if (mAnimator == nullptr)
         {
-            mAnimator = GetOwner()->GetComponent<Animator3D>();
+            mAnimator =
+                GetOwner()
+                ->GetComponent<Animator3D>();
         }
 
         if (mTransform == nullptr)
         {
-            mTransform = GetOwner()->GetComponent<Transform>();
+            mTransform =
+                GetOwner()
+                ->GetComponent<Transform>();
         }
     }
 
@@ -163,15 +339,22 @@ namespace ME
         if (mAnimator == nullptr)
             return;
 
-        if (mLeftHandBone != nullptr && mRightHandBone != nullptr)
-            return;
-
-        Skeleton* skeleton = mAnimator->GetSkeletonPtr();
+        Skeleton* skeleton =
+            mAnimator->GetSkeletonPtr();
 
         if (skeleton == nullptr)
             return;
 
-        mLeftHandBone = skeleton->GetLeftHandTransform();
-        mRightHandBone = skeleton->GetRightHandTransform();
+        if (mLeftHandBone == nullptr)
+        {
+            mLeftHandBone =
+                skeleton->GetLeftHandTransform();
+        }
+
+        if (mRightHandBone == nullptr)
+        {
+            mRightHandBone =
+                skeleton->GetRightHandTransform();
+        }
     }
 }

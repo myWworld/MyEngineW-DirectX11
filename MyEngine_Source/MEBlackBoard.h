@@ -14,6 +14,8 @@ namespace ME
 
 	public:
 		
+		~BlackBoard() = default;
+
 		template<typename T>
 		void SetValue(uint32_t key, T data)
 		{

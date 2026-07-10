@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)BoneMapManager.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEClientFSMContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)CommonInclude.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)ContentAndScript.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)FSMBrainCore.h" />
@@ -73,6 +74,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)MESceneManager.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScenes.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEScript.h" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)MEServerMonsterFSMContext.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MEShader.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MESkeleton.h" />
     <ClInclude Include="$(MSBuildThisFileDirectory)MESpriteRenderer.h" />
@@ -105,6 +107,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MEBoxCollider3D.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECamera.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECircleCollider2D.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEClientFSMContext.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECollider.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MECollisionManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEComponent.cpp" />
@@ -141,6 +144,7 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)MESceneManager.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScenes.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEScript.cpp" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)MEServerMonsterFSMContext.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MEShader.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MESkeleton.cpp" />
     <ClCompile Include="$(MSBuildThisFileDirectory)MESpriteRenderer.cpp" />

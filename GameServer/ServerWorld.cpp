@@ -1,5 +1,17 @@
 #include "ServerWorld.h"
 
+
+#include "../MyEngine_Source/FSMFactory.h"
+#include "../MyEngine_Source/FSMBrainCore.h"
+#include "../MyEngine_Source/FSMFactory.h"
+#include "../MyEngine_Source/IFSMContext.h"
+
+
+#include <algorithm>
+#include <limits>
+#include <random>
+#include <vector>
+
 #include <chrono>
 #include <cmath>
 #include <iostream>
@@ -172,32 +184,79 @@ namespace
         return packet;
     }
 
-    /*Pkt_S_MonsterMove MakeMonsterMovePacket(EntityId entityId)
+    Pkt_S_MonsterMove MakeMonsterMovePacket(
+        const ServerMonster& monster)
     {
         Pkt_S_MonsterMove packet = {};
 
-        packet.header.type = ePacketType::S_MONSTER_MOVE;
-        packet.header.size = sizeof(Pkt_S_MonsterMove);
+        packet.header.type =
+            ePacketType::S_MONSTER_MOVE;
 
-        packet.entityId = entityId;
+        packet.header.size =
+            sizeof(Pkt_S_MonsterMove);
 
-        packet.x = player.position.x;
-        packet.y = player.position.y;
-        packet.z = player.position.z;
-        packet.yaw = player.yaw;
+        packet.entityId = monster.entityId;
+
+        packet.x = monster.position.x;
+        packet.y = monster.position.y;
+        packet.z = monster.position.z;
+        packet.yaw = monster.yaw;
 
         return packet;
-    }*/
+    }
 
-    Pkt_S_State MaketatePacket(const ServerPlayer& player)
+    Pkt_S_MonsterState MakeMonsterStatePacket(
+        const ServerMonster& monster)
     {
-        Pkt_S_State packet = {};
+        Pkt_S_MonsterState packet = {};
 
-        packet.header.type = ePacketType::S_STATE;
-        packet.header.size = sizeof(Pkt_S_State);
+        packet.header.type =
+            ePacketType::S_MONSTER_STATE;
 
-        packet.entityId = player.entityId;
-        packet.state = player.state;
+        packet.header.size =
+            sizeof(Pkt_S_MonsterState);
+
+        packet.entityId = monster.entityId;
+        packet.state = monster.state;
+
+        return packet;
+    }
+
+    Pkt_S_MonsterAttack MakeMonsterAttackPacket(
+        const ServerMonster& monster)
+    {
+        Pkt_S_MonsterAttack packet = {};
+
+        packet.header.type =
+            ePacketType::S_MONSTER_ATTACK;
+
+        packet.header.size =
+            sizeof(Pkt_S_MonsterAttack);
+
+        packet.entityId = monster.entityId;
+        packet.targetEntityId =monster.attackTargetId;
+
+        packet.attackIndex =monster.attackIndex;
+
+        packet.dir_x =monster.attackDirection.x;
+        packet.dir_y = monster.attackDirection.y;
+        packet.dir_z = monster.attackDirection.z;
+
+        return packet;
+    }
+
+    Pkt_S_MonsterDespawn MakeMonsterDespawnPacket(
+        EntityId entityId)
+    {
+        Pkt_S_MonsterDespawn packet = {};
+
+        packet.header.type =
+            ePacketType::S_MONSTER_DESPAWN;
+
+        packet.header.size =
+            sizeof(Pkt_S_MonsterDespawn);
+
+        packet.entityId = entityId;
 
         return packet;
     }
@@ -311,19 +370,19 @@ void ServerWorld::Tick(float deltaTime)
 {
     for (auto& [entityId, player] : mPlayers)
     {
-        if (player.attackCooldown > 0.0f)
-        {
-            player.attackCooldown -= deltaTime;
+        player.attackCooldown = (std::max)(0.0f,player.attackCooldown - deltaTime);
+    }
 
-            if (player.attackCooldown < 0.0f)
-            {
-                player.attackCooldown = 0.0f;
-            }
-        }
+    for (auto& [entityId, monster] : mMonsters)
+    {
+        monster.actionRemainingTime = (std::max)( 0.0f,monster.actionRemainingTime - deltaTime);
     }
 
     UpdateMonsters(deltaTime);
     UpdateProjectiles(deltaTime);
+
+    FlushMonsterReplication(deltaTime);
+    DespawnRequestedMonsters();
 }
 
 void ServerWorld::HandleCommand(const EnterCommand& command)
@@ -560,7 +619,35 @@ void ServerWorld::HandleCommand(const AttackCommand& command)
 
 void ServerWorld::UpdateMonsters(float deltaTime)
 {
-    for(const auto&)
+    for (auto& [monsterId, monster] : mMonsters)
+    {
+        if (!monster.alive &&
+            monster.state != eMonsterState::DEATH)
+        {
+            auto brainIter =
+                mMonsterBrains.find(monsterId);
+
+            if (brainIter != mMonsterBrains.end())
+            {
+                brainIter->second
+                    ->SendFSMEvent("DEATH");
+            }
+        }
+
+        auto brainIter =
+            mMonsterBrains.find(monsterId);
+
+        if (brainIter == mMonsterBrains.end())
+            continue;
+
+        ServerMonsterFSMContext context(
+            *this,
+            monster,
+            deltaTime
+        );
+
+        brainIter->second->Update(context);
+    }
 }
 
 void ServerWorld::UpdateProjectiles(float deltaTime)
@@ -630,6 +717,37 @@ EntityId ServerWorld::SpawnMonster(
     if (!inserted)
         return 0;
 
+    auto brain =
+        std::make_unique<ME::FSMBrainCore>();
+
+    const bool fsmLoaded =
+        ME::FSMFactory::MakeFSMWithJsonFile(
+            brain.get(),
+            "..\\Resources\\EnemyFSMJson.json"
+        );
+
+    if (!fsmLoaded)
+    {
+        std::cout
+            << "[World] 몬스터 FSM 로딩 실패 id: "
+            << monsterId
+            << '\n';
+
+        mMonsters.erase(monsterId);
+        return 0;
+    }
+
+    iter->second.patrolOrigin =
+        iter->second.position;
+
+    iter->second.patrolTarget =
+        iter->second.position;
+
+    mMonsterBrains.emplace(
+        monsterId,
+        std::move(brain)
+    );
+
     if (broadcast)
     {
         const Pkt_S_MonsterSpawn packet =
@@ -650,4 +768,378 @@ EntityId ServerWorld::SpawnMonster(
         << '\n';
 
     return monsterId;
+}
+
+
+EntityId ServerWorld::FindClosestAlivePlayer(
+    const ServerVec3& position,
+    float maxDistance) const
+{
+    EntityId closestId = 0;
+
+    float closestDistanceSquared =
+        maxDistance * maxDistance;
+
+    for (const auto& [playerId, player] : mPlayers)
+    {
+        if (!player.alive)
+            continue;
+
+        const float distanceSquared =
+            DistanceSquaredXZ(
+                position,
+                player.position
+            );
+
+        if (distanceSquared >
+            closestDistanceSquared)
+        {
+            continue;
+        }
+
+        closestDistanceSquared =
+            distanceSquared;
+
+        closestId = playerId;
+    }
+
+    return closestId;
+}
+
+ServerPlayer* ServerWorld::FindAlivePlayer(
+    EntityId entityId)
+{
+    auto iter = mPlayers.find(entityId);
+
+    if (iter == mPlayers.end() ||
+        !iter->second.alive)
+    {
+        return nullptr;
+    }
+
+    return &iter->second;
+}
+
+const ServerPlayer* ServerWorld::FindAlivePlayer(EntityId entityId) const
+{
+    auto iter = mPlayers.find(entityId);
+
+    if (iter == mPlayers.end() ||
+        !iter->second.alive)
+    {
+        return nullptr;
+    }
+
+    return &iter->second;
+}
+
+float ServerWorld::DistanceSquaredXZ(const ServerVec3& lhs, const ServerVec3& rhs) const
+{
+    const float dx = rhs.x - lhs.x;
+    const float dz = rhs.z - lhs.z;
+
+    return dx * dx + dz * dz;
+}
+
+void ServerWorld::SelectRandomPatrolTarget(ServerMonster& monster, float radius)
+{
+    if (!monster.hasPatrolTarget)
+    {
+        monster.patrolOrigin =
+            monster.position;
+    }
+
+    std::uniform_real_distribution<float>
+        distribution(-radius, radius);
+
+    monster.patrolTarget =
+    {
+        monster.patrolOrigin.x +
+            distribution(mRandomEngine),
+        monster.patrolOrigin.y,
+        monster.patrolOrigin.z +
+            distribution(mRandomEngine)
+    };
+
+    monster.hasPatrolTarget = true; //도착 여부 판단을 위한 flag
+}
+
+bool ServerWorld::MoveMonsterToward(
+    ServerMonster& monster,
+    const ServerVec3& target,
+    float speed,
+    float stoppingDistance,
+    float deltaTime)
+{
+    float dx =
+        target.x - monster.position.x;
+
+    float dz =
+        target.z - monster.position.z;
+
+    const float distanceSquared =
+        dx * dx + dz * dz;
+
+    if (distanceSquared <=
+        stoppingDistance * stoppingDistance)
+    {
+        return false;
+    }
+
+    const float distance =
+        std::sqrt(distanceSquared);
+
+    if (distance < 0.0001f)
+        return false;
+
+    dx /= distance;
+    dz /= distance;
+
+    const float remainingDistance =
+        (std::max)(
+            0.0f,
+            distance - stoppingDistance
+        );
+
+    const float movement =
+        (std::min)(
+            speed * deltaTime,
+            remainingDistance
+        );
+
+    monster.position.x += dx * movement;
+    monster.position.z += dz * movement;
+
+    constexpr float RadToDegree =
+        57.295779513f;
+
+    monster.yaw =
+        std::atan2(dx, dz)
+        * RadToDegree
+        + 180.0f;
+
+    monster.transformDirty = true; //한번에 업데이트 하기위한 flag
+
+    return true;
+}
+
+void ServerWorld::ApplyMonsterAnimation(
+    ServerMonster& monster,
+    const std::string& animationName,
+    bool loop)
+{
+    eMonsterState nextState =
+        monster.state;
+
+    if (animationName == "MONSTER_IDLE")
+        nextState = eMonsterState::IDLE;
+
+    else if (animationName == "MONSTER_WALK")
+        nextState = eMonsterState::WALK;
+
+    else if (animationName == "MONSTER_RUN")
+        nextState = eMonsterState::RUN;
+
+    else if (animationName == "MONSTER_ATTACK")
+        nextState = eMonsterState::ATTACK_1;
+
+    else if (animationName == "MONSTER_ATTACK2")
+        nextState = eMonsterState::ATTACK_2;
+
+    else if (animationName == "MONSTER_ATTACK3")
+        nextState = eMonsterState::ATTACK_3;
+
+    else if (animationName == "MONSTER_HIT")
+        nextState = eMonsterState::HIT;
+
+    else if (animationName == "MONSTER_DEATH")
+        nextState = eMonsterState::DEATH;
+
+    if (monster.state != nextState)
+    {
+        monster.state = nextState;
+        monster.stateDirty = true;
+    }
+
+    if (!loop)
+    {
+        monster.actionRemainingTime =
+            GetMonsterAnimationDuration(
+                animationName
+            );
+    }
+}
+
+float ServerWorld::GetMonsterAnimationDuration(const std::string& animationName) const
+{
+    if (animationName == "MONSTER_ATTACK")
+        return 0.9f;
+
+    if (animationName == "MONSTER_ATTACK2")
+        return 1.0f;
+
+    if (animationName == "MONSTER_ATTACK3")
+        return 1.1f;
+
+    if (animationName == "MONSTER_HIT")
+        return 0.6f;
+
+    if (animationName == "MONSTER_DEATH")
+        return 2.0f;
+
+    return 0.0f;
+}
+
+void ServerWorld::BeginMonsterMeleeAttack(ServerMonster& monster, const std::vector<std::string>& animationNames)
+{
+    if (animationNames.empty())
+        return;
+
+    const ServerPlayer* target = //서버 내에 존재하는 플레이어 중 가장 가까운 플레이어 찾기
+        FindAlivePlayer(
+            monster.targetPlayerId
+        );
+
+    if (target == nullptr)
+        return;
+
+    std::uniform_int_distribution<std::size_t>
+        distribution(
+            0,
+            animationNames.size() - 1
+        ); //랜덤 공격 재생
+
+    const std::size_t index = distribution(mRandomEngine);
+
+    const std::string& animationName = animationNames[index];
+
+    monster.attackIndex = static_cast<std::uint8_t>(index);
+
+    monster.attackTargetId = target->entityId;
+
+    monster.state =
+        index == 0
+        ? eMonsterState::ATTACK_1
+        : index == 1
+        ? eMonsterState::ATTACK_2
+        : eMonsterState::ATTACK_3;
+
+    float dirX =
+        target->position.x -
+        monster.position.x;
+
+    float dirY =
+        target->position.y -
+        monster.position.y;
+
+    float dirZ =
+        target->position.z -
+        monster.position.z;
+
+    const float lengthSquared =
+        dirX * dirX +
+        dirY * dirY +
+        dirZ * dirZ;
+
+    if (lengthSquared > 0.0001f)
+    {
+        const float inverseLength =
+            1.0f / std::sqrt(lengthSquared);
+
+        dirX *= inverseLength;
+        dirY *= inverseLength;
+        dirZ *= inverseLength;
+    }
+
+    monster.attackDirection =
+    {
+        dirX,
+        dirY,
+        dirZ
+    };
+
+    monster.actionRemainingTime = GetMonsterAnimationDuration( animationName);
+
+    monster.attackEventPending = true;
+
+    // S_MONSTER_STATE와 S_MONSTER_ATTACK이
+    // 중복으로 공격을 재생하지 않도록 한다.
+    monster.stateDirty = false;
+}
+
+void ServerWorld::FlushMonsterReplication(float deltaTime) //몬스터 이동, 공격때마다 바로바로 하지않고 flag를 이용하여 한번에 업데이트
+{
+    constexpr float MoveSendInterval =
+        1.0f / 20.0f;
+
+    for (auto& [monsterId, monster] : mMonsters)
+    {
+        monster.moveReplicationTimer += deltaTime;
+
+        if (monster.stateDirty) //상태 변경이 있는지
+        {
+            const Pkt_S_MonsterState packet =
+                MakeMonsterStatePacket(
+                    monster
+                );
+
+            BroadcastExcept(0, packet);
+
+            monster.stateDirty = false;
+        }
+
+        if (monster.attackEventPending) //공격 이벤트가 발생했는지
+        {
+            const Pkt_S_MonsterAttack packet =
+                MakeMonsterAttackPacket(
+                    monster
+                );
+
+            BroadcastExcept(0, packet);
+
+            monster.attackEventPending = false;
+        }
+
+        if (monster.transformDirty &&
+            monster.moveReplicationTimer
+            >= MoveSendInterval) //움직임이 있는지
+        {
+            const Pkt_S_MonsterMove packet =
+                MakeMonsterMovePacket(
+                    monster
+                );
+
+            BroadcastExcept(0, packet);
+
+            monster.transformDirty = false;
+            monster.moveReplicationTimer = 0.0f;
+        }
+    }
+}
+
+void ServerWorld::DespawnRequestedMonsters()
+{
+    std::vector<EntityId> destroyIds;
+
+    for (const auto& [monsterId, monster] :
+        mMonsters)
+    {
+        if (monster.destroyRequested)
+        {
+            destroyIds.push_back(
+                monsterId
+            );
+        }
+    }
+
+    for (EntityId monsterId : destroyIds) //특정 몬스터 나간다고 서버내 모든 클라이언트(플레이어)에게 알림
+    {
+        const Pkt_S_MonsterDespawn packet =
+            MakeMonsterDespawnPacket(monsterId);
+
+        BroadcastExcept(0, packet);
+
+        mMonsterBrains.erase(monsterId);
+        mMonsters.erase(monsterId);
+    }
 }

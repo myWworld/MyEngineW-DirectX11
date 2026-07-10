@@ -1,19 +1,18 @@
 #pragma once
+
 #include "../MyEngine_Source/MEFSMTask.h"
 
 namespace ME
 {
-	class DestroyTask: public FSMTask
-	{
-	public:
+    class DestroyTask final : public FSMTask
+    {
+    protected:
+        void OnEnter(
+            FSMBrainCore* brain,
+            IFSMContext& context) override;
 
-		DestroyTask() {}
-		~DestroyTask() {}
-
-	protected:
-
-		void OnEnter(FSMBrain* brain, GameObject* owner)override;
-		 void OnExecute(FSMBrain* brain, GameObject* owner) override;
-		 void OnExit(FSMBrain* brain, GameObject* owner)override {}
-	};
+        void OnExecute(
+            FSMBrainCore* brain,
+            IFSMContext& context) override;
+    };
 }

@@ -82,6 +82,7 @@ namespace ME
 
 			// 씬의 리모트 플레이어 맵을 참조(&)로 가져옵니다
 			auto& remotePlayers = activeScene->GetRemotePlayers();
+			auto& remoteMonsters = activeScene->GetRemoteMonsters();
 
 			PacketHeader* packetHeader = reinterpret_cast<PacketHeader*>(packetData.data());
 
@@ -295,30 +296,50 @@ namespace ME
 
 			case ePacketType::S_MONSTER_SPAWN:
 			{
+				const Pkt_S_MonsterSpawn* packet =
+					reinterpret_cast<const Pkt_S_MonsterSpawn*>(	packetData.data());
 
-				Pkt_S_MonsterSpawn* packet = reinterpret_cast< Pkt_S_MonsterSpawn*>(packetData.data());
-
-
-				if (packet->entityId == mMyEntityId)
+				if (remoteMonsters.find(
+					packet->entityId)
+					!= remoteMonsters.end())
+				{
 					break;
+				}
 
-				if (remotePlayers.find(packet->entityId) != remotePlayers.end())
-					break;
+				auto enemyDummy =
+					std::make_unique<GameObject>();
 
-				std::unique_ptr<GameObject> enemyDummy = std::make_unique<GameObject>();
-				Transform* transform = enemyDummy->GetComponent<Transform>();
-				
+				enemyDummy->SetLayerType(
+					enums::eLayerType::Monster
+				);
+
 				std::wstring modelKey;
 
-				if (packet->modelType == eModelType::Character)
-					modelKey = L"CharacterModel";
-				else if (packet->modelType == eModelType::Mutant)
+				switch (packet->modelType)
+				{
+				case eModelType::Mutant:
 					modelKey = L"MutantModel";
-				else if (packet->modelType == eModelType::Alien)
-					modelKey = L"AlienModel";
+					break;
 
-				activeScene->MakeCharacter(enemyDummy.get(), modelKey);
-				RemoteMonsterScript* remoteScript = enemyDummy->AddComponent<RemoteMonsterScript>();
+				case eModelType::Alien:
+					modelKey = L"AlienModel";
+					break;
+
+				default:
+					break;
+				}
+
+				if (modelKey.empty())
+					break;
+
+				activeScene->MakeCharacter(
+					enemyDummy.get(),
+					modelKey
+				);
+
+				RemoteMonsterScript* remoteScript =
+					enemyDummy
+					->AddComponent<RemoteMonsterScript>();
 
 				WeaponScript* leftGauntlet =
 					activeScene->MakeWeapon(
@@ -336,28 +357,37 @@ namespace ME
 						0.0f
 					);
 
-				rightGauntlet->SetSocketOffsetAntRot(math::Vector3(-96.0f, 149.0f, 1.0f), math::Vector3::Zero);
+				if (leftGauntlet)
+				{
+					leftGauntlet->SetSocketOffsetAntRot(
+						math::Vector3(
+							129.0f,
+							139.0f,
+							-9.0f
+						),
+						math::Vector3::Zero
+					);
 
+					remoteScript->SetLeftWeapon(
+						leftGauntlet
+					);
+				}
 
-				leftGauntlet->SetSocketOffsetAntRot(math::Vector3(129.0f, 139.0f, -9.0f), math::Vector3::Zero); //129.0f, 139.0f, -9.0f
+				if (rightGauntlet)
+				{
+					rightGauntlet->SetSocketOffsetAntRot(
+						math::Vector3(
+							-96.0f,
+							149.0f,
+							1.0f
+						),
+						math::Vector3::Zero
+					);
 
-				remoteScript->RegisterWeapon(
-					eWeaponType::Gauntlet,
-					leftGauntlet
-				);
-
-				remoteScript->RegisterWeapon(
-					eWeaponType::Gauntlet,
-					rightGauntlet
-				);
-
-			//	remoteScript->ApplyWeaponChange(
-			//		packet->weaponType
-			//	);
-
-				remoteScript->ApplyState(
-					packet->state
-				);
+					remoteScript->SetRightWeapon(
+						rightGauntlet
+					);
+				}
 
 				remoteScript->ApplyMove(
 					packet->x,
@@ -366,13 +396,14 @@ namespace ME
 					packet->yaw
 				);
 
-				activeScene->AddRemotePlayer(packet->entityId, std::move(enemyDummy));
-				
-				
-				
-				//FSMBrain* brain = enemy->AddComponent<FSMBrain>();
-				//FSMFactory::MakeFSMWithJsonFile(brain, "..\\Resources\\EnemyFSMJson.json");
+				remoteScript->ApplyState(
+					packet->state
+				);
 
+				activeScene->AddRemoteMonster(
+					packet->entityId,
+					std::move(enemyDummy)
+				);
 
 				break;
 			}
@@ -380,27 +411,27 @@ namespace ME
 
 			case ePacketType::S_MONSTER_MOVE:
 			{
+				const Pkt_S_MonsterMove* packet =
+					reinterpret_cast<const Pkt_S_MonsterMove*>(packetData.data());
 
-				Pkt_S_MonsterMove* movePkt = reinterpret_cast<Pkt_S_MonsterMove*>(packetData.data());
+				auto iter =
+					remoteMonsters.find(
+						packet->entityId
+					);
 
-				auto iter = remotePlayers.find(movePkt->entityId);
-				if (iter == remotePlayers.end())
+				if (iter == remoteMonsters.end())
 					break;
 
-				GameObject* targetMonster = iter->second;
+				RemoteMonsterScript* script =iter->second
+					->GetComponent<RemoteMonsterScript>();
 
-				if (targetMonster == nullptr) return;
-
-				RemoteMonsterScript* remoteScript =
-					targetMonster->GetComponent<RemoteMonsterScript>();
-
-				if (remoteScript)
+				if (script)
 				{
-					remoteScript->ApplyMove(
-						movePkt->x,
-						movePkt->y,
-						movePkt->z,
-						movePkt->yaw
+					script->ApplyMove(
+						packet->x,
+						packet->y,
+						packet->z,
+						packet->yaw
 					);
 				}
 
@@ -410,39 +441,77 @@ namespace ME
 
 			case ePacketType::S_MONSTER_STATE:
 			{
+				const Pkt_S_MonsterState* packet =
+					reinterpret_cast<const Pkt_S_MonsterState*>(packetData.data());
 
-				Pkt_S_MonsterState* statePkt = reinterpret_cast<Pkt_S_MonsterState*>(packetData.data());
+				auto iter =
+					remoteMonsters.find(
+						packet->entityId
+					);
 
-				auto iter = remotePlayers.find(statePkt->entityId);
-				if (iter == remotePlayers.end())
+				if (iter == remoteMonsters.end())
 					break;
 
-				GameObject* targetMonster = iter->second;
+				RemoteMonsterScript* script =
+					iter->second
+					->GetComponent<RemoteMonsterScript>();
 
-				RemoteMonsterScript* remoteScript =
-					targetMonster->GetComponent<RemoteMonsterScript>();
-
-				if (remoteScript)
+				if (script)
 				{
-					remoteScript->ApplyState(statePkt->state);
+					script->ApplyState(
+						packet->state
+					);
 				}
 
 				break;
 			}
 
+			case ePacketType::S_MONSTER_ATTACK:
+			{
+				const Pkt_S_MonsterAttack* packet =
+					reinterpret_cast<
+					const Pkt_S_MonsterAttack*>(
+						packetData.data()
+						);
+
+				auto iter =
+					remoteMonsters.find(
+						packet->entityId
+					);
+
+				if (iter == remoteMonsters.end())
+					break;
+
+				RemoteMonsterScript* script =
+					iter->second
+					->GetComponent<RemoteMonsterScript>();
+
+				if (script)
+				{
+					script->ApplyAttack(
+						packet->attackIndex,
+						math::Vector3(
+							packet->dir_x,
+							packet->dir_y,
+							packet->dir_z
+						)
+					);
+				}
+
+				break;
+			}
 
 			case ePacketType::S_MONSTER_DESPAWN:
 			{
+				const Pkt_S_MonsterDespawn* packet =
+					reinterpret_cast<
+					const Pkt_S_MonsterDespawn*>(
+						packetData.data()
+						);
 
-				Pkt_S_MonsterDespawn* leavePkt = reinterpret_cast<Pkt_S_MonsterDespawn*>(packetData.data());
-
-				auto iter = remotePlayers.find(leavePkt->entityId);
-
-				if (iter != remotePlayers.end())
-				{
-					object::Destroy(iter->second);
-					remotePlayers.erase(iter);
-				}
+				activeScene->EraseRemoteMonster(
+					packet->entityId
+				);
 
 				break;
 			}

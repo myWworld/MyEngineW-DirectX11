@@ -109,6 +109,35 @@ namespace ME
 		}
 	}
 
+	void Scene::AddRemoteMonster(UINT id, std::unique_ptr<GameObject> monster)
+	{
+		if (!monster)
+			return;
+
+		mRemoteMonsters[id] =
+			monster.get();
+
+		mLayers[static_cast<UINT>(enums::eLayerType::Monster)]->AddGameObject(
+			std::move(monster)
+		);
+	}
+
+	void Scene::EraseRemoteMonster(UINT id)
+	{
+		auto iter =
+			mRemoteMonsters.find(id);
+
+		if (iter == mRemoteMonsters.end())
+			return;
+
+		GameObject* monster =
+			iter->second;
+
+		EraseGameObject(monster);
+
+		mRemoteMonsters.erase(iter);
+	}
+
 	void Scene::EraseGameObject(GameObject* gameObj)
 	{
 		enums::eLayerType layerType = gameObj->GetLayerType();
