@@ -44,12 +44,9 @@ namespace ME
 
 		void WeaponOnOff(bool on) { 
 			
-			if(mOwner)
-				mOwner->SetActive(on); 
-			else
-			{
+			
 				this->GetOwner()->SetActive(on);
-			}
+			
 		}
 
 		virtual void SetOnwer(GameObject* owner)

@@ -134,11 +134,14 @@ namespace ME
 
         WeaponAttackInfo attackInfo = {};
 
+
+        mEquippedWeapon->SetIsAttackEnd(false);
+
+
         // 실제 공격이 시작된 경우에만 패킷 전송
         if (!mEquippedWeapon->Use(attackInfo))
             return;
 
-        mEquippedWeapon->SetIsAttackEnd(false);
         mState = State::Attack;
 
         Vector3 aimDirection = GetAimDirection();

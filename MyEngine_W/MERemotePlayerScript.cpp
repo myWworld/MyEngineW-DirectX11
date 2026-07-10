@@ -106,6 +106,10 @@ namespace ME
             return;
 
         mTransform->SetPosition(x, y, z);
+        
+        Vector3 rot = mTransform->GetRotation();
+        rot.y = yaw;
+        mTransform->SetRotation(rot);
     }
 
 
@@ -143,7 +147,13 @@ namespace ME
         }
         else if (weaponType == eWeaponType::Gun)
         {
+            switch (attackIndex)
+            {
+            case 0:
 
+                mAnimator->PlayAnimation(L"PISTOLWALK", false);
+                break;
+            }
         }
     
     }
@@ -165,34 +175,29 @@ namespace ME
     {
         auto iter = mWeaponMap.find(weaponType);
 
-        if (iter == mWeaponMap.end())
-        {
+        if (iter == mWeaponMap.end() || iter->second == nullptr)
             return;
-        }
 
         WeaponScript* nextWeapon = iter->second;
 
-        if (nextWeapon == nullptr) return;
-
-        if (mCurrentWeapon == nextWeapon) return;
-
-        mCurrentWeaponType = weaponType;
-        
-        if (mCurrentWeapon)
+        for (auto& [type, weapon] : mWeaponMap)
         {
-            mCurrentWeapon->WeaponOnOff(false);
+            if (weapon != nullptr)
+            {
+                weapon->WeaponOnOff(weapon == nextWeapon);
+            }
         }
 
-        mCurrentWeapon = nextWeapon;
-        mCurrentWeapon->WeaponOnOff(true);
-        
+        mEquippedWeapon = nextWeapon;
+        mCurrentWeaponType = weaponType;
+
         if (!mbPlayingAction)
         {
-            ApplyState(mCurrentRemoteState);
+            ApplyState(mCurrentRemoteState, true);
         }
     }
 
-    void RemotePlayerScript::ApplyState(ePlayerState state)
+    void RemotePlayerScript::ApplyState(ePlayerState state, bool forced)
     {
         CacheComponents();
 

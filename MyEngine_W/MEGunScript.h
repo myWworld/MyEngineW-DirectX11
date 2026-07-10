@@ -23,8 +23,8 @@ namespace ME
 		void LateUpdate()override;
 		void Render()override;
 
-		bool Use(WeaponAttackInfo& outAttackInfo) override { Fire(); return true; }
-		void Fire();
+		bool Use(WeaponAttackInfo& outAttackInfo) override;
+		bool Fire();
 
 	private:
 

@@ -95,7 +95,19 @@ namespace ME
 	{
 	}
 
-	void GunScript::Fire()
+	bool GunScript::Use(WeaponAttackInfo& outAttackInfo)
+	{
+
+		if (Fire())
+		{
+			outAttackInfo.attackIndex = 0;
+			return true;
+		}
+
+		return false;
+	}
+
+	bool GunScript::Fire()
 	{
 		if (mbCanShoot)
 		{
@@ -103,9 +115,12 @@ namespace ME
 			mbCanShoot = false;
 			mCoolDownTimer = 0.0f;
 			
+			mbIsAttackEnd = true;
+			return true;
 		}
-		
+
 		mbIsAttackEnd = true;
+		return false;
 	}
 
 	void GunScript::adjustGunPos()

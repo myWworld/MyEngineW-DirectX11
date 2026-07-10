@@ -223,7 +223,7 @@ namespace ME
 				break;
 			}
 
-			case ePacketType::C_ATTACK:
+			case ePacketType::S_ATTACK:
 			{
 				Pkt_S_Attack* attackPkt = reinterpret_cast<Pkt_S_Attack*>(packetData.data());
 
@@ -250,7 +250,7 @@ namespace ME
 				break;
 			}
 
-			case ePacketType::C_WEAPON_CHANGE:
+			case ePacketType::S_WEAPON_CHANGE:
 			{
 				Pkt_S_WeaponChange* weaponChangePkt = reinterpret_cast<Pkt_S_WeaponChange*>(packetData.data());
 

@@ -48,7 +48,8 @@ namespace ME
             float yaw);
 
         void ApplyState(
-            ePlayerState state);
+            ePlayerState state,
+            bool forced = false);
 
         void ApplyAttack(
             eWeaponType weaponType,
