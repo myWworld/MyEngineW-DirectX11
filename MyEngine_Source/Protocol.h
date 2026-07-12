@@ -29,6 +29,9 @@ enum class ePacketType : std::uint16_t
     C_WEAPON_CHANGE = 12,
     S_WEAPON_CHANGE = 13,
 
+    C_Bullet_Spawn = 14,
+    S_Bullet_Spawn = 14,
+
     S_MONSTER_STATE = 20,
     S_MONSTER_SPAWN = 21,
     S_MONSTER_MOVE = 22,

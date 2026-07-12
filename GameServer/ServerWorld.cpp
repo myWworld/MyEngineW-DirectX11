@@ -282,7 +282,7 @@ void ServerWorld::EnsureWorldInitialization()
     if (mbInitialized.load()) return;
 
     mbInitialized.store(true);
-
+    InitializeMonsterAnimationMeta();
     SpawnMonster(eModelType::Mutant, eWeaponType::Gauntlet, { 500.0f, 0.0f, 0.0f }, 0, true);
 
 
@@ -373,9 +373,33 @@ void ServerWorld::Tick(float deltaTime)
         player.attackCooldown = (std::max)(0.0f,player.attackCooldown - deltaTime);
     }
 
-    for (auto& [entityId, monster] : mMonsters)
+    for (auto& [monsterId, monster] : mMonsters)
     {
-        monster.actionRemainingTime = (std::max)( 0.0f,monster.actionRemainingTime - deltaTime);
+        if (monster.actionDuration <= 0.0f)
+            continue;
+
+        monster.actionElapsedTime += deltaTime;
+
+        if (monster.actionElapsedTime >
+            monster.actionDuration)
+        {
+            monster.actionElapsedTime =
+                monster.actionDuration;
+        }
+
+        const float normalizedTime =
+            monster.actionElapsedTime /
+            monster.actionDuration;
+
+        if (!monster.attackHitProcessed &&
+            normalizedTime >=
+            monster.attackHitNormalizedTime)
+        {
+            monster.attackHitProcessed = true;
+
+            // 이후 데미지 판정
+            // ResolveMonsterMeleeAttack(monster);
+        }
     }
 
     UpdateMonsters(deltaTime);
@@ -624,18 +648,15 @@ void ServerWorld::UpdateMonsters(float deltaTime)
         if (!monster.alive &&
             monster.state != eMonsterState::DEATH)
         {
-            auto brainIter =
-                mMonsterBrains.find(monsterId);
+            auto brainIter = mMonsterBrains.find(monsterId);
 
             if (brainIter != mMonsterBrains.end())
             {
-                brainIter->second
-                    ->SendFSMEvent("DEATH");
+                brainIter->second->SendFSMEvent("DEATH");
             }
         }
 
-        auto brainIter =
-            mMonsterBrains.find(monsterId);
+        auto brainIter = mMonsterBrains.find(monsterId);
 
         if (brainIter == mMonsterBrains.end())
             continue;
@@ -717,14 +738,10 @@ EntityId ServerWorld::SpawnMonster(
     if (!inserted)
         return 0;
 
-    auto brain =
-        std::make_unique<ME::FSMBrainCore>();
+    auto brain = std::make_unique<ME::FSMBrainCore>();
 
     const bool fsmLoaded =
-        ME::FSMFactory::MakeFSMWithJsonFile(
-            brain.get(),
-            "..\\Resources\\EnemyFSMJson.json"
-        );
+        ME::FSMFactory::MakeFSMWithJsonFile(brain.get(),"..\\Resources\\EnemyFSMJson.json");
 
     if (!fsmLoaded)
     {
@@ -791,8 +808,7 @@ EntityId ServerWorld::FindClosestAlivePlayer(
                 player.position
             );
 
-        if (distanceSquared >
-            closestDistanceSquared)
+        if (distanceSquared > closestDistanceSquared)
         {
             continue;
         }
@@ -871,11 +887,9 @@ bool ServerWorld::MoveMonsterToward(
     float stoppingDistance,
     float deltaTime)
 {
-    float dx =
-        target.x - monster.position.x;
+    float dx = target.x - monster.position.x;
 
-    float dz =
-        target.z - monster.position.z;
+    float dz = target.z - monster.position.z;
 
     const float distanceSquared =
         dx * dx + dz * dz;
@@ -963,10 +977,7 @@ void ServerWorld::ApplyMonsterAnimation(
 
     if (!loop)
     {
-        monster.actionRemainingTime =
-            GetMonsterAnimationDuration(
-                animationName
-            );
+       // monster.actionRemainingTime = GetMonsterAnimationDuration(animationName);
     }
 }
 
@@ -990,12 +1001,25 @@ float ServerWorld::GetMonsterAnimationDuration(const std::string& animationName)
     return 0.0f;
 }
 
+const AnimationActionMeta* ServerWorld::FindMonsterAnimationMeta(const std::string& animationName) const
+{
+    auto iter =
+        mMonsterAnimationMeta.find(
+            animationName
+        );
+
+    if (iter == mMonsterAnimationMeta.end())
+        return nullptr;
+
+    return &iter->second;
+}
+
 void ServerWorld::BeginMonsterMeleeAttack(ServerMonster& monster, const std::vector<std::string>& animationNames)
 {
     if (animationNames.empty())
         return;
 
-    const ServerPlayer* target = //서버 내에 존재하는 플레이어 중 가장 가까운 플레이어 찾기
+    const ServerPlayer* target =
         FindAlivePlayer(
             monster.targetPlayerId
         );
@@ -1007,22 +1031,48 @@ void ServerWorld::BeginMonsterMeleeAttack(ServerMonster& monster, const std::vec
         distribution(
             0,
             animationNames.size() - 1
-        ); //랜덤 공격 재생
+        );
 
-    const std::size_t index = distribution(mRandomEngine);
+    const std::size_t attackIndex =
+        distribution(mRandomEngine);
 
-    const std::string& animationName = animationNames[index];
+    const std::string& animationName =
+        animationNames[attackIndex];
 
-    monster.attackIndex = static_cast<std::uint8_t>(index);
+    const AnimationActionMeta* animationMeta =
+        FindMonsterAnimationMeta(
+            animationName
+        );
+
+    if (animationMeta == nullptr ||
+        animationMeta->duration <= 0.0f)
+    {
+        std::cerr
+            << "[Monster FSM] 애니메이션 메타데이터 없음: "
+            << animationName
+            << '\n';
+
+        return;
+    }
+
+    monster.attackIndex = static_cast<std::uint8_t>(attackIndex);
 
     monster.attackTargetId = target->entityId;
 
-    monster.state =
-        index == 0
-        ? eMonsterState::ATTACK_1
-        : index == 1
-        ? eMonsterState::ATTACK_2
-        : eMonsterState::ATTACK_3;
+    monster.currentActionAnimation = animationName;
+
+    monster.actionElapsedTime = 0.0f;
+
+    monster.actionDuration = animationMeta->duration;
+
+    monster.attackHitNormalizedTime =
+        animationMeta->hitNormalizedTime;
+
+    monster.attackHitProcessed =
+        false;
+
+
+    monster.state = attackIndex == 0 ? eMonsterState::ATTACK_1: attackIndex == 1 ? eMonsterState::ATTACK_2 : eMonsterState::ATTACK_3;
 
     float dirX =
         target->position.x -
@@ -1058,7 +1108,7 @@ void ServerWorld::BeginMonsterMeleeAttack(ServerMonster& monster, const std::vec
         dirZ
     };
 
-    monster.actionRemainingTime = GetMonsterAnimationDuration( animationName);
+ //   monster.actionRemainingTime = GetMonsterAnimationDuration( animationName);
 
     monster.attackEventPending = true;
 
@@ -1079,9 +1129,7 @@ void ServerWorld::FlushMonsterReplication(float deltaTime) //몬스터 이동, 공격때
         if (monster.stateDirty) //상태 변경이 있는지
         {
             const Pkt_S_MonsterState packet =
-                MakeMonsterStatePacket(
-                    monster
-                );
+                MakeMonsterStatePacket(monster);
 
             BroadcastExcept(0, packet);
 
@@ -1091,9 +1139,7 @@ void ServerWorld::FlushMonsterReplication(float deltaTime) //몬스터 이동, 공격때
         if (monster.attackEventPending) //공격 이벤트가 발생했는지
         {
             const Pkt_S_MonsterAttack packet =
-                MakeMonsterAttackPacket(
-                    monster
-                );
+                MakeMonsterAttackPacket(monster);
 
             BroadcastExcept(0, packet);
 
@@ -1105,9 +1151,7 @@ void ServerWorld::FlushMonsterReplication(float deltaTime) //몬스터 이동, 공격때
             >= MoveSendInterval) //움직임이 있는지
         {
             const Pkt_S_MonsterMove packet =
-                MakeMonsterMovePacket(
-                    monster
-                );
+                MakeMonsterMovePacket( monster );
 
             BroadcastExcept(0, packet);
 
@@ -1126,9 +1170,7 @@ void ServerWorld::DespawnRequestedMonsters()
     {
         if (monster.destroyRequested)
         {
-            destroyIds.push_back(
-                monsterId
-            );
+            destroyIds.push_back(monsterId);
         }
     }
 
@@ -1142,4 +1184,37 @@ void ServerWorld::DespawnRequestedMonsters()
         mMonsterBrains.erase(monsterId);
         mMonsters.erase(monsterId);
     }
+}
+
+void ServerWorld::InitializeMonsterAnimationMeta()
+{
+    mMonsterAnimationMeta["MONSTER_ATTACK"] =
+    {
+        1.1f,
+        0.2f
+    };
+
+    mMonsterAnimationMeta["MONSTER_ATTACK2"] =
+    {
+        4.63f,
+        0.42f
+    };
+
+    mMonsterAnimationMeta["MONSTER_ATTACK3"] =
+    {
+        3.7f,
+        0.30f
+    };
+
+    mMonsterAnimationMeta["MONSTER_HIT"] =
+    {
+        2.73f,
+        0.0f
+    };
+
+    mMonsterAnimationMeta["MONSTER_DEATH"] =
+    {
+        4.6f,
+        0.0f
+    };
 }

@@ -23,31 +23,22 @@ bool ServerMonsterFSMContext::DetectTarget(
     float radius)
 {
     const EntityId targetId =
-        mWorld.FindClosestAlivePlayer(
-            mMonster.position,
-            radius
-        );
+        mWorld.FindClosestAlivePlayer(mMonster.position, radius);
 
-    mMonster.targetPlayerId =
-        targetId;
+    mMonster.targetPlayerId = targetId;
 
     return targetId != 0;
 }
 
 bool ServerMonsterFSMContext::HasTarget() const
 {
-    return mWorld.FindAlivePlayer(
-        mMonster.targetPlayerId
-    ) != nullptr;
+    return mWorld.FindAlivePlayer(mMonster.targetPlayerId) != nullptr;
 }
 
-float ServerMonsterFSMContext::
-GetTargetDistanceSquared() const
+float ServerMonsterFSMContext::GetTargetDistanceSquared() const
 {
     const ServerPlayer* target =
-        mWorld.FindAlivePlayer(
-            mMonster.targetPlayerId
-        );
+        mWorld.FindAlivePlayer(mMonster.targetPlayerId);
 
     if (target == nullptr)
     {
@@ -60,8 +51,7 @@ GetTargetDistanceSquared() const
     );
 }
 
-void ServerMonsterFSMContext::
-SelectRandomPatrolTarget(float radius)
+void ServerMonsterFSMContext::SelectRandomPatrolTarget(float radius)
 {
     mWorld.SelectRandomPatrolTarget(
         mMonster,
@@ -69,8 +59,7 @@ SelectRandomPatrolTarget(float radius)
     );
 }
 
-bool ServerMonsterFSMContext::
-MoveToPatrolTarget(
+bool ServerMonsterFSMContext::MoveToPatrolTarget(
     float speed,
     float stoppingDistance)
 {
@@ -90,10 +79,7 @@ bool ServerMonsterFSMContext::MoveToTarget(
     float speed,
     float stoppingDistance)
 {
-    const ServerPlayer* target =
-        mWorld.FindAlivePlayer(
-            mMonster.targetPlayerId
-        );
+    const ServerPlayer* target = mWorld.FindAlivePlayer(mMonster.targetPlayerId);
 
     if (target == nullptr)
     {
@@ -121,15 +107,15 @@ void ServerMonsterFSMContext::PlayAnimation(
     );
 }
 
-bool ServerMonsterFSMContext::
-IsAnimationFinished() const
+bool ServerMonsterFSMContext::IsAnimationFinished() const
 {
-    return mMonster.actionRemainingTime
-        <= 0.0f;
+    if (mMonster.actionDuration <= 0.0f)
+        return true;
+
+    return mMonster.actionElapsedTime >= mMonster.actionDuration;
 }
 
-void ServerMonsterFSMContext::
-BeginMeleeAttack(
+void ServerMonsterFSMContext::BeginMeleeAttack(
     const std::vector<std::string>& animationNames)
 {
     mWorld.BeginMonsterMeleeAttack(

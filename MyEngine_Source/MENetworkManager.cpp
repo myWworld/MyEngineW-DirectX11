@@ -444,10 +444,7 @@ namespace ME
 				const Pkt_S_MonsterState* packet =
 					reinterpret_cast<const Pkt_S_MonsterState*>(packetData.data());
 
-				auto iter =
-					remoteMonsters.find(
-						packet->entityId
-					);
+				auto iter = remoteMonsters.find(packet->entityId);
 
 				if (iter == remoteMonsters.end())
 					break;
@@ -469,22 +466,15 @@ namespace ME
 			case ePacketType::S_MONSTER_ATTACK:
 			{
 				const Pkt_S_MonsterAttack* packet =
-					reinterpret_cast<
-					const Pkt_S_MonsterAttack*>(
-						packetData.data()
-						);
+					reinterpret_cast<const Pkt_S_MonsterAttack*>(packetData.data());
 
-				auto iter =
-					remoteMonsters.find(
-						packet->entityId
-					);
+				auto iter = remoteMonsters.find(packet->entityId);
 
 				if (iter == remoteMonsters.end())
 					break;
 
 				RemoteMonsterScript* script =
-					iter->second
-					->GetComponent<RemoteMonsterScript>();
+					iter->second->GetComponent<RemoteMonsterScript>();
 
 				if (script)
 				{
@@ -504,10 +494,7 @@ namespace ME
 			case ePacketType::S_MONSTER_DESPAWN:
 			{
 				const Pkt_S_MonsterDespawn* packet =
-					reinterpret_cast<
-					const Pkt_S_MonsterDespawn*>(
-						packetData.data()
-						);
+					reinterpret_cast<const Pkt_S_MonsterDespawn*>(packetData.data());
 
 				activeScene->EraseRemoteMonster(
 					packet->entityId

@@ -12,6 +12,12 @@ struct ServerVec3
     float z = 0.0f;
 };
 
+struct AnimationActionMeta
+{
+    float duration = 0.0f;
+    float hitNormalizedTime = 0.0f;
+};
+
 struct ServerPlayer
 {
     EntityId entityId = 0;
@@ -67,8 +73,13 @@ struct ServerMonster
     ServerVec3 patrolTarget;
     bool hasPatrolTarget = false;
 
-    // non-loop 애니메이션 서버 타이머
-    float actionRemainingTime = 0.0f;
+    std::string currentActionAnimation;
+
+    float actionElapsedTime = 0.0f;
+    float actionDuration = 0.0f;
+
+    float attackHitNormalizedTime = 0.35f;
+    bool attackHitProcessed = false;
 
     // 복제
     bool transformDirty = false;

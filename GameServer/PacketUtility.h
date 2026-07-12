@@ -10,6 +10,8 @@
 #include <mutex>
 #include <unordered_map>
 
+#pragma comment(lib, "Ws2_32.lib")
+
 struct ClientSession
 {
     SOCKET socket = INVALID_SOCKET;

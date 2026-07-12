@@ -150,6 +150,8 @@ private:
         ServerMonster& monster,
         const std::vector<std::string>& animationNames);
 
+    const AnimationActionMeta* FindMonsterAnimationMeta(const std::string& animationName) const;
+
     float GetMonsterAnimationDuration(
         const std::string& animationName) const;
 
@@ -158,10 +160,14 @@ private:
 
     void DespawnRequestedMonsters();
 
+    void InitializeMonsterAnimationMeta();
+
 private:
 
 
     std::unordered_map<EntityId,std::unique_ptr<ME::FSMBrainCore>>  mMonsterBrains;
+
+    std::unordered_map<std::string,AnimationActionMeta> mMonsterAnimationMeta;
 
     std::mt19937 mRandomEngine
     {

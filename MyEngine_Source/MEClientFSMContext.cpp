@@ -220,17 +220,13 @@ namespace ME
         if (mAnimator->GetActiveAnimation()
             != targetAnimation)
         {
-            mAnimator->PlayAnimation(
-                wideName,
-                loop
-            );
+            mAnimator->PlayAnimation(wideName, loop);
         }
     }
 
     bool ClientFSMContext::IsAnimationFinished() const
     {
-        return mAnimator != nullptr &&
-            mAnimator->IsAnimationComplete();
+        return mAnimator != nullptr &&  mAnimator->IsAnimationComplete();
     }
 
     void ClientFSMContext::BeginMeleeAttack(
@@ -240,15 +236,10 @@ namespace ME
             return;
 
         std::uniform_int_distribution<std::size_t>
-            distribution(
-                0,
-                animationNames.size() - 1
-            );
+            distribution(0, animationNames.size() - 1);
 
         const std::string& animationName =
-            animationNames[
-                distribution(GetRandomEngine())
-            ];
+            animationNames[distribution(GetRandomEngine())];
 
         PlayAnimation(
             animationName,
@@ -332,9 +323,7 @@ namespace ME
         currentPosition +=
             direction * speed * mDeltaTime;
 
-        mOwnerTransform->SetPosition(
-            currentPosition
-        );
+        mOwnerTransform->SetPosition(currentPosition);
 
         return true;
     }
