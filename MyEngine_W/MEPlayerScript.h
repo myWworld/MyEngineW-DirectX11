@@ -83,7 +83,10 @@ namespace ME
 			mEquippedWeapon = weapon;
 		}
 
-
+		void ApplyServerDamage(
+			float remainingHp,
+			bool isDead,
+			const Vector3& hitPosition);
 
 	private:
 

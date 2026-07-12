@@ -395,6 +395,44 @@ namespace ME
         return renderer::mainCamera->GetForward();
     }
 
+    void PlayerScript::ApplyServerDamage(
+        float remainingHp,
+        bool isDead,
+        const Vector3& hitPosition)
+    {
+        SetCurrentHP(remainingHp);
+
+        if (isDead)
+        {
+            if (mState != State::Death)
+            {
+                OnDeath();
+            }
+
+            return;
+        }
+
+        if (mState == State::Death)
+            return;
+
+        mState = State::Hit;
+
+        if (mEquippedWeapon)
+        {
+            mEquippedWeapon->SetIsAttackEnd(true);
+        }
+
+        if (mAnimator &&
+            (mAnimator->GetActiveAnimation() == nullptr ||
+                mAnimator->GetActiveAnimation()->GetName() != L"SWORDHIT"))
+        {
+            mAnimator->PlayAnimation(
+                L"SWORDHIT",
+                false
+            );
+        }
+    }
+
     void PlayerScript::OnDeath()
     {
         mAnimator->PlayAnimation(L"SWORDADEATH",false);
@@ -403,6 +441,11 @@ namespace ME
 
     void PlayerScript::OnCollisionEnter(Collider* other)
     {
+        if (NetworkManager::IsConnected())
+        {
+            return;
+        }
+
         if (mState == State::Death)
         {
             return;

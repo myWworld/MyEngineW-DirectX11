@@ -32,7 +32,7 @@
     { "key": "SWORDWALK",   "path": "..\\Resources\\Animation\\great sword walk.fbx" },
      { "key": "FORWARDWALK", "path": "..\\Resources\\Animation\\ForwardWalk.fbx" },
 
-        { "key": "MONSTER_HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
+    { "key": "MONSTER_HIT",         "path": "..\\Resources\\Animation\\HitReaction.fbx" },
     { "key": "MONSTER_ATTACK",   "path": "..\\Resources\\Animation\\mutant punch.fbx" },
     { "key": "MONSTER_ATTACK2",   "path": "..\\Resources\\Animation\\mutant attack2.fbx" },
     { "key": "MONSTER_ATTACK3",   "path": "..\\Resources\\Animation\\mutant jump attack.fbx" },

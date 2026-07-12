@@ -56,6 +56,13 @@ enum class eAttackType : std::uint32_t
     ATTACK_3 = 3,
 };
 
+enum class eDamageCause : std::uint8_t
+{
+    Projectile = 0,
+    PlayerMelee = 1,
+    MonsterMelee = 2,
+};
+
 enum class eMonsterState : std::uint32_t
 {
     IDLE = 0,
@@ -227,6 +234,29 @@ struct Pkt_S_Attack
     float dir_z;
 };
 
+struct Pkt_S_Damage
+{
+    PacketHeader header;
+
+    eDamageCause cause =
+        eDamageCause::Projectile;
+
+    // 근접 공격이면 0
+    ProjectileId projectileId = 0;
+
+    EntityId attackerId = 0;
+    EntityId victimId = 0;
+
+    float damage = 0.0f;
+    float remainingHp = 0.0f;
+
+    std::uint8_t isDead = 0;
+
+    float hit_x = 0.0f;
+    float hit_y = 0.0f;
+    float hit_z = 0.0f;
+};
+
 
 // 서버 -> 클라이언트: 몇 번 플레이어가 나감
 struct Pkt_S_Leave
@@ -325,14 +355,16 @@ struct Pkt_S_ProjectileEnd
 
     ProjectileId projectileId;
 
-    eProjectileEndReason reason;
+    eProjectileEndReason reason =
+        eProjectileEndReason::Expired;
 
     // 맞은 대상이 없다면 0
-    EntityId hitEntityId;
+    EntityId hitEntityId = 0;
 
-    float end_x;
-    float end_y;
-    float end_z;
+
+    float end_x = 0.0f;
+    float end_y = 0.0f;
+    float end_z = 0.0f;
 };
 
 #pragma pack(pop)

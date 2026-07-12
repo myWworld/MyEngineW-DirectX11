@@ -315,6 +315,29 @@ namespace ME
         mbHasPlayedState = true;
     }
 
+    void RemoteMonsterScript::ApplyServerDamage(
+            float remainingHp,
+            bool isDead,
+            const Vector3& hitPosition)
+    {
+        SetCurrentHP(remainingHp);
+
+        if (isDead)
+        {
+            ApplyState(
+                eMonsterState::DEATH,
+                true
+            );
+
+            return;
+        }
+
+        ApplyState(
+            eMonsterState::HIT,
+            true
+        );
+    }
+
     void RemoteMonsterScript::CacheComponents()
     {
         if (mAnimator == nullptr)
@@ -357,4 +380,5 @@ namespace ME
                 skeleton->GetRightHandTransform();
         }
     }
+
 }

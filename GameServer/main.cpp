@@ -4,143 +4,361 @@
 #include "ServerWorld.h"
 #include "PacketUtility.h"
 
+#include <array>
+#include <cstring>
+#include <iostream>
+#include <vector>
 
-
-
-void HandleClient(SOCKET clientSocket, EntityId clientId, ServerWorld& world)
+namespace
 {
-	char buffer[1024]; //패킷을 임시로 받을 바구니 -> 1바이트로 직렬화 했기 때문
+	constexpr std::uint16_t MaxPacketSize =
+		4096;
 
-	while (true)
+	template <typename T>
+	bool DecodePacket(
+		const std::vector<char>& packetData,
+		ePacketType expectedType,
+		T& outPacket)
 	{
-		int recvBytes = recv(clientSocket, buffer, sizeof(buffer), 0); //recv: 데이터가 올 때까지 여기서 멈춤 (블로킹)
-		
-		if (recvBytes <= 0)
-		{
-			std::cout << "[연결 종료] 클라이언트가 나갔습니다. playerId: "
-				<< clientId << " / socket: " << clientSocket << std::endl;
+		if (packetData.size() != sizeof(T))
+			return false;
 
-			break;
+		std::memcpy(
+			&outPacket,
+			packetData.data(),
+			sizeof(T)
+		);
+
+		return outPacket.header.type ==
+			expectedType &&
+			outPacket.header.size ==
+			sizeof(T);
+	}
+
+	bool DispatchClientPacket(
+		EntityId clientId,
+		const std::vector<char>& packetData,
+		ServerWorld& world)
+	{
+		if (packetData.size() <sizeof(PacketHeader))
+		{
+			return false;
 		}
 
-		PacketHeader* header = reinterpret_cast<PacketHeader*>(buffer);
+		PacketHeader header = {};
 
-		switch (header->type)
+		std::memcpy(
+			&header,
+			packetData.data(),
+			sizeof(PacketHeader)
+		);
+
+		switch (header.type)
 		{
 		case ePacketType::C_ENTER:
 		{
-			const Pkt_C_Enter* packet =
-				reinterpret_cast<const Pkt_C_Enter*>(buffer);
+			Pkt_C_Enter packet = {};
+
+			if (!DecodePacket(
+				packetData,
+				ePacketType::C_ENTER,
+				packet))
+			{
+				return false;
+			}
 
 			EnterCommand command = {};
 
-			command.entityId = clientId;
-			command.modelType = packet->modelType;
-			command.weaponType = packet->weaponType;
+			command.entityId =
+				clientId;
+
+			command.modelType =
+				packet.modelType;
+
+			command.weaponType =
+				packet.weaponType;
 
 			command.position =
 			{
-				packet->x,
-				packet->y,
-				packet->z
+				packet.x,
+				packet.y,
+				packet.z
 			};
 
-			command.yaw = packet->yaw;
+			command.yaw =
+				packet.yaw;
 
-			world.EnqueueCommand(command);
-			break;
+			world.EnqueueCommand(
+				command
+			);
+
+			return true;
 		}
 
 		case ePacketType::C_MOVE:
 		{
-			Pkt_C_Move* packet = reinterpret_cast<Pkt_C_Move*>(buffer);
+			Pkt_C_Move packet = {};
+
+			if (!DecodePacket(
+				packetData,
+				ePacketType::C_MOVE,
+				packet))
+			{
+				return false;
+			}
 
 			MoveCommand command = {};
 
-			command.entityId = clientId;
+			command.entityId =
+				clientId;
+
 			command.position =
 			{
-				packet->x,
-				packet->y,
-				packet->z
+				packet.x,
+				packet.y,
+				packet.z
 			};
 
-			command.yaw = packet->yaw;
+			command.yaw =
+				packet.yaw;
 
-			world.EnqueueCommand(command);
-			break;
+			world.EnqueueCommand(
+				command
+			);
+
+			return true;
 		}
 
 		case ePacketType::C_STATE:
 		{
-			Pkt_C_State* packet = reinterpret_cast<Pkt_C_State*>(buffer);
-			
+			Pkt_C_State packet = {};
+
+			if (!DecodePacket(
+				packetData,
+				ePacketType::C_STATE,
+				packet))
+			{
+				return false;
+			}
+
 			StateCommand command = {};
 
-			command.entityId = clientId;
-			command.state = packet->state;
+			command.entityId =
+				clientId;
 
-			world.EnqueueCommand(command);
-			break;
-		}
+			command.state =
+				packet.state;
 
-		case ePacketType::C_ATTACK:
-		{
-			Pkt_C_Attack* packet = reinterpret_cast<Pkt_C_Attack*>(buffer);
-			
-			AttackCommand command = {};
+			world.EnqueueCommand(
+				command
+			);
 
-			command.entityId = clientId;
-
-			command.origin =
-			{
-				packet->origin_x,
-				packet->origin_y,
-				packet->origin_z
-			};
-
-			command.direction =
-			{
-				packet->dir_x,
-				packet->dir_y,
-				packet->dir_z
-			};
-
-			command.attackIndex = packet->attackIndex;
-
-			world.EnqueueCommand(command);
-			break;
+			return true;
 		}
 
 		case ePacketType::C_WEAPON_CHANGE:
 		{
-			Pkt_C_WeaponChange* packet = reinterpret_cast<Pkt_C_WeaponChange*>(buffer);
-			
-			WeaponChangeCommand command= {};
+			Pkt_C_WeaponChange packet = {};
 
-			command.entityId = clientId;
-			command.weaponType = packet->weaponType;
+			if (!DecodePacket(
+				packetData,
+				ePacketType::C_WEAPON_CHANGE,
+				packet))
+			{
+				return false;
+			}
 
-			world.EnqueueCommand(command);
-			break;
+			WeaponChangeCommand command = {};
+
+			command.entityId =
+				clientId;
+
+			command.weaponType =
+				packet.weaponType;
+
+			world.EnqueueCommand(
+				command
+			);
+
+			return true;
+		}
+
+		case ePacketType::C_ATTACK:
+		{
+			Pkt_C_Attack packet = {};
+
+			if (!DecodePacket(
+				packetData,
+				ePacketType::C_ATTACK,
+				packet))
+			{
+				return false;
+			}
+
+			AttackCommand command = {};
+
+			command.entityId =
+				clientId;
+
+			command.attackIndex =
+				packet.attackIndex;
+
+			command.origin =
+			{
+				packet.origin_x,
+				packet.origin_y,
+				packet.origin_z
+			};
+
+			command.direction =
+			{
+				packet.dir_x,
+				packet.dir_y,
+				packet.dir_z
+			};
+
+			world.EnqueueCommand(
+				command
+			);
+
+			return true;
 		}
 
 		default:
-			std::cout << "[경고] 알 수 없는 패킷 type: "
-				<< static_cast<int>(header->type) << std::endl;
+			std::cout
+				<< "[Protocol] 알 수 없는 클라이언트 패킷: "
+				<< static_cast<int>(header.type)
+				<< '\n';
+
+			return false;
+		}
+	}
+}
+
+void HandleClient(
+	SOCKET clientSocket,
+	EntityId clientId,
+	ServerWorld& world)
+{
+	std::array<char, 4096>
+		receiveBuffer = {};
+
+	std::vector<char> pendingBuffer;
+	pendingBuffer.reserve(8192); //메모리는 8192바이트 정도 확보했지만, 벡터 안에 유효한 원소는 아직 0
+
+	bool protocolError = false;
+
+	while (!protocolError)
+	{
+		const int receivedBytes =
+			recv(clientSocket,
+				receiveBuffer.data(),
+				static_cast<int>(receiveBuffer.size()),
+				0
+			);
+
+		if (receivedBytes <= 0)
+		{
 			break;
 		}
 
-	
+		pendingBuffer.insert(
+			pendingBuffer.end(),//end를 해도 사실상 유효한 원소 없으면 처음부터 시작하는거랑 같다
+			receiveBuffer.data(),
+			receiveBuffer.data() + receivedBytes
+		);
+
+		std::size_t consumedBytes = 0;
+
+		while (true)
+		{
+			const std::size_t remainingBytes =
+				pendingBuffer.size() -
+				consumedBytes;
+
+			if (remainingBytes < sizeof(PacketHeader))
+			{
+				break;
+			}
+
+			PacketHeader header = {};
+
+			std::memcpy(
+				&header,
+				pendingBuffer.data() + consumedBytes,
+				sizeof(PacketHeader)
+			);
+
+			if (header.size < sizeof(PacketHeader) ||
+				header.size > MaxPacketSize)
+			{
+				std::cout
+					<< "[Protocol] 잘못된 패킷 크기: "
+					<< header.size
+					<< '\n';
+
+				protocolError = true;
+				break;
+			}
+
+			if (remainingBytes <
+				header.size)
+			{
+				// 다음 recv까지 대기
+				break;
+			}
+
+			std::vector<char> packetData(
+				pendingBuffer.begin() +
+				consumedBytes,
+
+				pendingBuffer.begin() +
+				consumedBytes +
+				header.size
+			);
+
+			if (!DispatchClientPacket(
+				clientId,
+				packetData,
+				world))
+			{
+				protocolError = true;
+				break;
+			}
+
+			consumedBytes += header.size;
+		}
+
+		if (consumedBytes > 0)
+		{
+			pendingBuffer.erase(
+				pendingBuffer.begin(),
+				pendingBuffer.begin() +
+				consumedBytes
+			);
+		}
 	}
 
-	MarkSessionEntered(clientId, false);    // 이후 브로드캐스트 대상에서 즉시 제외
+	MarkSessionEntered(
+		clientId,
+		false
+	);
 
-	closesocket(clientSocket);
-	RemoveSession(clientId);
+	shutdown(
+		clientSocket,
+		SD_BOTH
+	);
+
+	closesocket(
+		clientSocket
+	);
+
+	RemoveSession(
+		clientId
+	);
 
 	world.EnqueueCommand(
-		LeaveCommand{ clientId } //->서버 월드쪽 클라이언 세션 보관에서 제거해야함
+		LeaveCommand{ clientId }
 	);
 }
 

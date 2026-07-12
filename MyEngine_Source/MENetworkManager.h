@@ -2,50 +2,62 @@
 
 #include "CommonInclude.h"
 #include "../MyEngine_Source/Protocol.h"
+#include <atomic>
+#include <mutex>
 
 namespace ME
 {
+    class NetworkManager
+    {
+    public:
+        static bool Initialize();
+        static void Update();
+        static void Release();
 
-	class NetworkManager
-	{
-	public:
-		static bool Initialize();
-		static void Update();
-		static void Release();
+        static bool IsConnected()
+        {
+            return mbIsConnected.load();
+        }
 
-		static SOCKET GetSocket() { return mClientSocket; }
-		
-		template<typename T>
-		static void SendPacket(T* packet)
-		{
-			if (mClientSocket != INVALID_SOCKET)
-			{
-				// 보내려는 패킷의 진짜 구조체 크기
-				int packetSize = sizeof(T);
+        template <typename T>
+        static bool SendPacket(T* packet)
+        {
+            if (packet == nullptr)
+                return false;
 
-				packet->header.size = packetSize;
-				send(mClientSocket, (char*)packet, sizeof(T), 0);
+            std::lock_guard<std::mutex> lock(mSendMutex);
 
-			}
-		}
+            if (!mbIsConnected.load() ||
+                mClientSocket ==
+                INVALID_SOCKET)
+            {
+                return false;
+            }
 
-		static bool IsHost() { return mbIsHost; }
+            packet->header.size =
+                static_cast<std::uint16_t>(sizeof(T));
 
-		static UINT GetMyEntityId() { return mMyEntityId; }
+            return SendAll(reinterpret_cast<const char*>(packet), static_cast<int>(sizeof(T)));
+        }
 
-	private:
+    private:
+        static bool SendAll(const char* data, int size);
 
-		static void RecvThread();
+        static void RecvThread();
 
-		static SOCKET mClientSocket;
-		static EntityId mMyEntityId;
-		static std::thread mRecvThread; // 스레드 객체
-		static bool mbIsConnected;       // 스레드 종료를 위한 플래그
+    private:
+        static SOCKET mClientSocket;
 
-		static std::queue<std::vector<char>> mPacketQueue;
-		static std::mutex mPacketMutex;
+        static std::thread mRecvThread;
 
-		static bool mbIsHost;
-	};
+        static std::atomic_bool mbIsConnected;
+
+        static std::queue<std::vector<char>> mPacketQueue;
+
+        static std::mutex mPacketMutex;
+        static std::mutex mSendMutex;
+
+        static EntityId mMyEntityId;
+        static bool mbIsHost;
+    };
 }
-

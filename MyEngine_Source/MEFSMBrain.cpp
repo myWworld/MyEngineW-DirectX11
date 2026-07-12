@@ -29,12 +29,10 @@ namespace ME
 
         // 온라인 원격 몬스터는 FSMBrain 자체를 붙이지 않는다.
         // 기존 Host/오프라인 몬스터만 이 Wrapper를 실행한다.
-        if (!NetworkManager::IsHost())
+        if (!NetworkManager::IsConnected())
             return;
 
-        mContext->SetDeltaTime(
-            Time::DeltaTime()
-        );
+        mContext->SetDeltaTime(Time::DeltaTime());
 
         mCore.Update(*mContext);
     }

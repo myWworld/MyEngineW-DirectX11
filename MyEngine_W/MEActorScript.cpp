@@ -123,5 +123,24 @@ namespace ME
 		}
 	}
 
+	void ActorScript::SetCurrentHP(float hp)
+	{
+		mHp = (std::clamp)(
+				hp,
+				0.0f,
+				mMaxHP
+				);
+
+		if (mHp <= 0.0f &&
+			mHpBar != nullptr)
+		{
+			UIManager::RemoveAttachedUI(
+				mHpBar
+			);
+
+			mHpBar = nullptr;
+		}
+	}
+
 
 }

@@ -62,6 +62,11 @@ namespace ME
             std::uint8_t attackIndex,
             const Vector3& direction);
 
+        void ApplyServerDamage(
+            float remainingHp,
+            bool isDead,
+            const Vector3& hitPosition);
+
     private:
         void CacheComponents();
         void CacheBones();

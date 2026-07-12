@@ -111,6 +111,8 @@ namespace ME
 			MakeCharacter(mPlayer, L"CharacterModel");
 			mPlayer->AddComponent<PlayerScript>();
 
+			SetLocalPlayer(mPlayer);
+
 			MakeWeapon(mPlayer, L"PistolModel",L"LeftHand", 5.0f);
 			MakeWeapon(mPlayer, L"SwordModel", L"LeftHand", 15.0f);
 		
@@ -158,6 +160,8 @@ namespace ME
 
 	void TitleScene::OnExit()
 	{
+
+		SetLocalPlayer(nullptr);
 		if (mPlayer)
 		{
 			object::Destroy(mPlayer);

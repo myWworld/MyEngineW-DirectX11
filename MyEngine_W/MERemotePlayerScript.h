@@ -59,6 +59,11 @@ namespace ME
         void ApplyWeaponChange(
             eWeaponType weaponType);
 
+        void ApplyServerDamage(
+            float remainingHp,
+            bool isDead,
+            const Vector3& hitPosition);
+
 
     private:
         void CacheComponents();

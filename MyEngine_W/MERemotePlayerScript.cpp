@@ -238,6 +238,48 @@ namespace ME
         }
     }
 
+    void RemotePlayerScript::ApplyServerDamage(
+        float remainingHp,
+        bool isDead,
+        const Vector3& hitPosition)
+    {
+        SetCurrentHP(remainingHp);
+
+        if (isDead)
+        {
+            if (mCurrentRemoteState != ePlayerState::DEATH)
+            {
+                OnDeath();
+            }
+
+            return;
+        }
+
+        if (mCurrentRemoteState == ePlayerState::DEATH)
+            return;
+
+        mCurrentRemoteState = ePlayerState::HIT;
+
+        if (mEquippedWeapon)
+        {
+            mEquippedWeapon
+                ->SetIsAttackEnd(true);
+        }
+
+        if (mAnimator &&
+            (mAnimator->GetActiveAnimation() ==
+                nullptr ||
+                mAnimator->GetActiveAnimation()
+                ->GetName() != L"SWORDHIT"))
+        {
+            mAnimator->PlayAnimation(
+                L"SWORDHIT",
+                false
+            );
+        }
+    }
+  
+
     void RemotePlayerScript::CacheComponents()
     {
         if (mAnimator == nullptr)

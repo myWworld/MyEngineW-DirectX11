@@ -53,6 +53,7 @@ namespace ME
 		void SetHP(float damage);
 
 		void SetMaxHP(float maxHp) { mMaxHP = maxHp; }
+		void SetCurrentHP(float hp);;
 		float GetMaxHp() { return mMaxHP; }
 
 		Animator3D* GetAnimator() { return mAnimator; }

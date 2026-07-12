@@ -113,18 +113,62 @@ private:
 
     void UpdateMonsters(float deltaTime);
 
+    void UpdateProjectiles(float deltaTime);
 
     void SpawnProjectile(
         const ServerPlayer& player,
         const AttackCommand& command);
-
-    void UpdateProjectiles(float deltaTime);
 
     void EndProjectile(
         ProjectileId projectileId,
         eProjectileEndReason reason,
         EntityId hitEntityId,
         const ServerVec3& endPosition);
+
+
+
+    void UpdatePlayerMeleeAttacks(float deltaTime);
+
+    bool BeginPlayerMeleeAttack(
+        ServerPlayer& player,
+        const AttackCommand& command);
+
+    void ResolvePlayerMeleeAttack(
+        const ServerPlayer& attacker,
+        const ServerMeleeAttack& attack);
+
+    void ResolveMonsterMeleeAttack(
+        ServerMonster& monster);
+
+    bool FindClosestProjectileHit(
+        const ServerProjectile& projectile,
+        const ServerVec3& start,
+        const ServerVec3& end,
+        ProjectileHitResult& outHit) const;
+
+    void BroadcastProjectileEnd(
+        const ServerProjectile& projectile,
+        const ProjectileHitResult& hit,
+        eProjectileEndReason reason);
+
+    void ApplyServerDamage(
+        eDamageCause cause,
+        EntityId attackerId,
+        EntityId victimId,
+        ProjectileId projectileId,
+        float damage,
+        const ServerVec3& hitPosition);
+
+    bool IsValidProjectileOrigin(
+        const ServerPlayer& player,
+        const ServerVec3& origin) const;
+
+    ServerAabb MakePlayerAabb(
+        const ServerPlayer& player) const;
+
+    ServerAabb MakeMonsterAabb(
+        const ServerMonster& monster) const;
+
 
     EntityId FindClosestAlivePlayer(
         const ServerVec3& position,
@@ -203,4 +247,9 @@ private:
 
     std::unordered_map<ProjectileId, ServerProjectile> mProjectiles;
     ProjectileId mNextProjectileId = 1;
+
+    bool mbFriendlyFire = false;
+
+    // ¸Ê º®, ±âµÕ µîÀÇ ¼­¹ö Proxy Collider
+    std::vector<ServerStaticCollider> mStaticWorldColliders;
 };

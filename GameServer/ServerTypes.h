@@ -3,6 +3,7 @@
 #include "../MyEngine_Source/Protocol.h"
 
 #include <cstdint>
+#include <string>
 #include <variant>
 
 struct ServerVec3
@@ -17,6 +18,64 @@ struct AnimationActionMeta
     float duration = 0.0f;
     float hitNormalizedTime = 0.0f;
 };
+
+struct ServerAabb
+{
+    ServerVec3 center;
+    ServerVec3 halfExtent;
+};
+
+enum class eServerHitKind : std::uint8_t
+{
+    None = 0,
+    Player,
+    Monster,
+    World,
+};
+
+struct ProjectileHitResult
+{
+    bool hit = false;
+
+    // 선분 시작점 0.0 ~ 끝점 1.0
+    float hitT = 1.0f;
+
+    eServerHitKind kind =
+        eServerHitKind::None;
+
+    EntityId entityId = 0;
+
+    ServerVec3 hitPosition;
+};
+
+struct ServerStaticCollider
+{
+    std::uint32_t colliderId = 0;
+    ServerAabb bounds;
+};
+
+
+struct ServerMeleeAttack //칼같은 무기용 앞에 특정 범위에 대하여
+{
+    bool active = false;
+    bool hitProcessed = false;
+
+    std::uint8_t attackIndex = 0;
+
+    ServerVec3 direction;
+
+    float elapsedTime = 0.0f;
+    float duration = 0.0f;
+
+    float hitNormalizedTime = 0.3f;
+
+    float damage = 15.0f;
+    float reach = 180.0f;
+
+    // 선분 주위의 공격 두께
+    float radius = 45.0f;
+};
+
 
 struct ServerPlayer
 {
@@ -40,7 +99,13 @@ struct ServerPlayer
     float colliderRadius = 25.0f;
     float colliderHalfHeight = 125.0f;
 
+    // Transform 원점과 Collider 중심이 같으면 0
+     // 모델 원점이 발바닥이면 125 정도로 조정
+    float colliderCenterOffsetY = 0.0f;
+
     float attackCooldown = 0.0f;
+
+    ServerMeleeAttack meleeAttack;
 };
 
 struct ServerMonster
@@ -61,16 +126,18 @@ struct ServerMonster
 
     float hp = 100.0f;
     float maxHp = 100.0f;
+
     bool alive = true;
 
     EntityId targetPlayerId = 0;
 
     float colliderRadius = 35.0f;
     float colliderHalfHeight = 125.0f;
+    float colliderCenterOffsetY = 0.0f;
 
-    // 순찰
     ServerVec3 patrolOrigin;
     ServerVec3 patrolTarget;
+
     bool hasPatrolTarget = false;
 
     std::string currentActionAnimation;
@@ -79,15 +146,15 @@ struct ServerMonster
     float actionDuration = 0.0f;
 
     float attackHitNormalizedTime = 0.35f;
-    bool attackHitProcessed = false;
 
-    // 복제
+    bool attackHitProcessed = true;
+    bool actionIsAttack = false;
+
     bool transformDirty = false;
     bool stateDirty = false;
 
     float moveReplicationTimer = 0.0f;
 
-    // 공격 이벤트
     bool attackEventPending = false;
 
     std::uint8_t attackIndex = 0;
@@ -95,7 +162,6 @@ struct ServerMonster
     EntityId attackTargetId = 0;
     ServerVec3 attackDirection;
 
-    // DESTROY 상태
     bool destroyRequested = false;
 };
 

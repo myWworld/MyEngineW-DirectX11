@@ -20,12 +20,13 @@ namespace ME
 {
 	SOCKET NetworkManager::mClientSocket = INVALID_SOCKET;
 	EntityId NetworkManager::mMyEntityId = 0;
+	bool NetworkManager::mbIsHost = false;
 	std::thread NetworkManager::mRecvThread = {}; // 스레드 객체
-	bool NetworkManager::mbIsConnected = false;
 	std::queue<std::vector<char>> NetworkManager::mPacketQueue = {};
 	std::mutex NetworkManager::mPacketMutex = {};
-	bool NetworkManager::mbIsHost = false;
-
+	
+	std::atomic_bool NetworkManager::mbIsConnected = false;
+	std::mutex NetworkManager::mSendMutex = {};
 
 
 	bool NetworkManager::Initialize()
@@ -71,23 +72,53 @@ namespace ME
 
 	void NetworkManager::Update()
 	{
-		std::lock_guard<std::mutex> lock(mPacketMutex);
+		std::queue<std::vector<char>> localPackets; //로컬로 스왑만 하고 락을 풀어주어 큐에 패킷을 빠르게 받아올수 있도록함
 
-		while (!mPacketQueue.empty())
 		{
-			std::vector<char> packetData = mPacketQueue.front();
-			mPacketQueue.pop();
+			std::lock_guard<std::mutex> lock(mPacketMutex);
 
-			Scene* activeScene = SceneManager::GetActiveScene();
-			if (activeScene == nullptr) continue;
+			std::swap(
+				localPackets,
+				mPacketQueue
+			);
+		}
 
-			// 씬의 리모트 플레이어 맵을 참조(&)로 가져옵니다
-			auto& remotePlayers = activeScene->GetRemotePlayers();
-			auto& remoteMonsters = activeScene->GetRemoteMonsters();
+		while (!localPackets.empty())
+		{
+			std::vector<char> packetData =
+				std::move(
+					localPackets.front()
+				);
 
-			PacketHeader* packetHeader = reinterpret_cast<PacketHeader*>(packetData.data());
+			localPackets.pop();
 
-			switch (packetHeader->type)
+			if (packetData.size() <
+				sizeof(PacketHeader))
+			{
+				continue;
+			}
+
+			PacketHeader header = {};
+
+			std::memcpy(
+				&header,
+				packetData.data(),
+				sizeof(PacketHeader)
+			);
+
+			Scene* activeScene =
+				SceneManager::GetActiveScene();
+
+			if (activeScene == nullptr)
+				continue;
+
+			auto& remotePlayers =
+				activeScene->GetRemotePlayers();
+
+			auto& remoteMonsters =
+				activeScene->GetRemoteMonsters();
+
+			switch (header.type)
 			{
 			case ePacketType::S_ASSIGN_ID:
 			{
@@ -546,6 +577,100 @@ namespace ME
 				break;
 			}
 
+			case ePacketType::S_DAMAGE:
+			{
+				if (packetData.size() !=
+					sizeof(Pkt_S_Damage))
+				{
+					break;
+				}
+
+				Pkt_S_Damage packet = {};
+
+				std::memcpy(
+					&packet,
+					packetData.data(),
+					sizeof(packet)
+				);
+
+				const bool isDead = packet.isDead != 0;
+
+				const math::Vector3 hitPosition(
+					packet.hit_x,
+					packet.hit_y,
+					packet.hit_z
+				);
+
+				if (packet.victimId ==	mMyEntityId)
+				{
+					GameObject* localPlayer =
+						activeScene
+						->GetLocalPlayer();
+
+					if (localPlayer)
+					{
+						PlayerScript* script =
+							localPlayer->GetComponent<PlayerScript>();
+
+						if (script)
+						{
+							script->ApplyServerDamage(
+								packet.remainingHp,
+								isDead,
+								hitPosition
+							);
+						}
+					}
+
+					break;
+				}
+
+				auto playerIter =
+					remotePlayers.find(
+						packet.victimId
+					);
+
+				if (playerIter != remotePlayers.end())
+				{
+					RemotePlayerScript* script =
+						playerIter->second->GetComponent<RemotePlayerScript>();
+
+					if (script)
+					{
+						script->ApplyServerDamage(
+							packet.remainingHp,
+							isDead,
+							hitPosition
+						);
+					}
+
+					break;
+				}
+
+				auto monsterIter =
+					remoteMonsters.find(
+						packet.victimId
+					);
+
+				if (monsterIter !=
+					remoteMonsters.end())
+				{
+					RemoteMonsterScript* script =
+						monsterIter->second->GetComponent<RemoteMonsterScript>();
+
+					if (script)
+					{
+						script->ApplyServerDamage(
+							packet.remainingHp,
+							isDead,
+							hitPosition
+						);
+					}
+				}
+
+				break;
+			}
+
 			default:
 				break;
 			}
@@ -553,45 +678,177 @@ namespace ME
 		
 	}
 
-	void NetworkManager::RecvThread() //백그라운드 수신 스레드
+	void NetworkManager::RecvThread()
 	{
-		char buffer[1024];
+		constexpr std::uint16_t MaxPacketSize = 4096;
 
-		while (mbIsConnected)
+		std::array<char, 4096> receiveBuffer = {};
+
+		std::vector<char> pendingBuffer;
+		pendingBuffer.reserve(8192);
+
+		while (mbIsConnected.load())
 		{
-			int recvBytes = recv(mClientSocket, buffer, sizeof(buffer), 0);
+			const int receivedBytes =
+				recv(
+					mClientSocket,
+					receiveBuffer.data(),
+					static_cast<int>(
+						receiveBuffer.size()
+						),
+					0
+				);
 
-			if (recvBytes <= 0)
+			if (receivedBytes <= 0)
 			{
-				std::cout << "서버와 연결이 끊어졌습니다." << std::endl;
-				mbIsConnected = false;
+				mbIsConnected.store(false);
 				break;
 			}
 
-			PacketHeader* header = (PacketHeader*)buffer;
-			
+			pendingBuffer.insert(
+				pendingBuffer.end(),
+				receiveBuffer.data(),
+				receiveBuffer.data() +
+				receivedBytes
+			);
+
+			std::size_t consumedBytes = 0;
+
+			while (true)
 			{
-				std::lock_guard<std::mutex> lock(mPacketMutex);
-				std::vector<char> packetData(buffer, buffer + header->size); //char형 벡터를 사용하여 정해진 길이가 아닌 가변길이로 데이터를 받을 수 있게 함
-				mPacketQueue.push(packetData);
+				const std::size_t remainingBytes =
+					pendingBuffer.size() -
+					consumedBytes;
+
+				if (remainingBytes <
+					sizeof(PacketHeader))
+				{
+					break;
+				}
+
+				PacketHeader header = {};
+
+				std::memcpy(
+					&header,
+					pendingBuffer.data() +
+					consumedBytes,
+					sizeof(PacketHeader)
+				);
+
+				if (header.size <
+					sizeof(PacketHeader) ||
+					header.size >
+					MaxPacketSize)
+				{
+					std::cout
+						<< "[Network] 잘못된 패킷 크기: "
+						<< header.size
+						<< '\n';
+
+					mbIsConnected.store(false);
+					break;
+				}
+
+				if (remainingBytes <
+					header.size)
+				{
+					break;
+				}
+
+				std::vector<char> packetData(
+					pendingBuffer.begin() +
+					consumedBytes,
+
+					pendingBuffer.begin() +
+					consumedBytes +
+					header.size
+				);
+
+				{
+					std::lock_guard<std::mutex>
+						lock(mPacketMutex);
+
+					mPacketQueue.push(
+						std::move(packetData)
+					);
+				}
+
+				consumedBytes += header.size;
 			}
-			//}
+
+			if (consumedBytes > 0)
+			{
+				pendingBuffer.erase(
+					pendingBuffer.begin(),
+					pendingBuffer.begin() +
+					consumedBytes
+				);
+			}
 		}
+	}
+
+	bool NetworkManager::SendAll(
+		const char* data,
+		int size)
+	{
+		int totalSent = 0;
+
+		while (totalSent < size)
+		{
+			const int sentBytes =
+				send(
+					mClientSocket,
+					data + totalSent,
+					size - totalSent,
+					0
+				);
+
+			if (sentBytes ==
+				SOCKET_ERROR ||
+				sentBytes <= 0)
+			{
+				return false;
+			}
+
+			totalSent +=
+				sentBytes;
+		}
+
+		return true;
 	}
 
 	void NetworkManager::Release()
 	{
-		mbIsConnected = false;
+		mbIsConnected.store(false);
 
-		if (mClientSocket != INVALID_SOCKET)
 		{
-			closesocket(mClientSocket);
-			mClientSocket = INVALID_SOCKET;
+			std::lock_guard<std::mutex> lock(mSendMutex);
+
+			if (mClientSocket !=
+				INVALID_SOCKET)
+			{
+				shutdown(
+					mClientSocket,
+					SD_BOTH
+				);
+			}
 		}
 
 		if (mRecvThread.joinable())
 		{
 			mRecvThread.join();
+		}
+
+		{
+			std::lock_guard<std::mutex> lock(mSendMutex);
+
+			if (mClientSocket !=
+				INVALID_SOCKET)
+			{
+				closesocket(mClientSocket);
+
+				mClientSocket = INVALID_SOCKET;
+			}
 		}
 
 		WSACleanup();

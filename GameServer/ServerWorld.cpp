@@ -6,10 +6,10 @@
 #include "../MyEngine_Source/IFSMContext.h"
 
 
-
 #include <algorithm>
+#include <cmath>
 #include <limits>
-#include <random>
+#include <utility>
 #include <vector>
 
 #include <chrono>
@@ -45,38 +45,15 @@ namespace
         }
     }
 
-    bool IsValidProjectileOrigin(
-        const ServerPlayer& player,
-        const ServerVec3& origin)
+    bool IsFiniteVec3(
+        const ServerVec3& value)
     {
-        if (!std::isfinite(origin.x) ||
-            !std::isfinite(origin.y) ||
-            !std::isfinite(origin.z))
-        {
-            return false;
-        }
-
-        const float dx =
-            origin.x - player.position.x;
-
-        const float dy =
-            origin.y - player.position.y;
-
-        const float dz =
-            origin.z - player.position.z;
-
-        const float distanceSquared =
-            dx * dx +
-            dy * dy +
-            dz * dz;
-
-        constexpr float MaxMuzzleDistance = 350.0f;
-
-        return distanceSquared <=
-            MaxMuzzleDistance *
-            MaxMuzzleDistance;
+        return std::isfinite(value.x) &&
+            std::isfinite(value.y) &&
+            std::isfinite(value.z);
     }
 
+    
     bool IsValidAttackIndex(
         eWeaponType weaponType,
         std::uint8_t attackIndex)
@@ -88,6 +65,287 @@ namespace
 
         case eWeaponType::Sword:
             return attackIndex < 3;
+
+        default:
+            return false;
+        }
+    }
+
+ 
+
+    float LengthSquared(const ServerVec3& value)
+    {
+        return value.x * value.x +
+            value.y * value.y +
+            value.z * value.z;
+    }
+
+    bool Normalize(ServerVec3& value)
+    {
+        const float lengthSquared =
+            LengthSquared(value);
+
+        if (!std::isfinite(lengthSquared) ||
+            lengthSquared < 0.000001f)
+        {
+            return false;
+        }
+
+        const float inverseLength =
+            1.0f / std::sqrt(lengthSquared);
+
+        value.x *= inverseLength;
+        value.y *= inverseLength;
+        value.z *= inverseLength;
+
+        return true;
+    }
+
+    bool NormalizeXZ(ServerVec3& value)
+    {
+        value.y = 0.0f;
+
+        const float lengthSquared =
+            value.x * value.x +
+            value.z * value.z;
+
+        if (!std::isfinite(lengthSquared) ||
+            lengthSquared < 0.000001f)
+        {
+            return false;
+        }
+
+        const float inverseLength =
+            1.0f / std::sqrt(lengthSquared);
+
+        value.x *= inverseLength;
+        value.z *= inverseLength;
+
+        return true;
+    }
+
+    ServerVec3 Add(
+        const ServerVec3& lhs,
+        const ServerVec3& rhs)
+    {
+        return
+        {
+            lhs.x + rhs.x,
+            lhs.y + rhs.y,
+            lhs.z + rhs.z
+        };
+    }
+
+    ServerVec3 Multiply(
+        const ServerVec3& value,
+        float scalar)
+    {
+        return
+        {
+            value.x * scalar,
+            value.y * scalar,
+            value.z * scalar
+        };
+    }
+
+    ServerVec3 PointOnSegment(
+        const ServerVec3& start,
+        const ServerVec3& end,
+        float t)
+    {
+        return
+        {
+            start.x + (end.x - start.x) * t,
+
+            start.y + (end.y - start.y) * t,
+
+            start.z + (end.z - start.z) * t
+        };
+    }
+
+    bool TestSegmentAxis(
+        float start,
+        float delta,
+        float boxMin,
+        float boxMax,
+        float& inOutMinT,
+        float& inOutMaxT)
+    {
+        constexpr float Epsilon =
+            0.000001f;
+
+        if (std::abs(delta) < Epsilon)
+        {
+            return start >= boxMin &&
+                start <= boxMax;
+        }
+
+        const float inverseDelta =
+            1.0f / delta;
+
+        float t1 =
+            (boxMin - start) *
+            inverseDelta;
+
+        float t2 =
+            (boxMax - start) *
+            inverseDelta;
+
+        if (t1 > t2)
+        {
+            std::swap(t1, t2);
+        }
+
+        inOutMinT =
+            (std::max)(inOutMinT, t1);
+
+        inOutMaxT =
+            (std::min)(inOutMaxT,t2);
+
+        return inOutMinT <= inOutMaxT;
+    }
+
+    // 총알 또는 근접공격을 선분 + 반경으로 검사
+    // 대상 AABB를 반경만큼 확장하는 방식
+    bool SegmentIntersectsAabb(
+        const ServerVec3& start,
+        const ServerVec3& end,
+        const ServerAabb& box,
+        float sweepRadius,
+        float& outHitT)
+    {
+        const ServerVec3 expandedHalfExtent =
+        {
+            box.halfExtent.x + sweepRadius,
+            box.halfExtent.y + sweepRadius,
+            box.halfExtent.z + sweepRadius
+        };
+
+        const ServerVec3 boxMin =
+        {
+            box.center.x -
+                expandedHalfExtent.x,
+
+            box.center.y -
+                expandedHalfExtent.y,
+
+            box.center.z -
+                expandedHalfExtent.z
+        };
+
+        const ServerVec3 boxMax =
+        {
+            box.center.x +
+                expandedHalfExtent.x,
+
+            box.center.y +
+                expandedHalfExtent.y,
+
+            box.center.z +
+                expandedHalfExtent.z
+        };
+
+        const ServerVec3 delta =
+        {
+            end.x - start.x,
+            end.y - start.y,
+            end.z - start.z
+        };
+
+        float minT = 0.0f;
+        float maxT = 1.0f;
+
+        if (!TestSegmentAxis(
+            start.x,
+            delta.x,
+            boxMin.x,
+            boxMax.x,
+            minT,
+            maxT))
+        {
+            return false;
+        }
+
+        if (!TestSegmentAxis(
+            start.y,
+            delta.y,
+            boxMin.y,
+            boxMax.y,
+            minT,
+            maxT))
+        {
+            return false;
+        }
+
+        if (!TestSegmentAxis(
+            start.z,
+            delta.z,
+            boxMin.z,
+            boxMax.z,
+            minT,
+            maxT))
+        {
+            return false;
+        }
+
+        outHitT = minT;
+
+        return true;
+    }
+
+    struct SwordAttackConfig
+    {
+        float duration = 0.85f;
+        float hitNormalizedTime = 0.3f;
+
+        float damage = 15.0f;
+        float reach = 180.0f;
+        float radius = 45.0f;
+
+        float cooldown = 0.45f;
+    };
+
+    bool GetSwordAttackConfig(
+        std::uint8_t attackIndex,
+        SwordAttackConfig& outConfig)
+    {
+        switch (attackIndex)
+        {
+        case 0:
+            outConfig =
+            {
+                0.85f,
+                0.30f,
+                15.0f,
+                180.0f,
+                45.0f,
+                0.45f
+            };
+            return true;
+
+        case 1:
+            outConfig =
+            {
+                0.95f,
+                0.32f,
+                18.0f,
+                190.0f,
+                50.0f,
+                0.50f
+            };
+            return true;
+
+        case 2:
+            outConfig =
+            {
+                1.10f,
+                0.35f,
+                25.0f,
+                210.0f,
+                55.0f,
+                0.65f
+            };
+            return true;
 
         default:
             return false;
@@ -400,15 +658,27 @@ void ServerWorld::ProcessCommands()
 
 void ServerWorld::Tick(float deltaTime)
 {
-    for (auto& [entityId, player] : mPlayers)
+    for (auto& [playerId, player] :
+        mPlayers)
     {
-        player.attackCooldown = (std::max)(0.0f,player.attackCooldown - deltaTime);
+        player.attackCooldown =
+            (std::max)(
+                0.0f,
+                player.attackCooldown -
+                deltaTime
+                );
     }
 
+    UpdatePlayerMeleeAttacks(deltaTime);
+
+    // 몬스터 non-loop 애니메이션 진행 및
+    // 근접 공격 타격 시점
     for (auto& [monsterId, monster] : mMonsters)
     {
         if (monster.actionDuration <= 0.0f)
+        {
             continue;
+        }
 
         monster.actionElapsedTime += deltaTime;
 
@@ -423,14 +693,15 @@ void ServerWorld::Tick(float deltaTime)
             monster.actionElapsedTime /
             monster.actionDuration;
 
-        if (!monster.attackHitProcessed &&
+        if (monster.actionIsAttack &&
+            !monster.attackHitProcessed &&
             normalizedTime >=
             monster.attackHitNormalizedTime)
         {
-            monster.attackHitProcessed = true;
+            monster.attackHitProcessed =
+                true;
 
-            // 이후 데미지 판정
-            // ResolveMonsterMeleeAttack(monster);
+            ResolveMonsterMeleeAttack(monster);
         }
     }
 
@@ -438,6 +709,7 @@ void ServerWorld::Tick(float deltaTime)
     UpdateProjectiles(deltaTime);
 
     FlushMonsterReplication(deltaTime);
+
     DespawnRequestedMonsters();
 }
 
@@ -617,14 +889,17 @@ void ServerWorld::HandleCommand(const WeaponChangeCommand& command)
 
 void ServerWorld::HandleCommand(const AttackCommand& command)
 {
-    auto iter = mPlayers.find(command.entityId);
+    auto playerIter = mPlayers.find(command.entityId);
 
-    if (iter == mPlayers.end())
+    if (playerIter == mPlayers.end())
         return;
 
-    ServerPlayer& player = iter->second;
+    ServerPlayer& player = playerIter->second;
 
     if (!player.alive)
+        return;
+
+    if (player.attackCooldown > 0.0f)
         return;
 
     if (!IsValidAttackIndex(
@@ -634,50 +909,50 @@ void ServerWorld::HandleCommand(const AttackCommand& command)
         return;
     }
 
-    // 서버 쿨타임 검증
-    if (player.attackCooldown > 0.0f)
-        return;
+    ServerVec3 direction =
+        command.direction;
 
-    ServerVec3 direction = command.direction;
-
-    const float lengthSquared =
-        direction.x * direction.x +
-        direction.y * direction.y +
-        direction.z * direction.z;
-
-    if (!IsFinite(lengthSquared) ||
-        lengthSquared < 0.000001f)
+    if (player.weaponType ==
+        eWeaponType::Sword)
     {
-        return;
+        if (!NormalizeXZ(direction))
+            return;
     }
-
-    const float inverseLength =
-        1.0f / std::sqrt(lengthSquared);
-
-    direction.x *= inverseLength;
-    direction.y *= inverseLength;
-    direction.z *= inverseLength;
+    else
+    {
+        if (!Normalize(direction))
+            return;
+    }
 
     AttackCommand normalizedCommand = command;
+
     normalizedCommand.direction = direction;
 
-    // 무기별 서버 쿨타임
-    switch (player.weaponType)
+    if (player.weaponType ==
+        eWeaponType::Gun)
     {
-    case eWeaponType::Gun:
         player.attackCooldown = 0.2f;
-        break;
 
-    case eWeaponType::Sword:
-        player.attackCooldown = 0.5f;
-        break;
-
-    default:
+        SpawnProjectile(
+            player,
+            normalizedCommand
+        );
+    }
+    else if (player.weaponType ==
+        eWeaponType::Sword)
+    {
+        if (!BeginPlayerMeleeAttack(player,normalizedCommand))
+        {
+            return;
+        }
+    }
+    else
+    {
         return;
     }
 
-    // 원격 플레이어 공격 애니메이션
-    Pkt_S_Attack attackPacket =
+    // 다른 클라이언트에서 공격 애니메이션 재생
+    const Pkt_S_Attack attackPacket =
         MakeAttackPacket(
             player,
             normalizedCommand
@@ -687,16 +962,6 @@ void ServerWorld::HandleCommand(const AttackCommand& command)
         player.entityId,
         attackPacket
     );
-
-    // 총이면 서버 총알 생성
-    if (player.weaponType ==
-        eWeaponType::Gun)
-    {
-        SpawnProjectile(
-            player,
-            normalizedCommand
-        );
-    }
 }
 
 void ServerWorld::UpdateMonsters(float deltaTime)
@@ -731,69 +996,112 @@ void ServerWorld::UpdateMonsters(float deltaTime)
 
 void ServerWorld::UpdateProjectiles(float deltaTime)
 {
-    std::vector<ProjectileId> expiredProjectiles;
+    std::vector<ProjectileId> removeProjectiles;
 
-    for (auto& [projectileId, projectile] : mProjectiles)
+    for (auto& [projectileId, projectile] :mProjectiles)
     {
-        projectile.previousPosition =
-            projectile.position;
+        const ServerVec3 start = projectile.position;
 
-        projectile.position.x +=
-            projectile.velocity.x *
-            deltaTime;
+        const ServerVec3 end =
+        {
+            projectile.position.x +
+                projectile.velocity.x *
+                deltaTime,
 
-        projectile.position.y +=
-            projectile.velocity.y *
-            deltaTime;
+            projectile.position.y +
+                projectile.velocity.y *
+                deltaTime,
 
-        projectile.position.z +=
-            projectile.velocity.z *
-            deltaTime;
+            projectile.position.z +
+                projectile.velocity.z *
+                deltaTime
+        };
 
-        projectile.remainingLife -=
-            deltaTime;
+        projectile.previousPosition = start;
+
+        ProjectileHitResult hit = {};
+
+        if (FindClosestProjectileHit( //가까운 플레이어와 충돌한 경우
+            projectile,
+            start,
+            end,
+            hit))
+        {
+            projectile.position =
+                hit.hitPosition;
+
+            eProjectileEndReason endReason =
+                eProjectileEndReason::HitWorld;//벽이나 기둥같은거
+
+            if (hit.kind ==
+                eServerHitKind::Player)
+            {
+                endReason =
+                    eProjectileEndReason::HitPlayer;
+            }
+            else if (hit.kind ==
+                eServerHitKind::Monster)
+            {
+                endReason =
+                    eProjectileEndReason::HitMonster;
+            }
+
+            BroadcastProjectileEnd(
+                projectile,
+                hit,
+                endReason
+            );
+
+            if (hit.kind ==
+                eServerHitKind::Player ||
+                hit.kind ==
+                eServerHitKind::Monster)
+            {
+                ApplyServerDamage(
+                    eDamageCause::Projectile,
+                    projectile.ownerEntityId,
+                    hit.entityId,
+                    projectile.projectileId,
+                    projectile.damage,
+                    hit.hitPosition
+                );
+            }
+
+            removeProjectiles.push_back(
+                projectileId
+            );
+
+            continue;
+        }
+
+        projectile.position = end;
+
+        projectile.remainingLife -=  deltaTime;
 
         if (projectile.remainingLife <= 0.0f)
         {
-            expiredProjectiles.push_back(projectileId);
+            ProjectileHitResult expired = {};
+
+            expired.hitPosition =
+                projectile.position;
+
+            BroadcastProjectileEnd(
+                projectile,
+                expired,
+                eProjectileEndReason::Expired
+            );
+
+            removeProjectiles.push_back(
+                projectileId
+            );
         }
     }
 
-    for (ProjectileId projectileId :  expiredProjectiles)
+    for (ProjectileId projectileId : removeProjectiles)
     {
-        auto iter = mProjectiles.find(projectileId);
-
-        if (iter == mProjectiles.end())
-            continue;
-
-        Pkt_S_ProjectileEnd packet = {};
-
-        packet.header.type =
-            ePacketType::S_PROJECTILE_END;
-
-        packet.header.size =
-            sizeof(Pkt_S_ProjectileEnd);
-
-        packet.projectileId =
-            projectileId;
-
-        packet.reason =
-            eProjectileEndReason::Expired;
-
-        packet.hitEntityId = 0;
-
-        packet.end_x =
-            iter->second.position.x;
-
-        packet.end_y =
-            iter->second.position.y;
-
-        packet.end_z =
-            iter->second.position.z;
-
-        BroadcastExcept(0, packet);
-
-        mProjectiles.erase(iter);
+        mProjectiles.erase(
+            projectileId
+        );
     }
 }
 
@@ -801,56 +1109,51 @@ void ServerWorld::SpawnProjectile(
     const ServerPlayer& player,
     const AttackCommand& command)
 {
-    constexpr float BulletSpeed = 2000.0f;
-    constexpr float BulletLifeTime = 8.0f;
-    constexpr float MuzzleHeight = 120.0f;
-    constexpr float MuzzleForwardOffset = 60.0f;
+    constexpr float BulletSpeed =
+        1000.0f;
 
-    ServerVec3 direction = command.direction;
-    ServerVec3 spawnPosition = command.origin;
+    constexpr float BulletLifeTime =
+        8.0f;
 
+    ServerVec3 spawnPosition =
+        command.origin;
 
     if (!IsValidProjectileOrigin(
         player,
         spawnPosition))
     {
-        // 이상한 총구 위치면 서버 기준으로 대체
-        constexpr float MuzzleHeight = 70.0f;
-        constexpr float MuzzleForwardOffset = 60.0f;
+        constexpr float MuzzleHeight =
+            100.0f;
+
+        constexpr float ForwardOffset =
+            60.0f;
 
         spawnPosition =
         {
             player.position.x +
                 command.direction.x *
-                MuzzleForwardOffset,
+                ForwardOffset,
 
             player.position.y +
                 MuzzleHeight +
                 command.direction.y *
-                MuzzleForwardOffset,
+                ForwardOffset,
 
             player.position.z +
                 command.direction.z *
-                MuzzleForwardOffset
+                ForwardOffset
         };
     }
-
-    // HandleCommand에서 이미 정규화했지만
-    // 방어적으로 다시 검사
-    const float lengthSquared =
-        direction.x * direction.x +
-        direction.y * direction.y +
-        direction.z * direction.z;
-
-    if (lengthSquared < 0.000001f)
-        return;
-
-    const ProjectileId projectileId = mNextProjectileId++;
 
     ServerProjectile projectile = {};
 
     projectile.projectileId =
-        projectileId;
+        mNextProjectileId++;
+
+    if (mNextProjectileId == 0)
+    {
+        mNextProjectileId = 1;
+    }
 
     projectile.ownerEntityId =
         player.entityId;
@@ -863,9 +1166,14 @@ void ServerWorld::SpawnProjectile(
 
     projectile.velocity =
     {
-        direction.x * BulletSpeed,
-        direction.y * BulletSpeed,
-        direction.z * BulletSpeed
+        command.direction.x *
+            BulletSpeed,
+
+        command.direction.y *
+            BulletSpeed,
+
+        command.direction.z *
+            BulletSpeed
     };
 
     projectile.radius = 3.0f;
@@ -874,31 +1182,79 @@ void ServerWorld::SpawnProjectile(
         BulletLifeTime;
 
     mProjectiles.emplace(
-        projectileId,
+        projectile.projectileId,
         projectile
     );
 
     Pkt_S_ProjectileSpawn packet = {};
 
-    packet.header.type = ePacketType::S_PROJECTILE_SPAWN;
+    packet.header.type =
+        ePacketType::S_PROJECTILE_SPAWN;
 
-    packet.header.size = sizeof(Pkt_S_ProjectileSpawn);
+    packet.header.size =
+        sizeof(Pkt_S_ProjectileSpawn);
 
-    packet.projectileId = projectile.projectileId;
+    packet.projectileId =
+        projectile.projectileId;
 
-    packet.ownerEntityId = projectile.ownerEntityId;
+    packet.ownerEntityId =
+        projectile.ownerEntityId;
 
-    packet.start_x =projectile.position.x;
-    packet.start_y =projectile.position.y;
-    packet.start_z = projectile.position.z;
+    packet.start_x =
+        projectile.position.x;
 
-    packet.velocity_x =projectile.velocity.x;
-    packet.velocity_y =projectile.velocity.y;
-    packet.velocity_z = projectile.velocity.z;
+    packet.start_y =
+        projectile.position.y;
 
-    packet.lifeTime = projectile.remainingLife;
+    packet.start_z =
+        projectile.position.z;
 
-    // 발사한 클라이언트를 포함한 모든 클라이언트에게 보낸다.
+    packet.velocity_x =
+        projectile.velocity.x;
+
+    packet.velocity_y =
+        projectile.velocity.y;
+
+    packet.velocity_z =
+        projectile.velocity.z;
+
+    packet.lifeTime =
+        projectile.remainingLife;
+
+    // 발사자 포함 모두에게 전송
+    BroadcastExcept(0, packet);
+}
+
+void ServerWorld::BroadcastProjectileEnd(
+    const ServerProjectile& projectile,
+    const ProjectileHitResult& hit,
+    eProjectileEndReason reason)
+{
+    Pkt_S_ProjectileEnd packet = {};
+
+    packet.header.type =
+        ePacketType::S_PROJECTILE_END;
+
+    packet.header.size =
+        sizeof(Pkt_S_ProjectileEnd);
+
+    packet.projectileId =
+        projectile.projectileId;
+
+    packet.reason = reason;
+
+    packet.hitEntityId =
+        hit.entityId;
+
+    packet.end_x =
+        hit.hitPosition.x;
+
+    packet.end_y =
+        hit.hitPosition.y;
+
+    packet.end_z =
+        hit.hitPosition.z;
+
     BroadcastExcept(0, packet);
 }
 
@@ -911,6 +1267,614 @@ void ServerWorld::EndProjectile(
 
 }
 
+bool ServerWorld::FindClosestProjectileHit(
+    const ServerProjectile& projectile,
+    const ServerVec3& start,
+    const ServerVec3& end,
+    ProjectileHitResult& outHit) const
+{
+    outHit = {};
+
+    float closestT = 1.0f;
+
+    auto testTarget =
+        [&](const ServerAabb& box,
+            eServerHitKind kind,
+            EntityId entityId)
+        {
+            float hitT = 0.0f;
+
+            if (!SegmentIntersectsAabb(
+                start,
+                end,
+                box,
+                projectile.radius,
+                hitT))
+            {
+                return;
+            }
+
+            if (hitT >= closestT)
+                return;
+
+            closestT = hitT;
+
+            outHit.hit = true;
+            outHit.hitT = hitT;
+            outHit.kind = kind;
+            outHit.entityId = entityId;
+
+            outHit.hitPosition =
+                PointOnSegment(
+                    start,
+                    end,
+                    hitT
+                );
+        };
+
+    // 벽, 기둥 등의 정적 Proxy
+    for (const ServerStaticCollider& collider : mStaticWorldColliders)
+    {
+        testTarget(
+            collider.bounds,
+            eServerHitKind::World,
+            0
+        );
+    }
+
+    const bool ownerIsPlayer =
+        mPlayers.find(
+            projectile.ownerEntityId)
+        != mPlayers.end();
+
+    const bool ownerIsMonster =
+        mMonsters.find(
+            projectile.ownerEntityId)
+        != mMonsters.end();
+
+    if (ownerIsPlayer)
+    {
+        // 플레이어 총알은 몬스터를 맞힌다
+        for (const auto& [monsterId, monster] : mMonsters)
+        {
+            if (!monster.alive)
+                continue;
+
+            testTarget(
+                MakeMonsterAabb(monster),
+                eServerHitKind::Monster,
+                monsterId
+            );
+        }
+
+        if (mbFriendlyFire)
+        {
+            for (const auto& [playerId, player] : mPlayers)
+            {
+                if (!player.alive ||
+                    playerId ==
+                    projectile.ownerEntityId)
+                {
+                    continue;
+                }
+
+                testTarget(
+                    MakePlayerAabb(player),
+                    eServerHitKind::Player,
+                    playerId
+                );
+            }
+        }
+    }
+    else if (ownerIsMonster)
+    {
+        // 몬스터 투사체는 플레이어를 맞힌다
+        for (const auto& [playerId, player] : mPlayers)
+        {
+            if (!player.alive)
+                continue;
+
+            testTarget(
+                MakePlayerAabb(player),
+                eServerHitKind::Player,
+                playerId
+            );
+        }
+    }
+
+    return outHit.hit;
+}
+
+bool ServerWorld::IsValidProjectileOrigin(
+    const ServerPlayer& player,
+    const ServerVec3& origin) const
+{
+    if (!IsFiniteVec3(origin))
+        return false;
+
+    const float dx =
+        origin.x - player.position.x;
+
+    const float dy =
+        origin.y - player.position.y;
+
+    const float dz =
+        origin.z - player.position.z;
+
+    const float distanceSquared =
+        dx * dx +
+        dy * dy +
+        dz * dz;
+
+    constexpr float MaxMuzzleDistance =
+        350.0f;
+
+    return distanceSquared <=
+        MaxMuzzleDistance *
+        MaxMuzzleDistance;
+}
+
+
+ServerAabb ServerWorld::MakePlayerAabb(const ServerPlayer& player) const
+{
+    ServerAabb result = {};
+
+    result.center =
+    {
+        player.position.x,
+        player.position.y +
+            player.colliderCenterOffsetY,
+        player.position.z
+    };
+
+    result.halfExtent =
+    {
+        player.colliderRadius,
+        player.colliderHalfHeight,
+        player.colliderRadius
+    };
+
+    return result;
+}
+
+ServerAabb ServerWorld::MakeMonsterAabb(const ServerMonster& monster) const
+{
+    ServerAabb result = {};
+
+    result.center =
+    {
+        monster.position.x,
+        monster.position.y +
+            monster.colliderCenterOffsetY,
+        monster.position.z
+    };
+
+    result.halfExtent =
+    {
+        monster.colliderRadius,
+        monster.colliderHalfHeight,
+        monster.colliderRadius
+    };
+
+    return result;
+}
+
+void ServerWorld::UpdatePlayerMeleeAttacks(float deltaTime)
+{
+    for (auto& [playerId, player] : mPlayers)
+    {
+        ServerMeleeAttack& attack =
+            player.meleeAttack;
+
+        if (!player.alive ||
+            !attack.active)
+        {
+            continue;
+        }
+
+        attack.elapsedTime += deltaTime;
+
+        const float normalizedTime =
+            attack.duration > 0.0f
+            ? attack.elapsedTime /
+            attack.duration
+            : 1.0f;
+
+        if (!attack.hitProcessed &&
+            normalizedTime >=
+            attack.hitNormalizedTime) //콜라이더 활성화시점이 경우 충돌체크
+        {
+            attack.hitProcessed = true;
+
+            ResolvePlayerMeleeAttack(
+                player,
+                attack
+            );
+        }
+
+        if (attack.elapsedTime >= attack.duration)
+        {
+            attack.active = false;
+        }
+    }
+}
+
+bool ServerWorld::BeginPlayerMeleeAttack(
+    ServerPlayer& player,
+    const AttackCommand& command)
+{
+    SwordAttackConfig config = {};
+
+    if (!GetSwordAttackConfig(
+        command.attackIndex,
+        config))
+    {
+        return false;
+    }
+
+    ServerVec3 direction = command.direction;
+
+    if (!NormalizeXZ(direction))
+        return false;
+
+    ServerMeleeAttack attack = {};
+
+    attack.active = true;
+    attack.hitProcessed = false;
+
+    attack.attackIndex =
+        command.attackIndex;
+
+    attack.direction =
+        direction;
+
+    attack.elapsedTime = 0.0f;
+    attack.duration =
+        config.duration;
+
+    attack.hitNormalizedTime =
+        config.hitNormalizedTime;
+
+    attack.damage =
+        config.damage;
+
+    attack.reach =
+        config.reach;
+
+    attack.radius =
+        config.radius;
+
+    player.meleeAttack =
+        attack;
+
+    player.attackCooldown =
+        config.cooldown;
+
+    return true;
+}
+
+void ServerWorld::ResolvePlayerMeleeAttack(
+    const ServerPlayer& attacker,
+    const ServerMeleeAttack& attack)
+{
+    // 몸 중심보다 조금 위에서 검 Sweep 시작
+    ServerVec3 start =
+        attacker.position;
+
+    start.y += 80.0f;
+
+    const ServerVec3 end =
+        Add(start,
+            Multiply(
+                attack.direction,
+                attack.reach
+            )
+        );
+
+    for (const auto& [monsterId, monster] : mMonsters)
+    {
+        if (!monster.alive)
+            continue;
+
+        float hitT = 0.0f;
+
+        if (!SegmentIntersectsAabb(
+            start,
+            end,
+            MakeMonsterAabb(monster),
+            attack.radius,
+            hitT))
+        {
+            continue;
+        }
+
+        const ServerVec3 hitPosition =
+            PointOnSegment(
+                start,
+                end,
+                hitT
+            );
+
+        ApplyServerDamage(
+            eDamageCause::PlayerMelee,
+            attacker.entityId,
+            monsterId,
+            0,
+            attack.damage,
+            hitPosition
+        );
+    }
+
+    if (!mbFriendlyFire)
+        return;
+
+    for (const auto& [playerId, player] : mPlayers)
+    {
+        if (!player.alive ||
+            playerId == attacker.entityId)
+        {
+            continue;
+        }
+
+        float hitT = 0.0f;
+
+        if (!SegmentIntersectsAabb(
+            start,
+            end,
+            MakePlayerAabb(player),
+            attack.radius,
+            hitT))
+        {
+            continue;
+        }
+
+        ApplyServerDamage(
+            eDamageCause::PlayerMelee,
+            attacker.entityId,
+            playerId,
+            0,
+            attack.damage,
+            PointOnSegment(
+                start,
+                end,
+                hitT
+            )
+        );
+    }
+}
+
+void ServerWorld::ResolveMonsterMeleeAttack(
+    ServerMonster& monster)
+{
+    ServerPlayer* target =
+        FindAlivePlayer(
+            monster.attackTargetId
+        );
+
+    if (target == nullptr)
+        return;
+
+    ServerVec3 direction =
+        monster.attackDirection;
+
+    if (!NormalizeXZ(direction))
+    {
+        direction =
+        {
+            target->position.x -
+                monster.position.x,
+
+            0.0f,
+
+            target->position.z -
+                monster.position.z
+        };
+
+        if (!NormalizeXZ(direction))
+            return;
+    }
+
+    ServerVec3 start =
+        monster.position;
+
+    start.y += 80.0f;
+
+    constexpr float AttackReach =
+        170.0f;
+
+    constexpr float AttackRadius =
+        50.0f;
+
+    constexpr float AttackDamage =
+        10.0f;
+
+    const ServerVec3 end =
+        Add(
+            start,
+            Multiply(
+                direction,
+                AttackReach
+            )
+        );
+
+    float hitT = 0.0f;
+
+    if (!SegmentIntersectsAabb(
+        start,
+        end,
+        MakePlayerAabb(*target),
+        AttackRadius,
+        hitT))
+    {
+        return;
+    }
+
+    ApplyServerDamage(
+        eDamageCause::MonsterMelee,
+        monster.entityId,
+        target->entityId,
+        0,
+        AttackDamage,
+        PointOnSegment(
+            start,
+            end,
+            hitT
+        )
+    );
+}
+
+void ServerWorld::ApplyServerDamage(
+    eDamageCause cause,
+    EntityId attackerId,
+    EntityId victimId,
+    ProjectileId projectileId,
+    float damage,
+    const ServerVec3& hitPosition)
+{
+    if (damage <= 0.0f)
+        return;
+
+    float appliedDamage = 0.0f;
+    float remainingHp = 0.0f;
+
+    bool isDead = false;
+    bool foundVictim = false;
+
+    auto playerIter = mPlayers.find(victimId);
+
+    if (playerIter != mPlayers.end())
+    {
+        ServerPlayer& victim = playerIter->second;
+
+        if (!victim.alive)
+            return;
+
+        appliedDamage =
+            (std::min)(
+                damage,
+                victim.hp
+                );
+
+        victim.hp =
+            (std::max)(
+                0.0f,
+                victim.hp - damage
+                );
+
+        remainingHp = victim.hp;
+
+        if (victim.hp <= 0.0f)
+        {
+            victim.alive = false;
+            victim.state =
+                ePlayerState::DEATH;
+
+            isDead = true;
+        }
+
+        foundVictim = true;
+    }
+    else
+    {
+        auto monsterIter = mMonsters.find(victimId);
+
+        if (monsterIter ==
+            mMonsters.end())
+        {
+            return;
+        }
+
+        ServerMonster& victim =
+            monsterIter->second;
+
+        if (!victim.alive)
+            return;
+
+        appliedDamage =
+            (std::min)(
+                damage,
+                victim.hp
+                );
+
+        victim.hp =
+            (std::max)(
+                0.0f,
+                victim.hp - damage
+                );
+
+        remainingHp =
+            victim.hp;
+
+        auto brainIter =
+            mMonsterBrains.find(
+                victimId
+            );
+
+        if (victim.hp <= 0.0f)
+        {
+            victim.alive = false;
+            isDead = true;
+
+            if (brainIter !=
+                mMonsterBrains.end())
+            {
+                brainIter->second->SendFSMEvent("DEATH");
+            }
+        }
+        else
+        {
+            if (brainIter !=
+                mMonsterBrains.end())
+            {
+                brainIter->second->SendFSMEvent("DAMAGE");
+            }
+        }
+
+        foundVictim = true;
+    }
+
+    if (!foundVictim)
+        return;
+
+    Pkt_S_Damage packet = {};
+
+    packet.header.type =
+        ePacketType::S_DAMAGE;
+
+    packet.header.size =
+        sizeof(Pkt_S_Damage);
+
+    packet.cause = cause;
+
+    packet.projectileId =
+        projectileId;
+
+    packet.attackerId =
+        attackerId;
+
+    packet.victimId =
+        victimId;
+
+    packet.damage =
+        appliedDamage;
+
+    packet.remainingHp =
+        remainingHp;
+
+    packet.isDead =
+        isDead ? 1 : 0;
+
+    packet.hit_x =
+        hitPosition.x;
+
+    packet.hit_y =
+        hitPosition.y;
+
+    packet.hit_z =
+        hitPosition.z;
+
+    BroadcastExcept(0, packet);
+}
 
 void ServerWorld::SendMonsterSnapshotTo( //클라이언트마다 몬스터 생성하게 함
     EntityId targetPlayerId)
@@ -1303,8 +2267,8 @@ void ServerWorld::BeginMonsterMeleeAttack(ServerMonster& monster, const std::vec
     monster.attackHitNormalizedTime =
         animationMeta->hitNormalizedTime;
 
-    monster.attackHitProcessed =
-        false;
+    monster.actionIsAttack = true;
+    monster.attackHitProcessed = false;
 
 
     monster.state = attackIndex == 0 ? eMonsterState::ATTACK_1: attackIndex == 1 ? eMonsterState::ATTACK_2 : eMonsterState::ATTACK_3;
