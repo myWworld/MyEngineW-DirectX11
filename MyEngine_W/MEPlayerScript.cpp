@@ -129,36 +129,52 @@ namespace ME
 
     void PlayerScript::OnPrimaryAction()
     {
-        if (!mbHoldingWeapon || mEquippedWeapon == nullptr)
+        if (!mbHoldingWeapon ||
+            mEquippedWeapon == nullptr)
+        {
             return;
+        }
 
         WeaponAttackInfo attackInfo = {};
 
-
         mEquippedWeapon->SetIsAttackEnd(false);
 
-
-        // 실제 공격이 시작된 경우에만 패킷 전송
         if (!mEquippedWeapon->Use(attackInfo))
             return;
 
         mState = State::Attack;
 
-        Vector3 aimDirection = GetAimDirection();
-
-        if (aimDirection.LengthSquared() > 0.0001f)
-        {
-            aimDirection.Normalize();
-        }
-
         Pkt_C_Attack packet = {};
 
         packet.header.type = ePacketType::C_ATTACK;
+
         packet.attackIndex = attackInfo.attackIndex;
 
-        packet.dir_x = aimDirection.x;
-        packet.dir_y = aimDirection.y;
-        packet.dir_z = aimDirection.z;
+        if (attackInfo.hasProjectile)
+        {
+            packet.origin_x = attackInfo.projectileOrigin.x;
+            packet.origin_y = attackInfo.projectileOrigin.y;
+            packet.origin_z = attackInfo.projectileOrigin.z;
+
+            packet.dir_x = attackInfo.projectileDirection.x;
+            packet.dir_y = attackInfo.projectileDirection.y;
+            packet.dir_z = attackInfo.projectileDirection.z;
+        }
+        else
+        {
+  
+            math::Vector3 direction =  GetAimDirection();
+
+            if (direction.LengthSquared() >
+                0.0001f)
+            {
+                direction.Normalize();
+            }
+
+            packet.dir_x = direction.x;
+            packet.dir_y = direction.y;
+            packet.dir_z = direction.z;
+        }
 
         NetworkManager::SendPacket(&packet);
     }

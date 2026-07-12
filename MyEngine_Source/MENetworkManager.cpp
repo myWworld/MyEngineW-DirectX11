@@ -14,6 +14,7 @@
 #include "../MyEngine_Source/MEFSMBrain.h"
 #include "../MyEngine_W/MERemoteMonsterScript.h"
 #include "../MyEngine_W/MEWeaponScript.h"
+#include "../MyEngine_W/MEProjectileVisualManager.h"
 
 namespace ME
 {
@@ -498,6 +499,48 @@ namespace ME
 
 				activeScene->EraseRemoteMonster(
 					packet->entityId
+				);
+
+				break;
+			}
+
+			case ePacketType::S_PROJECTILE_SPAWN:
+			{
+				const Pkt_S_ProjectileSpawn* packet =
+					reinterpret_cast<const Pkt_S_ProjectileSpawn*>(packetData.data());
+
+				ProjectileVisualManager::Spawn(
+					packet->projectileId,
+					packet->ownerEntityId,
+					math::Vector3(
+						packet->start_x,
+						packet->start_y,
+						packet->start_z
+					),
+					math::Vector3(
+						packet->velocity_x,
+						packet->velocity_y,
+						packet->velocity_z
+					),
+					packet->lifeTime
+				);
+
+				break;
+			}
+
+			case ePacketType::S_PROJECTILE_END:
+			{
+				const Pkt_S_ProjectileEnd* packet =
+					reinterpret_cast<const Pkt_S_ProjectileEnd*>(packetData.data());
+
+				ProjectileVisualManager::End(
+					packet->projectileId,
+					math::Vector3(
+						packet->end_x,
+						packet->end_y,
+						packet->end_z
+					),
+					packet->reason
 				);
 
 				break;

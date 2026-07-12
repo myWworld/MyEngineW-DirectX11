@@ -19,11 +19,9 @@ float ServerMonsterFSMContext::GetDeltaTime() const
     return mDeltaTime;
 }
 
-bool ServerMonsterFSMContext::DetectTarget(
-    float radius)
+bool ServerMonsterFSMContext::DetectTarget(float radius)
 {
-    const EntityId targetId =
-        mWorld.FindClosestAlivePlayer(mMonster.position, radius);
+    const EntityId targetId = mWorld.FindClosestAlivePlayer(mMonster.position, radius);
 
     mMonster.targetPlayerId = targetId;
 
@@ -37,8 +35,7 @@ bool ServerMonsterFSMContext::HasTarget() const
 
 float ServerMonsterFSMContext::GetTargetDistanceSquared() const
 {
-    const ServerPlayer* target =
-        mWorld.FindAlivePlayer(mMonster.targetPlayerId);
+    const ServerPlayer* target = mWorld.FindAlivePlayer(mMonster.targetPlayerId);
 
     if (target == nullptr)
     {

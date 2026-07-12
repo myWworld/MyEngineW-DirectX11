@@ -84,6 +84,12 @@
     <ClInclude Include="MERemoteMonsterScript.h">
       <Filter>Script\Player</Filter>
     </ClInclude>
+    <ClInclude Include="MEProjectileVisualManager.h">
+      <Filter>Script\Others</Filter>
+    </ClInclude>
+    <ClInclude Include="MENetworkProjectileScript.h">
+      <Filter>Script\Others</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Contents">
@@ -192,6 +198,12 @@
     </ClCompile>
     <ClCompile Include="MERemoteMonsterScript.cpp">
       <Filter>Script\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="MEProjectileVisualManager.cpp">
+      <Filter>Script\Others</Filter>
+    </ClCompile>
+    <ClCompile Include="MENetworkProjectileScript.cpp">
+      <Filter>Script\Others</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

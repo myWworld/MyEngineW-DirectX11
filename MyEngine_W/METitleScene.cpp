@@ -36,6 +36,7 @@
 #include "../MyEngine_Source/MEUIHUD.h"
 #include "../MyEngine_Source/MENetworkManager.h"
 #include "../MyEngine_Source/Protocol.h"
+#include "MEProjectileVisualManager.h"
 
 extern ME::Application application;
 
@@ -147,6 +148,7 @@ namespace ME
 		}
 
 
+		ProjectileVisualManager::Initialize(100);
 
 		UIManager::Push(enums::eUIType::Button);
 

@@ -14,6 +14,14 @@ namespace ME
 		// 검이면 0, 1, 2가 각각
 		// SWORDATTACK1, SWORDATTACK2, SWORDATTACK3
 		std::uint8_t attackIndex = 0;
+
+		bool hasProjectile = false;
+
+		math::Vector3 projectileOrigin =
+			math::Vector3::Zero;
+
+		math::Vector3 projectileDirection =
+			math::Vector3::Forward;
 	};
 
 	class ActorScript;

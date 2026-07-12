@@ -99,6 +99,20 @@ struct ServerMonster
     bool destroyRequested = false;
 };
 
+struct ServerProjectile
+{
+    ProjectileId projectileId = 0;
+    EntityId ownerEntityId = 0;
+
+    ServerVec3 previousPosition;
+    ServerVec3 position;
+    ServerVec3 velocity;
+
+    float radius = 3.0f;
+    float damage = 5.0f;
+    float remainingLife = 8.0f;
+};
+
 struct EnterCommand
 {
     EntityId entityId = 0;
@@ -148,6 +162,7 @@ struct AttackCommand
 
     std::uint8_t attackIndex = 0;
 
+    ServerVec3 origin;
     ServerVec3 direction;
 };
 

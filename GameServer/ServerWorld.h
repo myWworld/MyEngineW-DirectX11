@@ -112,9 +112,19 @@ private:
   
 
     void UpdateMonsters(float deltaTime);
+
+
+    void SpawnProjectile(
+        const ServerPlayer& player,
+        const AttackCommand& command);
+
     void UpdateProjectiles(float deltaTime);
 
-
+    void EndProjectile(
+        ProjectileId projectileId,
+        eProjectileEndReason reason,
+        EntityId hitEntityId,
+        const ServerVec3& endPosition);
 
     EntityId FindClosestAlivePlayer(
         const ServerVec3& position,
@@ -190,4 +200,7 @@ private:
     AllocateEntityIdCallback  mAllocateEntityIdCallback;
 
     std::atomic<bool> mbInitialized = false;
+
+    std::unordered_map<ProjectileId, ServerProjectile> mProjectiles;
+    ProjectileId mNextProjectileId = 1;
 };

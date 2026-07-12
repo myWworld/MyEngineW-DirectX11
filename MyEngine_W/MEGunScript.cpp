@@ -56,10 +56,10 @@ namespace ME
 			mWeaponTransform = GetOwner()->GetComponent<Transform>();
 		}
 
-		mBulletPool = std::make_unique<ObjectPool<GameObject>>(50, [this]()->GameObject*
-		{
-			return this->makeBullet();
-		});
+		//mBulletPool = std::make_unique<ObjectPool<GameObject>>(50, [this]()->GameObject*
+		//{
+		//	return this->makeBullet();
+		//});
 	}
 	void GunScript::Update()
 	{
@@ -98,29 +98,44 @@ namespace ME
 	bool GunScript::Use(WeaponAttackInfo& outAttackInfo)
 	{
 
-		if (Fire())
+		if (!mbCanShoot)
 		{
-			outAttackInfo.attackIndex = 0;
-			return true;
+			mbIsAttackEnd = true;
+			return false;
 		}
 
-		return false;
+		if (!BuildShotInfo(outAttackInfo))
+		{
+			mbIsAttackEnd = true;
+			return false;
+		}
+
+		mbCanShoot = false;
+		mCoolDownTimer = 0.0f;
+		mbIsAttackEnd = true;
 	}
 
 	bool GunScript::Fire()
 	{
-		if (mbCanShoot)
+	/*	if (!mbCanShoot)
 		{
-			shootBullet();
-			mbCanShoot = false;
-			mCoolDownTimer = 0.0f;
-			
 			mbIsAttackEnd = true;
-			return true;
+			return false;
 		}
 
+		if (!BuildShotInfo(outAttackInfo))
+		{
+			mbIsAttackEnd = true;
+			return false;
+		}
+
+		mbCanShoot = false;
+		mCoolDownTimer = 0.0f;
 		mbIsAttackEnd = true;
-		return false;
+
+		return false;*/
+
+		return true;
 	}
 
 	void GunScript::adjustGunPos()
@@ -144,6 +159,46 @@ namespace ME
 		//}
 	
 	
+	}
+
+	bool GunScript::BuildShotInfo(WeaponAttackInfo& outAttackInfo) //기존 총알 발사는 클라이언트전용 -> 네트웨크는 방향, 위치등만 계산
+	{
+		if (mWeaponTransform == nullptr)
+		{
+			mWeaponTransform =
+				GetOwner()->GetComponent<Transform>();
+		}
+
+		if (mWeaponTransform == nullptr)
+			return false;
+
+		if (mActorScript == nullptr)
+			return false;
+
+		math::Vector3 direction = mActorScript->GetAimDirection();
+
+		direction.y = 0.0f;
+
+		if (direction.LengthSquared() < 0.0001f)
+		{
+			return false;
+		}
+
+		direction.Normalize();
+
+		math::Vector3 origin = mWeaponTransform->GetPosition();
+		constexpr float MuzzleForwardOffset = 20.0f;
+
+		origin += direction * MuzzleForwardOffset;
+
+		outAttackInfo.attackIndex = 0;
+		outAttackInfo.hasProjectile = true;
+
+		outAttackInfo.projectileOrigin = origin;
+
+		outAttackInfo.projectileDirection = direction;
+
+		return true;
 	}
 
 	GameObject* GunScript::makeBullet()

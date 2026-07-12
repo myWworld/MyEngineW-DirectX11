@@ -3,6 +3,8 @@
 
 
 using EntityId = std::uint32_t;
+using ProjectileId = std::uint32_t;
+
 #pragma pack(push, 1) //1바이트 단위로 메모리를 압축 (네트워크 낭비 방지 및 직렬화 필수)
 
 //C_ 패킷: 클라이언트가 서버에게 요청/보고하는 패킷
@@ -29,8 +31,8 @@ enum class ePacketType : std::uint16_t
     C_WEAPON_CHANGE = 12,
     S_WEAPON_CHANGE = 13,
 
-    C_Bullet_Spawn = 14,
-    S_Bullet_Spawn = 14,
+    S_PROJECTILE_SPAWN = 14,
+    S_PROJECTILE_END = 15,
 
     S_MONSTER_STATE = 20,
     S_MONSTER_SPAWN = 21,
@@ -80,6 +82,14 @@ enum class eWeaponType : std::uint32_t
     Gun = 2,
     Gauntlet = 3,
     None = 4,
+};
+
+enum class eProjectileEndReason : std::uint8_t
+{
+    Expired = 0,
+    HitWorld = 1,
+    HitPlayer = 2,
+    HitMonster = 3
 };
 
 struct PacketHeader
@@ -193,6 +203,9 @@ struct Pkt_C_Attack
 
     std::uint8_t attackIndex;
 
+    float origin_x;//총구용 방향
+    float origin_y;
+    float origin_z;
 
     float dir_x; //넉백 방향
     float dir_y;
@@ -283,6 +296,43 @@ struct Pkt_S_MonsterDespawn
     PacketHeader header;
 
     EntityId entityId;
+};
+
+
+// 서버 -> 클라이언트: 발사체 스폰 // 클라이언트 요청은 C_ATTACK으로 들어올때 서버가 받아서 무기 종류에 따라 처리
+struct Pkt_S_ProjectileSpawn
+{
+    PacketHeader header;
+
+    ProjectileId projectileId;
+    EntityId ownerEntityId;
+
+    float start_x;
+    float start_y;
+    float start_z;
+
+    float velocity_x;
+    float velocity_y;
+    float velocity_z;
+
+    float lifeTime;
+};
+
+
+struct Pkt_S_ProjectileEnd
+{
+    PacketHeader header;
+
+    ProjectileId projectileId;
+
+    eProjectileEndReason reason;
+
+    // 맞은 대상이 없다면 0
+    EntityId hitEntityId;
+
+    float end_x;
+    float end_y;
+    float end_z;
 };
 
 #pragma pack(pop)

@@ -27,12 +27,11 @@ namespace ME
 
 		~ObjectPool()
 		{
-			while(!mPool.empty())
+			while (!mPool.empty())
 			{
-				T* obj = mPool.front();
 				mPool.pop();
-				delete obj;
 			}
+
 			mInstantiateFunc = nullptr;
 		}
 

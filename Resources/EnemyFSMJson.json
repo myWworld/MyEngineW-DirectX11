@@ -77,15 +77,23 @@
         }
       ],
       "Transitions": [
-        {
-          "Decision": {
-            "Type": "DistanceDecision",
-            "TargetDist": 140.0
-          },
-          "TrueState": "ATTACK",
-          "FalseState": "TRACE"
-        }
-      ]
+      {
+        "Decision": {
+          "Type": "DetectTargetDecision",
+          "DetectRadius": 3000.0
+        },
+        "TrueState": null,
+        "FalseState": "IDLE"
+      },
+      {
+        "Decision": {
+          "Type": "DistanceDecision",
+          "TargetDist": 140.0
+        },
+        "TrueState": "ATTACK",
+        "FalseState": null
+      }
+  ] 
     },
     {
       "Name": "ATTACK",
@@ -102,7 +110,7 @@
             "Type": "AnimFinishDecision"
           },
           "TrueState": "TRACE",
-          "FalseState": "ATTACK"
+          "FalseState": null
         }
       ]
     },

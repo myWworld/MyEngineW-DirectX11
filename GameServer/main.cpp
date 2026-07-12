@@ -91,6 +91,14 @@ void HandleClient(SOCKET clientSocket, EntityId clientId, ServerWorld& world)
 			AttackCommand command = {};
 
 			command.entityId = clientId;
+
+			command.origin =
+			{
+				packet->origin_x,
+				packet->origin_y,
+				packet->origin_z
+			};
+
 			command.direction =
 			{
 				packet->dir_x,

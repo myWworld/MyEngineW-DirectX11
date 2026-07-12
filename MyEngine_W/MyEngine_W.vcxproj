@@ -34,6 +34,8 @@
     <ClInclude Include="MELoadingScene.h" />
     <ClInclude Include="MELoadScene.h" />
     <ClInclude Include="MEMeleeAttackTask.h" />
+    <ClInclude Include="MENetworkProjectileScript.h" />
+    <ClInclude Include="MEProjectileVisualManager.h" />
     <ClInclude Include="MEPlayAnimTask.h" />
     <ClInclude Include="MEPlayer.h" />
     <ClInclude Include="MEPlayerScript.h" />
@@ -64,6 +66,8 @@
     <ClCompile Include="MEGunScript.cpp" />
     <ClCompile Include="MELoadingScene.cpp" />
     <ClCompile Include="MEMeleeAttackTask.cpp" />
+    <ClCompile Include="MENetworkProjectileScript.cpp" />
+    <ClCompile Include="MEProjectileVisualManager.cpp" />
     <ClCompile Include="MEPlayAnimTask.cpp" />
     <ClCompile Include="MEPlayer.cpp" />
     <ClCompile Include="MEPlayerScript.cpp" />

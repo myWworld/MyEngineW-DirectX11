@@ -45,6 +45,38 @@ namespace
         }
     }
 
+    bool IsValidProjectileOrigin(
+        const ServerPlayer& player,
+        const ServerVec3& origin)
+    {
+        if (!std::isfinite(origin.x) ||
+            !std::isfinite(origin.y) ||
+            !std::isfinite(origin.z))
+        {
+            return false;
+        }
+
+        const float dx =
+            origin.x - player.position.x;
+
+        const float dy =
+            origin.y - player.position.y;
+
+        const float dz =
+            origin.z - player.position.z;
+
+        const float distanceSquared =
+            dx * dx +
+            dy * dy +
+            dz * dz;
+
+        constexpr float MaxMuzzleDistance = 350.0f;
+
+        return distanceSquared <=
+            MaxMuzzleDistance *
+            MaxMuzzleDistance;
+    }
+
     bool IsValidAttackIndex(
         eWeaponType weaponType,
         std::uint8_t attackIndex)
@@ -602,6 +634,10 @@ void ServerWorld::HandleCommand(const AttackCommand& command)
         return;
     }
 
+    // 서버 쿨타임 검증
+    if (player.attackCooldown > 0.0f)
+        return;
+
     ServerVec3 direction = command.direction;
 
     const float lengthSquared =
@@ -625,7 +661,23 @@ void ServerWorld::HandleCommand(const AttackCommand& command)
     AttackCommand normalizedCommand = command;
     normalizedCommand.direction = direction;
 
-    Pkt_S_Attack packet =
+    // 무기별 서버 쿨타임
+    switch (player.weaponType)
+    {
+    case eWeaponType::Gun:
+        player.attackCooldown = 0.2f;
+        break;
+
+    case eWeaponType::Sword:
+        player.attackCooldown = 0.5f;
+        break;
+
+    default:
+        return;
+    }
+
+    // 원격 플레이어 공격 애니메이션
+    Pkt_S_Attack attackPacket =
         MakeAttackPacket(
             player,
             normalizedCommand
@@ -633,12 +685,18 @@ void ServerWorld::HandleCommand(const AttackCommand& command)
 
     BroadcastExcept(
         player.entityId,
-        packet
+        attackPacket
     );
 
-    // 다음 단계:
-    // if (player.weaponType == eWeaponType::Gun)
-    //     SpawnProjectile(player, normalizedCommand);
+    // 총이면 서버 총알 생성
+    if (player.weaponType ==
+        eWeaponType::Gun)
+    {
+        SpawnProjectile(
+            player,
+            normalizedCommand
+        );
+    }
 }
 
 void ServerWorld::UpdateMonsters(float deltaTime)
@@ -673,6 +731,184 @@ void ServerWorld::UpdateMonsters(float deltaTime)
 
 void ServerWorld::UpdateProjectiles(float deltaTime)
 {
+    std::vector<ProjectileId> expiredProjectiles;
+
+    for (auto& [projectileId, projectile] : mProjectiles)
+    {
+        projectile.previousPosition =
+            projectile.position;
+
+        projectile.position.x +=
+            projectile.velocity.x *
+            deltaTime;
+
+        projectile.position.y +=
+            projectile.velocity.y *
+            deltaTime;
+
+        projectile.position.z +=
+            projectile.velocity.z *
+            deltaTime;
+
+        projectile.remainingLife -=
+            deltaTime;
+
+        if (projectile.remainingLife <= 0.0f)
+        {
+            expiredProjectiles.push_back(projectileId);
+        }
+    }
+
+    for (ProjectileId projectileId :  expiredProjectiles)
+    {
+        auto iter = mProjectiles.find(projectileId);
+
+        if (iter == mProjectiles.end())
+            continue;
+
+        Pkt_S_ProjectileEnd packet = {};
+
+        packet.header.type =
+            ePacketType::S_PROJECTILE_END;
+
+        packet.header.size =
+            sizeof(Pkt_S_ProjectileEnd);
+
+        packet.projectileId =
+            projectileId;
+
+        packet.reason =
+            eProjectileEndReason::Expired;
+
+        packet.hitEntityId = 0;
+
+        packet.end_x =
+            iter->second.position.x;
+
+        packet.end_y =
+            iter->second.position.y;
+
+        packet.end_z =
+            iter->second.position.z;
+
+        BroadcastExcept(0, packet);
+
+        mProjectiles.erase(iter);
+    }
+}
+
+void ServerWorld::SpawnProjectile(
+    const ServerPlayer& player,
+    const AttackCommand& command)
+{
+    constexpr float BulletSpeed = 2000.0f;
+    constexpr float BulletLifeTime = 8.0f;
+    constexpr float MuzzleHeight = 120.0f;
+    constexpr float MuzzleForwardOffset = 60.0f;
+
+    ServerVec3 direction = command.direction;
+    ServerVec3 spawnPosition = command.origin;
+
+
+    if (!IsValidProjectileOrigin(
+        player,
+        spawnPosition))
+    {
+        // 이상한 총구 위치면 서버 기준으로 대체
+        constexpr float MuzzleHeight = 70.0f;
+        constexpr float MuzzleForwardOffset = 60.0f;
+
+        spawnPosition =
+        {
+            player.position.x +
+                command.direction.x *
+                MuzzleForwardOffset,
+
+            player.position.y +
+                MuzzleHeight +
+                command.direction.y *
+                MuzzleForwardOffset,
+
+            player.position.z +
+                command.direction.z *
+                MuzzleForwardOffset
+        };
+    }
+
+    // HandleCommand에서 이미 정규화했지만
+    // 방어적으로 다시 검사
+    const float lengthSquared =
+        direction.x * direction.x +
+        direction.y * direction.y +
+        direction.z * direction.z;
+
+    if (lengthSquared < 0.000001f)
+        return;
+
+    const ProjectileId projectileId = mNextProjectileId++;
+
+    ServerProjectile projectile = {};
+
+    projectile.projectileId =
+        projectileId;
+
+    projectile.ownerEntityId =
+        player.entityId;
+
+    projectile.previousPosition =
+        spawnPosition;
+
+    projectile.position =
+        spawnPosition;
+
+    projectile.velocity =
+    {
+        direction.x * BulletSpeed,
+        direction.y * BulletSpeed,
+        direction.z * BulletSpeed
+    };
+
+    projectile.radius = 3.0f;
+    projectile.damage = 5.0f;
+    projectile.remainingLife =
+        BulletLifeTime;
+
+    mProjectiles.emplace(
+        projectileId,
+        projectile
+    );
+
+    Pkt_S_ProjectileSpawn packet = {};
+
+    packet.header.type = ePacketType::S_PROJECTILE_SPAWN;
+
+    packet.header.size = sizeof(Pkt_S_ProjectileSpawn);
+
+    packet.projectileId = projectile.projectileId;
+
+    packet.ownerEntityId = projectile.ownerEntityId;
+
+    packet.start_x =projectile.position.x;
+    packet.start_y =projectile.position.y;
+    packet.start_z = projectile.position.z;
+
+    packet.velocity_x =projectile.velocity.x;
+    packet.velocity_y =projectile.velocity.y;
+    packet.velocity_z = projectile.velocity.z;
+
+    packet.lifeTime = projectile.remainingLife;
+
+    // 발사한 클라이언트를 포함한 모든 클라이언트에게 보낸다.
+    BroadcastExcept(0, packet);
+}
+
+void ServerWorld::EndProjectile(
+    ProjectileId projectileId,
+    eProjectileEndReason reason,
+    EntityId hitEntityId,
+    const ServerVec3& endPosition)
+{
+
 }
 
 
@@ -822,8 +1058,7 @@ EntityId ServerWorld::FindClosestAlivePlayer(
     return closestId;
 }
 
-ServerPlayer* ServerWorld::FindAlivePlayer(
-    EntityId entityId)
+ServerPlayer* ServerWorld::FindAlivePlayer(EntityId entityId)
 {
     auto iter = mPlayers.find(entityId);
 

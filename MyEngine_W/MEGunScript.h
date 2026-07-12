@@ -26,6 +26,7 @@ namespace ME
 		bool Use(WeaponAttackInfo& outAttackInfo) override;
 		bool Fire();
 
+		bool BuildShotInfo(WeaponAttackInfo& outAttackInfo);
 	private:
 
 
