@@ -482,14 +482,11 @@ namespace ME
 					break;
 
 				RemoteMonsterScript* script =
-					iter->second
-					->GetComponent<RemoteMonsterScript>();
+					iter->second->GetComponent<RemoteMonsterScript>();
 
 				if (script)
 				{
-					script->ApplyState(
-						packet->state
-					);
+					script->ApplyState(packet->state);
 				}
 
 				break;

@@ -968,28 +968,35 @@ void ServerWorld::UpdateMonsters(float deltaTime)
 {
     for (auto& [monsterId, monster] : mMonsters)
     {
-        if (!monster.alive &&
-            monster.state != eMonsterState::DEATH)
-        {
-            auto brainIter = mMonsterBrains.find(monsterId);
+        auto brainIter =
+            mMonsterBrains.find(
+                monsterId
+            );
 
-            if (brainIter != mMonsterBrains.end())
-            {
-                brainIter->second->SendFSMEvent("DEATH");
-            }
+        if (brainIter ==
+            mMonsterBrains.end())
+        {
+            continue;
         }
 
-        auto brainIter = mMonsterBrains.find(monsterId);
-
-        if (brainIter == mMonsterBrains.end())
-            continue;
-
+        // 이번 Tick에만 유효한 Context
         ServerMonsterFSMContext context(
             *this,
             monster,
             deltaTime
         );
 
+        if (!monster.alive &&
+            monster.state !=
+            eMonsterState::DEATH)
+        {
+            // 현재 Update 바깥이므로
+            // pending 상태로 들어간다
+            brainIter->second->SendFSMEvent("DEATH");
+        }
+
+        // 여기서 pending DAMAGE/DEATH 상태가
+        // 유효한 context와 함께 적용된다.
         brainIter->second->Update(context);
     }
 }
@@ -2390,19 +2397,19 @@ void ServerWorld::InitializeMonsterAnimationMeta()
     mMonsterAnimationMeta["MONSTER_ATTACK"] =
     {
         1.1f,
-        0.2f
+        0.1f
     };
 
     mMonsterAnimationMeta["MONSTER_ATTACK2"] =
     {
         4.63f,
-        0.42f
+        0.25f
     };
 
     mMonsterAnimationMeta["MONSTER_ATTACK3"] =
     {
         3.7f,
-        0.30f
+        0.45f
     };
 
     mMonsterAnimationMeta["MONSTER_HIT"] =
